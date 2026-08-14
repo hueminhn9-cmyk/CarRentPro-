@@ -1,0 +1,115 @@
+:root {
+  /* Brand Primary Palette: Navy Blue - Xanh Navy */
+  --primary-color: #1e3a8a;
+  --primary-hover: #1d4ed8;
+  --primary-light: #f0f3ff;
+  --primary-border: #c7d2fe;
+  
+  /* Secondary / Highlight Palette: Gold - Vàng Gold */
+  --secondary-color: #d97706;
+  --secondary-hover: #b45309;
+  --secondary-light: #fffbeb;
+  --secondary-border: #fde68a;
+
+  /* Accent / Action / Alert Palette: Red - Đỏ Crimson */
+  --accent-color: #dc2626;
+  --accent-hover: #b91c1c;
+  --accent-light: #fef2f2;
+  --accent-border: #fecaca;
+  
+  /* Background & Surface Tones */
+  --background-color: #f8fafc;
+  --surface-lowest: #ffffff;
+  --surface-low: #f1f5f9;
+  --surface-container: #e2e8f0;
+  --surface-high: #cbd5e1;
+  --surface-highest: #94a3b8;
+  
+  /* Text Tones */
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --outline-color: #64748b;
+  --outline-variant: #cbd5e1;
+  
+  /* Semantic Statuses */
+  --color-success: #059669;
+  --color-success-bg: #ecfdf5;
+  --color-success-border: #a7f3d0;
+  
+  --color-warning: #d97706;
+  --color-warning-bg: #fffbeb;
+  --color-warning-border: #fde68a;
+  
+  --color-error: #dc2626;
+  --color-error-bg: #fef2f2;
+  --color-error-border: #fecaca;
+  
+  --color-info: #1e3a8a;
+  --color-info-bg: #f0f3ff;
+  --color-info-border: #c7d2fe;
+
+  --border-radius: 8px;
+  --transition-speed: 0.3s;
+}
+
+body {
+  margin: 0;
+  font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface-low);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--outline-variant);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--outline-color);
+}
+
+/* Micro-animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn var(--transition-speed) ease-out forwards;
+}
+
+.hover-lift {
+  transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, border-color var(--transition-speed) ease;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+}
+
+.card-img-zoom {
+  transition: transform 0.4s ease;
+}
+
+.hover-lift:hover .card-img-zoom {
+  transform: scale(1.05);
+}

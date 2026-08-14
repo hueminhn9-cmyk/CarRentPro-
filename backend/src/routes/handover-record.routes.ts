@@ -1,0 +1,15 @@
+import { Router } from 'express';
+import { HandoverRecordController } from '../controllers/handover-record.controller.js';
+import { authenticate, authorize } from '../middlewares/auth.js';
+
+const router = Router();
+
+router.use(authenticate);
+
+router.get('/', authorize('ADMIN', 'MANAGER'), HandoverRecordController.getAll);
+router.get('/:id', HandoverRecordController.getById);
+router.post('/', authorize('ADMIN', 'MANAGER'), HandoverRecordController.create);
+router.put('/:id', authorize('ADMIN', 'MANAGER'), HandoverRecordController.update);
+router.delete('/:id', authorize('ADMIN'), HandoverRecordController.delete);
+
+export default router;

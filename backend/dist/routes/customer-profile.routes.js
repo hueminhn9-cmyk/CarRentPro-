@@ -1,0 +1,11 @@
+import { Router } from 'express';
+import { CustomerProfileController } from '../controllers/customer-profile.controller.js';
+import { authenticate, authorize } from '../middlewares/auth.js';
+const router = Router();
+router.use(authenticate);
+router.get('/', authorize('ADMIN'), CustomerProfileController.getAll);
+router.get('/:id', CustomerProfileController.getById);
+router.post('/', authorize('ADMIN'), CustomerProfileController.create);
+router.put('/:id', CustomerProfileController.update);
+router.delete('/:id', authorize('ADMIN'), CustomerProfileController.delete);
+export default router;

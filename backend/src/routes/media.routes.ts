@@ -1,0 +1,18 @@
+import { Router } from 'express';
+import { MediaController } from '../controllers/media.controller.js';
+import { upload } from '../config/multer.js';
+import { authenticate, authorize } from '../middlewares/auth.js';
+
+const router = Router();
+
+router.use(authenticate);
+
+router.post('/upload', upload.single('file'), MediaController.uploadFile);
+router.get('/', MediaController.getAllFiles);
+router.get('/entity/:entityType/:entityId', MediaController.getEntityFiles);
+router.get('/:id', MediaController.getFileById);
+router.delete('/:id', MediaController.deleteFile);
+router.put('/:id', MediaController.updateFile);
+router.put('/:id/primary', authorize('ADMIN'), MediaController.setPrimaryImage);
+
+export default router;

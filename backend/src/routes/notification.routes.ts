@@ -1,0 +1,19 @@
+import { Router } from 'express';
+import { NotificationController } from '../controllers/notification.controller.js';
+import { authenticate, authorize } from '../middlewares/auth.js';
+
+const router = Router();
+
+router.use(authenticate);
+
+router.get('/', NotificationController.getNotifications);
+router.get('/unread-count', NotificationController.getUnreadCount);
+router.get('/:id', NotificationController.getNotificationById);
+router.post('/broadcast', authorize('ADMIN'), NotificationController.broadcast);
+router.post('/', authorize('ADMIN'), NotificationController.createNotification);
+router.put('/mark-all-read', NotificationController.markAllAsRead);
+router.put('/:id/read', NotificationController.markAsRead);
+router.put('/:id', authorize('ADMIN'), NotificationController.updateNotification);
+router.delete('/:id', authorize('ADMIN'), NotificationController.deleteNotification);
+
+export default router;

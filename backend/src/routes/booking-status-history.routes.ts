@@ -1,0 +1,15 @@
+import { Router } from 'express';
+import { BookingStatusHistoryController } from '../controllers/booking-status-history.controller.js';
+import { authenticate, authorize } from '../middlewares/auth.js';
+
+const router = Router();
+
+router.use(authenticate);
+
+router.get('/', BookingStatusHistoryController.getAll);
+router.get('/:id', BookingStatusHistoryController.getById);
+router.post('/', authorize('ADMIN'), BookingStatusHistoryController.create);
+router.put('/:id', authorize('ADMIN'), BookingStatusHistoryController.update);
+router.delete('/:id', authorize('ADMIN'), BookingStatusHistoryController.delete);
+
+export default router;
