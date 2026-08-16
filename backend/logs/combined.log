@@ -758,3 +758,234 @@ Can't reach database server at `127.0.0.1:3306`
 
 Please make sure your database server is running at `127.0.0.1:3306`.
 [2026-08-14 23:00:20] [INFO]: [0mGET /api/vehicles [31m503[0m 2027.188 ms - 129[0m
+[2026-08-16 23:52:50] [INFO]: Swagger API documentation initialized under /api-docs
+[2026-08-16 23:52:50] [INFO]: Server started successfully on port 5000 in development mode
+[2026-08-16 23:53:04] [INFO]: [0mGET / [32m200[0m 1.651 ms - 144[0m
+[2026-08-16 23:53:08] [INFO]: [0mGET /api/vehicles [32m200[0m 28.645 ms - 9523[0m
+[2026-08-16 23:58:41] [INFO]: [0mGET /api/vehicles [32m200[0m 11.185 ms - 9523[0m
+[2026-08-16 23:58:41] [INFO]: [0mGET /api/vehicles [36m304[0m 8.649 ms - -[0m
+[2026-08-16 23:58:57] [INFO]: [0mGET /api/vehicles [36m304[0m 6.703 ms - -[0m
+[2026-08-16 23:58:57] [INFO]: [0mGET /api/vehicles [36m304[0m 6.184 ms - -[0m
+[2026-08-17 00:00:23] [INFO]: [AUTH] User logged in: admin@autorent.vn
+[2026-08-17 00:00:23] [INFO]: [0mPOST /api/auth/login [32m200[0m 192.296 ms - 647[0m
+[2026-08-17 00:00:23] [INFO]: [0mGET /api/bookings [32m200[0m 24.323 ms - 15665[0m
+[2026-08-17 00:00:23] [INFO]: [0mGET /api/bookings [36m304[0m 19.219 ms - -[0m
+[2026-08-17 00:00:23] [INFO]: [0mGET /api/dashboard/stats [32m200[0m 118.809 ms - 6734[0m
+[2026-08-17 00:00:24] [INFO]: [0mGET /api/dashboard/stats [36m304[0m 117.590 ms - -[0m
+[2026-08-17 00:00:35] [INFO]: [0mGET /api/bookings [36m304[0m 14.329 ms - -[0m
+[2026-08-17 00:00:35] [INFO]: [0mGET /api/bookings [36m304[0m 13.745 ms - -[0m
+[2026-08-17 00:00:35] [INFO]: [0mGET /api/dashboard/stats [36m304[0m 50.898 ms - -[0m
+[2026-08-17 00:00:35] [INFO]: [0mGET /api/dashboard/stats [36m304[0m 38.652 ms - -[0m
+[2026-08-17 00:00:40] [INFO]: [AUTH] Token logged out / revoked
+[2026-08-17 00:00:40] [INFO]: [0mPOST /api/auth/logout [32m200[0m 26.495 ms - 55[0m
+[2026-08-17 00:00:48] [INFO]: [0mGET /api/vehicles [36m304[0m 7.343 ms - -[0m
+[2026-08-17 00:00:48] [INFO]: [0mGET /api/vehicles [36m304[0m 6.368 ms - -[0m
+[2026-08-17 00:00:49] [INFO]: [0mGET /api/vehicles [36m304[0m 4.672 ms - -[0m
+[2026-08-17 00:00:49] [INFO]: [0mGET /api/vehicles [36m304[0m 7.832 ms - -[0m
+[2026-08-17 00:00:52] [INFO]: [0mGET /api/vehicles/28 [32m200[0m 5.013 ms - 1002[0m
+[2026-08-17 00:00:52] [INFO]: [0mGET /api/vehicles/28 [36m304[0m 5.429 ms - -[0m
+[2026-08-17 00:01:27] [INFO]: [AUTH] User logged in: admin@autorent.vn
+[2026-08-17 00:01:27] [INFO]: [0mPOST /api/auth/login [32m200[0m 97.464 ms - 647[0m
+[2026-08-17 00:01:27] [INFO]: [0mGET /api/vehicles/28 [36m304[0m 4.902 ms - -[0m
+[2026-08-17 00:01:27] [INFO]: [0mGET /api/vehicles/28 [36m304[0m 6.783 ms - -[0m
+[2026-08-17 00:01:27] [INFO]: [0mGET /api/bookings [36m304[0m 13.343 ms - -[0m
+[2026-08-17 00:01:27] [INFO]: [0mGET /api/bookings [36m304[0m 14.635 ms - -[0m
+[2026-08-17 00:01:27] [INFO]: [0mGET /api/dashboard/stats [36m304[0m 60.276 ms - -[0m
+[2026-08-17 00:01:27] [INFO]: [0mGET /api/dashboard/stats [36m304[0m 44.156 ms - -[0m
+[2026-08-17 00:01:36] [INFO]: [0mGET /api/vehicles [36m304[0m 5.985 ms - -[0m
+[2026-08-17 00:01:36] [INFO]: [0mGET /api/vehicles [36m304[0m 6.244 ms - -[0m
+[2026-08-17 00:01:39] [INFO]: [0mGET /api/bookings [36m304[0m 8.729 ms - -[0m
+[2026-08-17 00:01:39] [INFO]: [0mGET /api/bookings [36m304[0m 8.615 ms - -[0m
+[2026-08-17 00:01:39] [INFO]: [0mGET /api/dashboard/stats [36m304[0m 43.386 ms - -[0m
+[2026-08-17 00:01:39] [INFO]: [0mGET /api/dashboard/stats [36m304[0m 32.245 ms - -[0m
+[2026-08-17 00:03:10] [INFO]: [0mGET /api/users [32m200[0m 9.329 ms - 7928[0m
+[2026-08-17 00:03:10] [INFO]: [0mGET /api/users [36m304[0m 7.953 ms - -[0m
+[2026-08-17 00:03:10] [INFO]: [0mGET /api/users [36m304[0m 11.457 ms - -[0m
+[2026-08-17 00:03:10] [INFO]: [0mGET /api/users [36m304[0m 10.218 ms - -[0m
+[2026-08-17 00:03:11] [INFO]: [0mGET /api/vehicles [36m304[0m 5.363 ms - -[0m
+[2026-08-17 00:03:11] [INFO]: [0mGET /api/vehicles [36m304[0m 8.547 ms - -[0m
+[2026-08-17 00:03:12] [INFO]: [0mGET /api/bookings [36m304[0m 10.129 ms - -[0m
+[2026-08-17 00:03:12] [INFO]: [0mGET /api/bookings [36m304[0m 10.779 ms - -[0m
+[2026-08-17 00:03:12] [INFO]: [0mGET /api/users [36m304[0m 5.266 ms - -[0m
+[2026-08-17 00:03:12] [INFO]: [0mGET /api/users [36m304[0m 8.423 ms - -[0m
+[2026-08-17 00:03:13] [INFO]: [0mGET /api/dashboard/stats [36m304[0m 35.694 ms - -[0m
+[2026-08-17 00:03:13] [INFO]: [0mGET /api/dashboard/stats [36m304[0m 36.332 ms - -[0m
+[2026-08-17 00:03:13] [INFO]: [0mGET /api/maintenance [32m200[0m 7.373 ms - 7835[0m
+[2026-08-17 00:03:13] [INFO]: [0mGET /api/maintenance [36m304[0m 6.886 ms - -[0m
+[2026-08-17 00:03:14] [INFO]: [0mGET /api/contracts [32m200[0m 10.852 ms - 5497[0m
+[2026-08-17 00:03:14] [INFO]: [0mGET /api/contracts [36m304[0m 8.795 ms - -[0m
+[2026-08-17 00:03:16] [INFO]: [0mGET /api/bookings [36m304[0m 8.017 ms - -[0m
+[2026-08-17 00:03:16] [INFO]: [0mGET /api/bookings [36m304[0m 8.724 ms - -[0m
+[2026-08-17 00:03:16] [INFO]: [0mGET /api/dashboard/stats [36m304[0m 43.262 ms - -[0m
+[2026-08-17 00:03:16] [INFO]: [0mGET /api/dashboard/stats [36m304[0m 35.127 ms - -[0m
+[2026-08-17 00:03:19] [INFO]: [0mGET /api/contracts [36m304[0m 8.054 ms - -[0m
+[2026-08-17 00:03:19] [INFO]: [0mGET /api/contracts [36m304[0m 10.478 ms - -[0m
+[2026-08-17 00:03:19] [INFO]: [0mGET /api/maintenance [36m304[0m 10.782 ms - -[0m
+[2026-08-17 00:03:19] [INFO]: [0mGET /api/maintenance [36m304[0m 6.813 ms - -[0m
+[2026-08-17 00:03:19] [INFO]: [0mGET /api/dashboard/stats [36m304[0m 42.627 ms - -[0m
+[2026-08-17 00:03:19] [INFO]: [0mGET /api/dashboard/stats [36m304[0m 39.370 ms - -[0m
+[2026-08-17 00:03:19] [INFO]: [0mGET /api/users [36m304[0m 5.947 ms - -[0m
+[2026-08-17 00:03:19] [INFO]: [0mGET /api/users [36m304[0m 6.114 ms - -[0m
+[2026-08-17 00:03:19] [INFO]: [0mGET /api/bookings [36m304[0m 7.345 ms - -[0m
+[2026-08-17 00:03:19] [INFO]: [0mGET /api/bookings [36m304[0m 12.592 ms - -[0m
+[2026-08-17 00:03:20] [INFO]: [0mGET /api/vehicles [36m304[0m 9.198 ms - -[0m
+[2026-08-17 00:03:20] [INFO]: [0mGET /api/vehicles [36m304[0m 9.261 ms - -[0m
+[2026-08-17 00:03:20] [INFO]: [0mGET /api/users [36m304[0m 4.351 ms - -[0m
+[2026-08-17 00:03:20] [INFO]: [0mGET /api/users [36m304[0m 7.218 ms - -[0m
+[2026-08-17 00:03:20] [INFO]: [0mGET /api/users [36m304[0m 4.527 ms - -[0m
+[2026-08-17 00:03:20] [INFO]: [0mGET /api/users [36m304[0m 9.056 ms - -[0m
+[2026-08-17 00:03:20] [INFO]: [0mGET /api/bookings [36m304[0m 10.978 ms - -[0m
+[2026-08-17 00:03:20] [INFO]: [0mGET /api/bookings [36m304[0m 15.649 ms - -[0m
+[2026-08-17 00:03:20] [INFO]: [0mGET /api/dashboard/stats [36m304[0m 53.789 ms - -[0m
+[2026-08-17 00:03:20] [INFO]: [0mGET /api/dashboard/stats [36m304[0m 38.814 ms - -[0m
+[2026-08-17 00:03:22] [INFO]: [0mGET /api/bookings [36m304[0m 10.276 ms - -[0m
+[2026-08-17 00:03:22] [INFO]: [0mGET /api/bookings [36m304[0m 10.924 ms - -[0m
+[2026-08-17 00:03:22] [INFO]: [0mGET /api/dashboard/stats [36m304[0m 45.096 ms - -[0m
+[2026-08-17 00:03:22] [INFO]: [0mGET /api/dashboard/stats [36m304[0m 40.085 ms - -[0m
+[2026-08-17 00:03:27] [INFO]: [0mGET /api/vehicles [36m304[0m 4.947 ms - -[0m
+[2026-08-17 00:03:27] [INFO]: [0mGET /api/vehicles [36m304[0m 4.935 ms - -[0m
+[2026-08-17 00:03:30] [INFO]: [0mGET /api/bookings [36m304[0m 8.789 ms - -[0m
+[2026-08-17 00:03:30] [INFO]: [0mGET /api/bookings [36m304[0m 8.228 ms - -[0m
+[2026-08-17 00:03:30] [INFO]: [0mGET /api/dashboard/stats [36m304[0m 35.795 ms - -[0m
+[2026-08-17 00:03:30] [INFO]: [0mGET /api/dashboard/stats [36m304[0m 26.623 ms - -[0m
+[2026-08-17 00:06:50] [INFO]: [0mGET /api/vehicles [36m304[0m 8.454 ms - -[0m
+[2026-08-17 00:06:50] [INFO]: [0mGET /api/vehicles [36m304[0m 9.059 ms - -[0m
+[2026-08-17 00:06:54] [INFO]: [0mGET /api/bookings [36m304[0m 21.203 ms - -[0m
+[2026-08-17 00:06:54] [INFO]: [0mGET /api/bookings [36m304[0m 6.538 ms - -[0m
+[2026-08-17 00:06:54] [INFO]: [0mGET /api/dashboard/stats [36m304[0m 37.471 ms - -[0m
+[2026-08-17 00:06:54] [INFO]: [0mGET /api/dashboard/stats [36m304[0m 34.571 ms - -[0m
+[2026-08-17 00:06:55] [INFO]: [0mGET /api/users [36m304[0m 6.919 ms - -[0m
+[2026-08-17 00:06:55] [INFO]: [0mGET /api/users [36m304[0m 6.294 ms - -[0m
+[2026-08-17 00:06:55] [INFO]: [0mGET /api/users [36m304[0m 6.641 ms - -[0m
+[2026-08-17 00:06:55] [INFO]: [0mGET /api/users [36m304[0m 4.954 ms - -[0m
+[2026-08-17 00:06:59] [INFO]: [0mGET /api/vehicles [36m304[0m 4.711 ms - -[0m
+[2026-08-17 00:06:59] [INFO]: [0mGET /api/vehicles [36m304[0m 6.529 ms - -[0m
+[2026-08-17 00:07:00] [INFO]: [0mGET /api/bookings [36m304[0m 9.767 ms - -[0m
+[2026-08-17 00:07:00] [INFO]: [0mGET /api/bookings [36m304[0m 10.534 ms - -[0m
+[2026-08-17 00:07:01] [INFO]: [0mGET /api/users [36m304[0m 4.139 ms - -[0m
+[2026-08-17 00:07:01] [INFO]: [0mGET /api/users [36m304[0m 6.092 ms - -[0m
+[2026-08-17 00:07:02] [INFO]: [0mGET /api/dashboard/stats [36m304[0m 21.950 ms - -[0m
+[2026-08-17 00:07:02] [INFO]: [0mGET /api/dashboard/stats [33m429[0m 0.580 ms - 111[0m
+[2026-08-17 00:07:02] [INFO]: [0mGET /api/maintenance [33m429[0m 0.229 ms - 111[0m
+[2026-08-17 00:07:02] [INFO]: [0mGET /api/maintenance [33m429[0m 0.146 ms - 111[0m
+[2026-08-17 00:07:03] [INFO]: [0mGET /api/contracts [33m429[0m 0.230 ms - 111[0m
+[2026-08-17 00:07:03] [INFO]: [0mGET /api/contracts [33m429[0m 0.199 ms - 111[0m
+[2026-08-17 00:07:07] [INFO]: [0mGET /api/dashboard/stats [33m429[0m 0.264 ms - 111[0m
+[2026-08-17 00:07:07] [INFO]: [0mGET /api/bookings [33m429[0m 0.244 ms - 111[0m
+[2026-08-17 00:07:07] [INFO]: [0mGET /api/dashboard/stats [33m429[0m 0.270 ms - 111[0m
+[2026-08-17 00:07:07] [INFO]: [0mGET /api/bookings [33m429[0m 0.440 ms - 111[0m
+[2026-08-17 00:07:28] [INFO]: [0mGET /api/users [33m429[0m 0.298 ms - 111[0m
+[2026-08-17 00:07:28] [INFO]: [0mGET /api/users [33m429[0m 0.282 ms - 111[0m
+[2026-08-17 00:07:31] [INFO]: [0mGET /api/users [33m429[0m 0.190 ms - 111[0m
+[2026-08-17 00:07:31] [INFO]: [0mGET /api/users [33m429[0m 0.225 ms - 111[0m
+[2026-08-17 00:07:33] [INFO]: [0mGET /api/vehicles [33m429[0m 0.193 ms - 111[0m
+[2026-08-17 00:07:33] [INFO]: [0mGET /api/vehicles [33m429[0m 0.233 ms - 111[0m
+[2026-08-17 00:11:06] [INFO]: [0mGET /api/health [33m429[0m 0.321 ms - 111[0m
+[2026-08-17 00:11:11] [INFO]: [0mGET /api/health [33m429[0m 0.231 ms - 111[0m
+[2026-08-17 00:11:39] [INFO]: Swagger API documentation initialized under /api-docs
+[2026-08-17 00:11:39] [INFO]: Server started successfully on port 5000 in development mode
+[2026-08-17 00:11:48] [INFO]: [0mGET /api/health [32m200[0m 7.620 ms - 109[0m
+[2026-08-17 00:13:01] [ERROR]: POST /api/auth/register - Error: [
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "fullName"
+    ],
+    "message": "Họ và tên là bắt buộc"
+  }
+]
+[2026-08-17 00:13:01] [INFO]: [0mPOST /api/auth/register [33m400[0m 4.181 ms - 145[0m
+[2026-08-17 00:13:01] [ERROR]: POST /api/auth/register - Error: [
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "fullName"
+    ],
+    "message": "Họ và tên là bắt buộc"
+  }
+]
+[2026-08-17 00:13:01] [INFO]: [0mPOST /api/auth/register [33m400[0m 1.336 ms - 145[0m
+[2026-08-17 00:13:01] [ERROR]: POST /api/auth/register - Error: [
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "password"
+    ],
+    "message": "Mật khẩu là bắt buộc"
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "fullName"
+    ],
+    "message": "Họ và tên là bắt buộc"
+  }
+]
+[2026-08-17 00:13:01] [INFO]: [0mPOST /api/auth/register [33m400[0m 1.047 ms - 208[0m
+[2026-08-17 00:13:01] [INFO]: [AUTH] User logged in: admin@autorent.vn
+[2026-08-17 00:13:01] [INFO]: [0mPOST /api/auth/login [32m200[0m 89.534 ms - 647[0m
+[2026-08-17 00:13:01] [INFO]: [AUTH] User logged in: manager@autorent.vn
+[2026-08-17 00:13:01] [INFO]: [0mPOST /api/auth/login [32m200[0m 100.202 ms - 657[0m
+[2026-08-17 00:13:01] [INFO]: [AUTH] User logged in: nguyenvana@gmail.com
+[2026-08-17 00:13:01] [INFO]: [0mPOST /api/auth/login [32m200[0m 118.592 ms - 645[0m
+[2026-08-17 00:13:01] [ERROR]: POST /api/auth/login - Error: Email hoặc mật khẩu không chính xác
+[2026-08-17 00:13:01] [INFO]: [0mPOST /api/auth/login [33m401[0m 96.360 ms - 74[0m
+[2026-08-17 00:13:01] [ERROR]: POST /api/auth/login - Error: Email hoặc mật khẩu không chính xác
+[2026-08-17 00:13:01] [INFO]: [0mPOST /api/auth/login [33m401[0m 2.786 ms - 74[0m
+[2026-08-17 00:13:01] [ERROR]: GET /api/audit-logs - Error: Vui lòng cung cấp token xác thực
+[2026-08-17 00:13:01] [INFO]: [0mGET /api/audit-logs [33m401[0m 1.592 ms - 68[0m
+[2026-08-17 00:13:01] [ERROR]: GET /api/audit-logs - Error: Bạn không có quyền thực hiện hành động này
+[2026-08-17 00:13:01] [INFO]: [0mGET /api/audit-logs [33m403[0m 6.397 ms - 87[0m
+[2026-08-17 00:13:01] [INFO]: [0mGET /api/vehicles [32m200[0m 11.826 ms - 9523[0m
+[2026-08-17 00:13:01] [INFO]: [0mGET /api/vehicles/1 [32m200[0m 6.945 ms - 984[0m
+[2026-08-17 00:13:01] [INFO]: [0mGET /api/vehicles?status=AVAILABLE [32m200[0m 7.778 ms - 9515[0m
+[2026-08-17 00:13:01] [ERROR]: POST /api/vehicles - Error: [
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "code"
+    ],
+    "message": "Mã xe là bắt buộc"
+  }
+]
+[2026-08-17 00:13:01] [INFO]: [0mPOST /api/vehicles [33m400[0m 3.982 ms - 134[0m
+[2026-08-17 00:13:01] [INFO]: [0mGET /api/bookings [32m200[0m 11.693 ms - 15665[0m
+[2026-08-17 00:13:01] [INFO]: [BOOKING #29] Status changed to PENDING - Khởi tạo đơn đặt xe bởi khách hàng ID 5
+[2026-08-17 00:13:01] [INFO]: [0mPOST /api/bookings [32m201[0m 69.343 ms - 2092[0m
+[2026-08-17 00:13:01] [INFO]: [0mPATCH /api/bookings/29/status [33m404[0m 3.695 ms - 163[0m
+[2026-08-17 00:13:01] [INFO]: [0mGET /api/payments [32m200[0m 7.190 ms - 3717[0m
+[2026-08-17 00:13:01] [ERROR]: POST /api/payments - Error: [
+  {
+    "expected": "'DEPOSIT' | 'RENTAL' | 'SERVICE_FEE' | 'SURCHARGE' | 'REFUND'",
+    "received": "undefined",
+    "code": "invalid_type",
+    "path": [
+      "transaction_type"
+    ],
+    "message": "Loại giao dịch là bắt buộc"
+  }
+]
+[2026-08-17 00:13:01] [INFO]: [0mPOST /api/payments [33m400[0m 4.212 ms - 158[0m
+[2026-08-17 00:13:01] [INFO]: [0mGET /api/contracts [32m200[0m 8.869 ms - 5422[0m
+[2026-08-17 00:13:01] [INFO]: [0mPOST /api/contracts/booking/29/sign [33m404[0m 3.223 ms - 169[0m
+[2026-08-17 00:13:01] [INFO]: [0mGET /api/handover-records [32m200[0m 11.468 ms - 6152[0m
+[2026-08-17 00:13:02] [INFO]: [0mGET /api/maintenance [32m200[0m 10.644 ms - 7835[0m
+[2026-08-17 00:13:02] [INFO]: [0mPATCH /api/maintenance/13/complete [33m404[0m 0.460 ms - 168[0m
+[2026-08-17 00:13:02] [INFO]: [0mGET /api/customer-profiles [32m200[0m 7.306 ms - 4581[0m
+[2026-08-17 00:13:02] [INFO]: [0mGET /api/reviews [32m200[0m 6.759 ms - 4895[0m
+[2026-08-17 00:13:02] [INFO]: [0mGET /api/notifications [32m200[0m 6.894 ms - 143[0m
+[2026-08-17 00:13:02] [INFO]: [0mGET /api/dashboard/admin [33m404[0m 0.977 ms - 158[0m
+[2026-08-17 00:13:02] [INFO]: [0mGET /api/users [32m200[0m 7.195 ms - 7928[0m
+[2026-08-17 00:13:02] [INFO]: [0mGET /api/settings [32m200[0m 3.687 ms - 1801[0m
+[2026-08-17 00:13:02] [INFO]: [0mGET /api/health [32m200[0m 2.018 ms - 109[0m
+[2026-08-17 00:13:02] [INFO]: [0mGET /api/audit-logs [32m200[0m 6.649 ms - 3805[0m

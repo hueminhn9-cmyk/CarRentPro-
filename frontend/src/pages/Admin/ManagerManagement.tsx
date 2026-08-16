@@ -25,33 +25,16 @@ export const ManagerManagement: React.FC = () => {
   const fetchManagers = async () => {
     setLoading(true);
     try {
-      // Get all users from API and filter for MANAGER role
-      const res = await (api as any).axiosInstance?.get('/users?role=MANAGER') ||
-        await fetch('http://localhost:5000/api/users', {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('autorent_token')}`
-          }
-        }).then(r => r.json());
-      
-      // Use api.customers.getAll as a workaround then filter
-      // Actually let's call the raw endpoint
-      const token = localStorage.getItem('autorent_token');
-      const response = await fetch('http://localhost:5000/api/users', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await response.json();
-      const usersList = data?.data?.users || [];
-      const managersList = usersList
-        .filter((u: any) => u.role === 'MANAGER')
-        .map((u: any) => ({
-          id: u.id?.toString(),
-          name: u.full_name || u.fullName,
-          email: u.email,
-          phone: u.phone || 'N/A',
-          status: u.status === 'ACTIVE' ? 'Đang hoạt động' : 'Tạm khóa',
-          joinedDate: u.created_at ? u.created_at.split('T')[0] : '',
-          role: u.role,
-        }));
+      const usersList = await api.managers.getAll();
+      const managersList = usersList.map((u: any) => ({
+        id: u.id?.toString(),
+        name: u.full_name || u.fullName || u.email,
+        email: u.email,
+        phone: u.phone || 'N/A',
+        status: u.status === 'ACTIVE' ? 'Đang hoạt động' : 'Tạm khóa',
+        joinedDate: u.created_at ? u.created_at.split('T')[0] : '',
+        role: u.role,
+      }));
       setManagers(managersList);
     } catch (err) {
       console.error('Failed to fetch managers:', err);
@@ -68,33 +51,13 @@ export const ManagerManagement: React.FC = () => {
   const handleCreateManager = async (values: any) => {
     setSubmitting(true);
     try {
-      const token = localStorage.getItem('autorent_token');
-      const response = await fetch('http://localhost:5000/api/users', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          email: values.email,
-          password: 'manager123',
-          full_name: values.name,
-          phone: values.phone,
-          role: 'MANAGER',
-          status: 'ACTIVE'
-        })
-      });
-      const data = await response.json();
-      if (response.ok) {
-        message.success(`Đã cấp tài khoản Manager thành công cho ${values.name}. Mật khẩu mặc định: manager123`);
-        setIsModalOpen(false);
-        form.resetFields();
-        fetchManagers();
-      } else {
-        message.error(data?.message || 'Tạo tài khoản thất bại!');
-      }
+      await api.managers.create(values);
+      message.success(`Đã cấp tài khoản Manager thành công cho ${values.name}. Mật khẩu mặc định: manager123`);
+      setIsModalOpen(false);
+      form.resetFields();
+      fetchManagers();
     } catch (err: any) {
-      message.error('Lỗi kết nối đến server!');
+      message.error(err.response?.data?.message || 'Tạo tài khoản thất bại!');
     } finally {
       setSubmitting(false);
     }
@@ -102,25 +65,13 @@ export const ManagerManagement: React.FC = () => {
 
   const toggleStatus = async (id: string, currentStatus: string) => {
     try {
-      const token = localStorage.getItem('autorent_token');
       const newStatus = currentStatus === 'Đang hoạt động' ? 'INACTIVE' : 'ACTIVE';
-      const response = await fetch(`http://localhost:5000/api/users/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ status: newStatus })
-      });
-      if (response.ok) {
-        const label = newStatus === 'ACTIVE' ? 'Đang hoạt động' : 'Tạm khóa';
-        message.success(`Đã đổi trạng thái tài khoản thành ${label}`);
-        fetchManagers();
-      } else {
-        message.error('Cập nhật trạng thái thất bại!');
-      }
+      await api.managers.update(id, { status: newStatus });
+      const label = newStatus === 'ACTIVE' ? 'Đang hoạt động' : 'Tạm khóa';
+      message.success(`Đã đổi trạng thái tài khoản thành ${label}`);
+      fetchManagers();
     } catch (err) {
-      message.error('Lỗi kết nối đến server!');
+      message.error('Cập nhật trạng thái thất bại!');
     }
   };
 

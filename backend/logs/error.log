@@ -314,3 +314,71 @@ D:\AutoRent\backend\src\repositories\vehicle.repository.ts:53:23
 Can't reach database server at `127.0.0.1:3306`
 
 Please make sure your database server is running at `127.0.0.1:3306`.
+[2026-08-17 00:13:01] [ERROR]: POST /api/auth/register - Error: [
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "fullName"
+    ],
+    "message": "Họ và tên là bắt buộc"
+  }
+]
+[2026-08-17 00:13:01] [ERROR]: POST /api/auth/register - Error: [
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "fullName"
+    ],
+    "message": "Họ và tên là bắt buộc"
+  }
+]
+[2026-08-17 00:13:01] [ERROR]: POST /api/auth/register - Error: [
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "password"
+    ],
+    "message": "Mật khẩu là bắt buộc"
+  },
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "fullName"
+    ],
+    "message": "Họ và tên là bắt buộc"
+  }
+]
+[2026-08-17 00:13:01] [ERROR]: POST /api/auth/login - Error: Email hoặc mật khẩu không chính xác
+[2026-08-17 00:13:01] [ERROR]: POST /api/auth/login - Error: Email hoặc mật khẩu không chính xác
+[2026-08-17 00:13:01] [ERROR]: GET /api/audit-logs - Error: Vui lòng cung cấp token xác thực
+[2026-08-17 00:13:01] [ERROR]: GET /api/audit-logs - Error: Bạn không có quyền thực hiện hành động này
+[2026-08-17 00:13:01] [ERROR]: POST /api/vehicles - Error: [
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "code"
+    ],
+    "message": "Mã xe là bắt buộc"
+  }
+]
+[2026-08-17 00:13:01] [ERROR]: POST /api/payments - Error: [
+  {
+    "expected": "'DEPOSIT' | 'RENTAL' | 'SERVICE_FEE' | 'SURCHARGE' | 'REFUND'",
+    "received": "undefined",
+    "code": "invalid_type",
+    "path": [
+      "transaction_type"
+    ],
+    "message": "Loại giao dịch là bắt buộc"
+  }
+]

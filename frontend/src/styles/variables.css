@@ -1,11 +1,14 @@
 :root {
-  /* Brand Primary Palette: Navy Blue - Xanh Navy */
-  --primary-color: #1e3a8a;
-  --primary-hover: #1d4ed8;
-  --primary-light: #f0f3ff;
-  --primary-border: #c7d2fe;
-  
-  /* Secondary / Highlight Palette: Gold - Vàng Gold */
+  /* Brand Primary Palette: Navy & Slate - Sang trọng, tin cậy */
+  --primary-color: #0f172a;
+  --primary-hover: #1e293b;
+  --primary-light: #f1f5f9;
+  --primary-border: #cbd5e1;
+  --brand-blue: #1e3a8a;
+  --brand-blue-hover: #1d4ed8;
+  --brand-blue-light: #eff6ff;
+
+  /* Secondary / Highlight Palette: Amber Gold - Vàng Cao Cấp */
   --secondary-color: #d97706;
   --secondary-hover: #b45309;
   --secondary-light: #fffbeb;
@@ -20,36 +23,77 @@
   /* Background & Surface Tones */
   --background-color: #f8fafc;
   --surface-lowest: #ffffff;
-  --surface-low: #f1f5f9;
-  --surface-container: #e2e8f0;
-  --surface-high: #cbd5e1;
-  --surface-highest: #94a3b8;
+  --surface-low: #f8fafc;
+  --surface-container: #f1f5f9;
+  --surface-high: #e2e8f0;
+  --surface-highest: #cbd5e1;
   
   /* Text Tones */
   --text-primary: #0f172a;
   --text-secondary: #475569;
+  --text-tertiary: #94a3b8;
   --outline-color: #64748b;
   --outline-variant: #cbd5e1;
   
   /* Semantic Statuses */
-  --color-success: #059669;
-  --color-success-bg: #ecfdf5;
-  --color-success-border: #a7f3d0;
+  --color-success: #16a34a;
+  --color-success-bg: #f0fdf4;
+  --color-success-border: #bbf7d0;
   
-  --color-warning: #d97706;
+  --color-warning: #f59e0b;
   --color-warning-bg: #fffbeb;
-  --color-warning-border: #fde68a;
+  --color-warning-border: #fef3c7;
   
   --color-error: #dc2626;
   --color-error-bg: #fef2f2;
   --color-error-border: #fecaca;
   
-  --color-info: #1e3a8a;
-  --color-info-bg: #f0f3ff;
-  --color-info-border: #c7d2fe;
+  --color-info: #2563eb;
+  --color-info-bg: #eff6ff;
+  --color-info-border: #bfdbfe;
 
+  /* Spacing Scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Border Radius Scale */
+  --radius-sm: 4px;    /* Tags, badges */
+  --radius-md: 8px;    /* Buttons, inputs */
+  --radius-lg: 12px;   /* Cards */
+  --radius-xl: 16px;   /* Modals, drawers */
+  --radius-full: 9999px; /* Pills, Avatars */
   --border-radius: 8px;
-  --transition-speed: 0.3s;
+
+  /* Typography Scale */
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-base: 14px;
+  --text-md: 15px;
+  --text-lg: 16px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+  --text-3xl: 30px;
+
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+  --font-extrabold: 800;
+
+  /* Shadow Scale */
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.06);
+  --shadow-lg: 0 10px 25px rgba(15, 23, 42, 0.08);
+
+  --transition-speed: 0.25s;
 }
 
 body {
@@ -84,7 +128,7 @@ body {
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
@@ -98,12 +142,12 @@ body {
 
 .hover-lift {
   transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, border-color var(--transition-speed) ease;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+  box-shadow: var(--shadow-sm);
 }
 
 .hover-lift:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
 }
 
 .card-img-zoom {
@@ -111,5 +155,5 @@ body {
 }
 
 .hover-lift:hover .card-img-zoom {
-  transform: scale(1.05);
+  transform: scale(1.04);
 }

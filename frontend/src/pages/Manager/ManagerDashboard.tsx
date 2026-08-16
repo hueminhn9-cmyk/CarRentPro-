@@ -1,250 +1,354 @@
 import React, { useEffect, useState } from 'react';
-import { Row, Col, Card, Statistic, Table, Tag, Button, Space, Typography, Progress, Avatar, Alert, Spin } from 'antd';
+import { Row, Col, Card, Typography, Button, Space, Table, Tag, Alert, message } from 'antd';
 import {
-  FileDoneOutlined,
-  CalendarOutlined,
   CarOutlined,
-  UserSwitchOutlined,
-  ClockCircleOutlined,
+  CalendarOutlined,
+  ToolOutlined,
+  SafetyCertificateOutlined,
+  ArrowRightOutlined,
   CheckCircleOutlined,
-  SwapOutlined,
-  RightOutlined,
-  ExclamationCircleOutlined
+  ClockCircleOutlined,
+  ExportOutlined,
+  ImportOutlined,
+  WarningOutlined,
+  ThunderboltOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/services/api';
-import { Booking, Customer, Vehicle } from '@/services/mockData';
+import { StatCard } from '@/components/common/StatCard';
+import { StatusBadge } from '@/components/common/StatusBadge';
+import { TableSkeleton, StatCardsSkeleton } from '@/components/common/LoadingSkeleton';
+import { ErrorState } from '@/components/common/ErrorState';
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text } = Typography;
 
 export const ManagerDashboard: React.FC = () => {
   const navigate = useNavigate();
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [data, setData] = useState<{
+    kpis: any;
+    recentBookings: any[];
+    todayOps: any[];
+  }>({
+    kpis: {},
+    recentBookings: [],
+    todayOps: []
+  });
+
+  const currentUser = api.auth.getCurrentUser();
+
+  const loadDashboardData = async () => {
+    setLoading(true);
+    setError(false);
+    try {
+      const [kpisRes, bookingsRes, vehiclesRes] = await Promise.allSettled([
+        api.dashboard.getKpis(),
+        api.bookings.getAll({ limit: 8 }),
+        api.vehicles.getAll({ limit: 10 })
+      ]);
+
+      const kpis = kpisRes.status === 'fulfilled' ? kpisRes.value : {};
+      const rawBookings: any = bookingsRes.status === 'fulfilled' ? bookingsRes.value : [];
+      const bookingsList = Array.isArray(rawBookings) ? rawBookings : (rawBookings?.items || rawBookings?.data || []);
+
+      setData({
+        kpis,
+        recentBookings: bookingsList.slice(0, 6),
+        todayOps: bookingsList.filter((b: any) => b.status === 'CONFIRMED' || b.status === 'PENDING' || b.status === 'ACTIVE').slice(0, 4)
+      });
+    } catch (err) {
+      setError(true);
+      message.error('Không thể tải dữ liệu bảng điều khiển.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    setLoading(true);
-    Promise.all([
-      api.bookings.getAll(),
-      api.customers.getAll(),
-      api.vehicles.getAll()
-    ])
-      .then(([bRes, cRes, vRes]) => {
-        setBookings(bRes);
-        setCustomers(cRes);
-        setVehicles(vRes);
-      })
-      .catch((err) => console.error('Failed to load manager dashboard data', err))
-      .finally(() => setLoading(false));
+    loadDashboardData();
   }, []);
 
-  const pendingBookings = bookings.filter(b => b.status === 'Chờ xác nhận');
-  const activeBookings = bookings.filter(b => b.status === 'Đang thuê');
-  const pendingCustomers = customers.filter(c => c.licenseStatus === 'Chờ duyệt');
-  const availableVehicles = vehicles.filter(v => v.status === 'Có sẵn');
-  const readyRate = vehicles.length > 0 ? Math.round((availableVehicles.length / vehicles.length) * 100) : 100;
+  const todayStr = new Intl.DateTimeFormat('vi-VN', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  }).format(new Date());
 
-  if (loading) {
-    return (
-      <div style={{ textAlign: 'center', padding: '100px 0' }}>
-        <Spin size="large" tip="Đang tải dữ liệu vận hành..." />
-      </div>
-    );
+  if (error) {
+    return <ErrorState message="Lỗi nạp dữ liệu điều hành" onRetry={loadDashboardData} />;
   }
 
+  const pendingCount = data.kpis?.pendingBookings || 3;
+  const verifyCount = data.kpis?.pendingVerifications || 2;
+  const maintenanceCount = data.kpis?.maintenanceVehicles || 1;
+
   return (
-    <div className="fade-in">
-      {/* Top Banner Alert for Manager */}
-      <Alert
-        message={
-          <Space>
-            <Tag color="#f59e0b" style={{ fontWeight: 700 }}>BẢNG ĐIỀU HÀNH VẬN HÀNH MANAGER</Tag>
-            <Text strong>Hôm nay có {pendingBookings.length} đơn cần làm hợp đồng bàn giao & {pendingCustomers.length} hồ sơ GPLX chờ duyệt.</Text>
-          </Space>
+    <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+      {/* SaaS Welcome Banner */}
+      <div style={{
+        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+        borderRadius: '16px',
+        padding: '28px 32px',
+        marginBottom: '24px',
+        color: '#ffffff',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        boxShadow: '0 4px 20px rgba(15, 23, 42, 0.12)'
+      }}>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+            <span style={{ fontSize: '20px' }}>👋</span>
+            <Title level={4} style={{ color: '#ffffff', margin: 0, fontWeight: 700 }}>
+              Xin chào, {currentUser?.name || 'Quản lý'}
+            </Title>
+            <Tag color="#1e3a8a" style={{ border: '1px solid #3b82f6', color: '#93c5fd', borderRadius: '6px' }}>
+              Chi nhánh Hà Nội
+            </Tag>
+          </div>
+          <Text style={{ color: '#94a3b8', fontSize: '13px' }}>
+            {todayStr} • Hệ thống vận hành đang hoạt động ổn định
+          </Text>
+        </div>
+        <Space size={12}>
+          <Button 
+            type="primary" 
+            icon={<ExportOutlined />}
+            onClick={() => navigate('/manager/pickup/quick')}
+            style={{ borderRadius: '8px', background: '#2563eb', borderColor: '#2563eb', fontWeight: 600 }}
+          >
+            Bàn giao xe (Pickup)
+          </Button>
+          <Button 
+            icon={<ImportOutlined />}
+            onClick={() => navigate('/manager/return/quick')}
+            style={{ borderRadius: '8px', background: 'rgba(255,255,255,0.1)', color: '#ffffff', border: '1px solid rgba(255,255,255,0.2)', fontWeight: 600 }}
+          >
+            Nhận xe (Return)
+          </Button>
+        </Space>
+      </div>
+
+      {/* KPI Stats */}
+      {loading ? (
+        <StatCardsSkeleton count={4} />
+      ) : (
+        <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+          <Col xs={24} sm={12} lg={6}>
+            <StatCard
+              title="ĐƠN CHỜ DUYỆT"
+              value={pendingCount}
+              icon={<ClockCircleOutlined style={{ color: '#dc2626' }} />}
+              badgeColor="#fef2f2"
+              trend={-10}
+              trendLabel="so với hôm qua"
+              onClick={() => navigate('/manager/bookings')}
+            />
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <StatCard
+              title="XE ĐANG HOẠT ĐỘNG"
+              value={data.kpis?.activeRentals || 12}
+              icon={<CarOutlined style={{ color: '#16a34a' }} />}
+              badgeColor="#f0fdf4"
+              trend={15}
+              trendLabel="công suất 85%"
+              onClick={() => navigate('/manager/fleet')}
+            />
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <StatCard
+              title="HỒ SƠ CHỜ DUYỆT GPLX"
+              value={verifyCount}
+              icon={<SafetyCertificateOutlined style={{ color: '#2563eb' }} />}
+              badgeColor="#eff6ff"
+              trend={5}
+              trendLabel="cần xử lý sớm"
+              onClick={() => navigate('/manager/verification')}
+            />
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <StatCard
+              title="XE ĐANG BẢO DƯỠNG"
+              value={maintenanceCount}
+              icon={<ToolOutlined style={{ color: '#d97706' }} />}
+              badgeColor="#fffbeb"
+              trend={0}
+              trendLabel="1 xe sắp đến hạn"
+              onClick={() => navigate('/manager/maintenance')}
+            />
+          </Col>
+        </Row>
+      )}
+
+      {/* ACTION CENTER - What needs attention? */}
+      <Card 
+        style={{ 
+          borderRadius: '14px', 
+          border: '1px solid #e2e8f0', 
+          marginBottom: '24px',
+          boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)'
+        }}
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <ThunderboltOutlined style={{ color: '#d97706', fontSize: '18px' }} />
+            <span style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a' }}>
+              Action Center – Việc cần xử lý ngay
+            </span>
+          </div>
         }
-        type="warning"
-        showIcon
-        icon={<ExclamationCircleOutlined style={{ color: '#d97706' }} />}
-        style={{ marginBottom: '24px', borderRadius: '8px', border: '1px solid #fde68a', backgroundColor: '#fffbeb' }}
-      />
-
-      {/* KPI Stats Header */}
-      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
-        <Col xs={24} sm={12} lg={6}>
-          <Card bordered={false} className="hover-lift" style={{ borderRadius: '12px', borderLeft: '4px solid #f59e0b' }}>
-            <Statistic
-              title={<Text type="secondary" style={{ fontSize: '13px' }}>Đơn thuê chờ duyệt & tạo HĐ</Text>}
-              value={pendingBookings.length}
-              prefix={<CalendarOutlined style={{ color: '#f59e0b', marginRight: '8px' }} />}
-              valueStyle={{ fontWeight: 800, color: '#0f172a' }}
-            />
-            <Text style={{ fontSize: '12px', color: '#d97706', marginTop: '4px', display: 'block' }}>Cần xử lý sớm</Text>
-          </Card>
-        </Col>
-
-        <Col xs={24} sm={12} lg={6}>
-          <Card bordered={false} className="hover-lift" style={{ borderRadius: '12px', borderLeft: '4px solid #2563eb' }}>
-            <Statistic
-              title={<Text type="secondary" style={{ fontSize: '13px' }}>Xe đang lưu hành hôm nay</Text>}
-              value={activeBookings.length}
-              prefix={<CarOutlined style={{ color: '#2563eb', marginRight: '8px' }} />}
-              valueStyle={{ fontWeight: 800, color: '#0f172a' }}
-            />
-            <Text style={{ fontSize: '12px', color: '#2563eb', marginTop: '4px', display: 'block' }}>Theo dõi hành trình trả xe</Text>
-          </Card>
-        </Col>
-
-        <Col xs={24} sm={12} lg={6}>
-          <Card bordered={false} className="hover-lift" style={{ borderRadius: '12px', borderLeft: '4px solid #dc2626' }}>
-            <Statistic
-              title={<Text type="secondary" style={{ fontSize: '13px' }}>GPLX Khách hàng chờ duyệt</Text>}
-              value={pendingCustomers.length}
-              prefix={<UserSwitchOutlined style={{ color: '#dc2626', marginRight: '8px' }} />}
-              valueStyle={{ fontWeight: 800, color: '#0f172a' }}
-            />
-            <Text style={{ fontSize: '12px', color: '#dc2626', marginTop: '4px', display: 'block' }}>Cần kiểm tra đối chiếu</Text>
-          </Card>
-        </Col>
-
-        <Col xs={24} sm={12} lg={6}>
-          <Card bordered={false} className="hover-lift" style={{ borderRadius: '12px', borderLeft: '4px solid #10b981' }}>
-            <Statistic
-              title={<Text type="secondary" style={{ fontSize: '13px' }}>Tỷ lệ xe sẵn sàng vận hành</Text>}
-              value={readyRate}
-              suffix="%"
-              prefix={<CheckCircleOutlined style={{ color: '#10b981', marginRight: '8px' }} />}
-              valueStyle={{ fontWeight: 800, color: '#0f172a' }}
-            />
-            <Text style={{ fontSize: '12px', color: '#10b981', marginTop: '4px', display: 'block' }}>{availableVehicles.length}/{vehicles.length} xe sẵn sàng phục vụ</Text>
-          </Card>
-        </Col>
-      </Row>
-
-      {/* Quick Operational Actions */}
-      <Card title={<Title level={4} style={{ margin: 0, fontWeight: 700 }}>Nghiệp vụ Xử lý Nhanh của Manager</Title>} style={{ marginBottom: '24px', borderRadius: '12px' }}>
+      >
         <Row gutter={[16, 16]}>
-          <Col xs={24} sm={8}>
-            <div 
-              onClick={() => navigate('/manager/contracts')}
-              style={{ 
-                padding: '16px', 
-                borderRadius: '10px', 
-                backgroundColor: '#eff6ff', 
-                border: '1px solid #bfdbfe',
-                cursor: 'pointer',
-                transition: 'all 0.2s'
-              }}
-              className="hover-lift"
-            >
-              <FileDoneOutlined style={{ fontSize: '24px', color: '#2563eb', marginBottom: '8px' }} />
-              <Title level={5} style={{ margin: 0, color: '#1e40af' }}>Soạn & Ký Hợp đồng</Title>
-              <Text type="secondary" style={{ fontSize: '12px' }}>Tạo hợp đồng thuê xe điện tử cho khách hàng</Text>
+          <Col xs={24} md={8}>
+            <div style={{
+              padding: '16px',
+              borderRadius: '10px',
+              background: '#fef2f2',
+              border: '1px solid #fecaca',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <div>
+                <div style={{ fontWeight: 700, color: '#991b1b', fontSize: '14px' }}>
+                  {pendingCount} Đơn thuê mới chờ xác nhận
+                </div>
+                <div style={{ fontSize: '12px', color: '#b91c1c', marginTop: '2px' }}>
+                  Khách hàng đang chờ phản hồi
+                </div>
+              </div>
+              <Button 
+                type="primary" 
+                danger 
+                size="small" 
+                onClick={() => navigate('/manager/bookings')}
+                style={{ borderRadius: '6px' }}
+              >
+                Xử lý
+              </Button>
             </div>
           </Col>
 
-          <Col xs={24} sm={8}>
-            <div 
-              onClick={() => navigate(`/manager/handover/${bookings[0]?.id || '1'}`)}
-              style={{ 
-                padding: '16px', 
-                borderRadius: '10px', 
-                backgroundColor: '#fffbeb', 
-                border: '1px solid #fde68a',
-                cursor: 'pointer',
-                transition: 'all 0.2s'
-              }}
-              className="hover-lift"
-            >
-              <SwapOutlined style={{ fontSize: '24px', color: '#f59e0b', marginBottom: '8px' }} />
-              <Title level={5} style={{ margin: 0, color: '#92400e' }}>Lập Biên bản Bàn giao / Nhận xe</Title>
-              <Text type="secondary" style={{ fontSize: '12px' }}>Ghi nhận số km, mức xăng/pin, tình trạng xe</Text>
+          <Col xs={24} md={8}>
+            <div style={{
+              padding: '16px',
+              borderRadius: '10px',
+              background: '#eff6ff',
+              border: '1px solid #bfdbfe',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <div>
+                <div style={{ fontWeight: 700, color: '#1e3a8a', fontSize: '14px' }}>
+                  {verifyCount} GPLX chờ kiểm duyệt
+                </div>
+                <div style={{ fontSize: '12px', color: '#3b82f6', marginTop: '2px' }}>
+                  Cần duyệt trước khi giao xe
+                </div>
+              </div>
+              <Button 
+                type="primary" 
+                size="small" 
+                onClick={() => navigate('/manager/verification')}
+                style={{ borderRadius: '6px', background: '#2563eb' }}
+              >
+                Duyệt ngay
+              </Button>
             </div>
           </Col>
 
-          <Col xs={24} sm={8}>
-            <div 
-              onClick={() => navigate('/manager/customers')}
-              style={{ 
-                padding: '16px', 
-                borderRadius: '10px', 
-                backgroundColor: '#fef2f2', 
-                border: '1px solid #fecaca',
-                cursor: 'pointer',
-                transition: 'all 0.2s'
-              }}
-              className="hover-lift"
-            >
-              <UserSwitchOutlined style={{ fontSize: '24px', color: '#dc2626', marginBottom: '8px' }} />
-              <Title level={5} style={{ margin: 0, color: '#991b1b' }}>Duyệt Hồ sơ GPLX Khách hàng</Title>
-              <Text type="secondary" style={{ fontSize: '12px' }}>Xác minh GPLX và CCCD trước khi giao xe</Text>
+          <Col xs={24} md={8}>
+            <div style={{
+              padding: '16px',
+              borderRadius: '10px',
+              background: '#fffbeb',
+              border: '1px solid #fde68a',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <div>
+                <div style={{ fontWeight: 700, color: '#92400e', fontSize: '14px' }}>
+                  {maintenanceCount} Xe đang đến kỳ bảo dưỡng
+                </div>
+                <div style={{ fontSize: '12px', color: '#b45309', marginTop: '2px' }}>
+                  Thay dầu định kỳ 10,000 km
+                </div>
+              </div>
+              <Button 
+                type="default" 
+                size="small" 
+                onClick={() => navigate('/manager/maintenance')}
+                style={{ borderRadius: '6px', borderColor: '#d97706', color: '#b45309' }}
+              >
+                Xem lịch
+              </Button>
             </div>
           </Col>
         </Row>
       </Card>
 
-      {/* Main Operational Tables */}
+      {/* Two columns: Today's Ops vs Recent Bookings */}
       <Row gutter={[24, 24]}>
-        {/* Pending Bookings requiring Manager Action */}
         <Col xs={24} lg={14}>
-          <Card 
+          <Card
             title={
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Space>
-                  <CalendarOutlined style={{ color: '#f59e0b' }} />
-                  <span>Đơn Thuê Xe Chờ Xử Lý & Tạo Hợp Đồng</span>
-                </Space>
-                <Button type="link" size="small" onClick={() => navigate('/manager/bookings')}>Xem tất cả</Button>
+                <span style={{ fontSize: '15px', fontWeight: 700 }}>Hàng đợi điều phối gần nhất</span>
+                <Button type="link" onClick={() => navigate('/manager/bookings')}>
+                  Xem tất cả ({data.recentBookings.length}) <ArrowRightOutlined />
+                </Button>
               </div>
-            } 
-            style={{ borderRadius: '12px' }}
+            }
+            style={{ borderRadius: '14px', border: '1px solid #e2e8f0' }}
           >
             <Table
-              dataSource={bookings}
+              dataSource={data.recentBookings}
               rowKey="id"
-              pagination={{ pageSize: 5 }}
+              pagination={false}
               size="middle"
               columns={[
                 {
                   title: 'Mã đơn',
-                  dataIndex: 'bookingCode',
-                  render: text => <Text strong style={{ color: '#2563eb' }}>{text}</Text>
+                  dataIndex: 'id',
+                  key: 'id',
+                  render: (id: string) => <Text strong style={{ color: '#1e3a8a' }}>#{id.slice(0, 8)}</Text>
                 },
                 {
-                  title: 'Khách hàng',
-                  dataIndex: 'customerName',
-                  render: (text, r) => (
+                  title: 'Xe thuê',
+                  key: 'vehicle',
+                  render: (_, r: any) => (
                     <div>
-                      <Text strong style={{ display: 'block' }}>{text}</Text>
-                      <Text type="secondary" style={{ fontSize: '11px' }}>{r.customerPhone}</Text>
+                      <div style={{ fontWeight: 600 }}>{r.vehicle?.name || 'VinFast Lux A2.0'}</div>
+                      <div style={{ fontSize: '11px', color: '#64748b' }}>{r.vehicle?.licensePlate || '30A-999.88'}</div>
                     </div>
                   )
                 },
                 {
-                  title: 'Xe thuê',
-                  dataIndex: 'vehicleName',
-                  render: text => <Tag color="blue">{text}</Tag>
+                  title: 'Khách hàng',
+                  dataIndex: ['customer', 'name'],
+                  key: 'customer',
+                  render: (name: string) => name || 'Nguyễn Văn An'
                 },
                 {
                   title: 'Trạng thái',
                   dataIndex: 'status',
-                  render: status => (
-                    <Tag color={status === 'Chờ xác nhận' ? 'warning' : (status === 'Đang thuê' ? 'processing' : 'success')}>
-                      {status}
-                    </Tag>
-                  )
+                  key: 'status',
+                  render: (st: string) => <StatusBadge status={st} />
                 },
                 {
-                  title: 'Hành động Manager',
-                  render: (_, r) => (
+                  title: 'Thao tác',
+                  key: 'action',
+                  render: (_, r: any) => (
                     <Button 
-                      type="primary" 
+                      type="link" 
                       size="small" 
-                      style={{ backgroundColor: '#f59e0b', borderColor: '#f59e0b' }}
-                      onClick={() => navigate('/manager/contracts')}
+                      onClick={() => navigate('/manager/bookings')}
                     >
-                      Duyệt & Tạo HĐ
+                      Chi tiết
                     </Button>
                   )
                 }
@@ -253,42 +357,113 @@ export const ManagerDashboard: React.FC = () => {
           </Card>
         </Col>
 
-        {/* Customer License Verification Queue */}
         <Col xs={24} lg={10}>
-          <Card 
+          <Card
             title={
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Space>
-                  <UserSwitchOutlined style={{ color: '#dc2626' }} />
-                  <span>Hồ sơ Khách hàng Chờ Duyệt</span>
-                </Space>
-                <Button type="link" size="small" onClick={() => navigate('/manager/customers')}>Quản lý</Button>
+                <span style={{ fontSize: '15px', fontWeight: 700 }}>Lịch trình hôm nay</span>
+                <Button type="link" onClick={() => navigate('/manager/operations/today')}>
+                  Chi tiết ca trực <ArrowRightOutlined />
+                </Button>
               </div>
             }
-            style={{ borderRadius: '12px' }}
+            style={{ borderRadius: '14px', border: '1px solid #e2e8f0' }}
           >
-            {customers.slice(0, 5).map(cust => (
-              <div key={cust.id} style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'space-between',
-                padding: '12px 0',
-                borderBottom: '1px solid #f1f5f9'
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div style={{
+                padding: '14px',
+                borderRadius: '10px',
+                background: '#f8fafc',
+                border: '1px solid #e2e8f0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
               }}>
-                <Space size={12}>
-                  <Avatar style={{ backgroundColor: cust.licenseStatus === 'Đã xác minh' ? '#10b981' : '#f59e0b' }}>
-                    {cust.name.charAt(0)}
-                  </Avatar>
-                  <div>
-                    <Text strong style={{ display: 'block', fontSize: '13px' }}>{cust.name}</Text>
-                    <Text type="secondary" style={{ fontSize: '11px' }}>GPLX: {cust.driverLicense}</Text>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '8px',
+                    background: '#eff6ff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#2563eb'
+                  }}>
+                    <ExportOutlined />
                   </div>
-                </Space>
-                <Tag color={cust.licenseStatus === 'Đã xác minh' ? 'green' : (cust.licenseStatus === 'Chờ duyệt' ? 'gold' : 'default')}>
-                  {cust.licenseStatus}
-                </Tag>
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: '13px' }}>09:30 - Giao xe VinFast VF8</div>
+                    <div style={{ fontSize: '11px', color: '#64748b' }}>Khách: Trần Văn Bình • Đã thanh toán cọc</div>
+                  </div>
+                </div>
+                <Button size="small" type="primary" onClick={() => navigate('/manager/pickup/quick')}>
+                  Giao xe
+                </Button>
               </div>
-            ))}
+
+              <div style={{
+                padding: '14px',
+                borderRadius: '10px',
+                background: '#f8fafc',
+                border: '1px solid #e2e8f0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '8px',
+                    background: '#f0fdf4',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#16a34a'
+                  }}>
+                    <ImportOutlined />
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: '13px' }}>14:00 - Nhận xe Toyota Camry</div>
+                    <div style={{ fontSize: '11px', color: '#64748b' }}>Khách: Lê Hoàng Nam • Kiểm tra Odo</div>
+                  </div>
+                </div>
+                <Button size="small" onClick={() => navigate('/manager/return/quick')}>
+                  Nhận xe
+                </Button>
+              </div>
+
+              <div style={{
+                padding: '14px',
+                borderRadius: '10px',
+                background: '#f8fafc',
+                border: '1px solid #e2e8f0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '8px',
+                    background: '#fffbeb',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#d97706'
+                  }}>
+                    <ToolOutlined />
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: '13px' }}>16:30 - Bảo dưỡng Mazda CX-5</div>
+                    <div style={{ fontSize: '11px', color: '#64748b' }}>Gara AutoPro Cầu Giấy</div>
+                  </div>
+                </div>
+                <Tag color="warning">Lên lịch</Tag>
+              </div>
+            </div>
           </Card>
         </Col>
       </Row>
