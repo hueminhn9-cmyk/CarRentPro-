@@ -708,3 +708,53 @@ Please make sure your database server is running at `localhost:3306`.
 [2026-08-12 20:10:51] [INFO]: [0mGET /api/vehicles [36m304[0m 5.795 ms - -[0m
 [2026-08-12 20:29:36] [INFO]: [0mGET /api/vehicles [36m304[0m 10.307 ms - -[0m
 [2026-08-12 20:29:36] [INFO]: [0mGET /api/vehicles [36m304[0m 23.066 ms - -[0m
+[2026-08-14 22:13:12] [INFO]: Swagger API documentation initialized under /api-docs
+[2026-08-14 22:13:12] [INFO]: Server started successfully on port 5000 in development mode
+[2026-08-14 23:00:07] [ERROR]: GET /api/vehicles - Error: 
+Invalid `prisma.vehicles.findMany()` invocation in
+D:\AutoRent\backend\src\repositories\vehicle.repository.ts:53:23
+
+  50 
+  51 static async findAll(options: { skip?: number; take?: number; orderBy?: any; where?: any }) {
+  52   const [vehicles, total] = await Promise.all([
+→ 53     prisma.vehicles.findMany(
+Can't reach database server at `127.0.0.1:3306`
+
+Please make sure your database server is running at `127.0.0.1:3306`.
+[2026-08-14 23:00:07] [INFO]: [0mGET /api/vehicles [31m503[0m 2111.245 ms - 129[0m
+[2026-08-14 23:00:09] [ERROR]: GET /api/vehicles - Error: 
+Invalid `prisma.vehicles.findMany()` invocation in
+D:\AutoRent\backend\src\repositories\vehicle.repository.ts:53:23
+
+  50 
+  51 static async findAll(options: { skip?: number; take?: number; orderBy?: any; where?: any }) {
+  52   const [vehicles, total] = await Promise.all([
+→ 53     prisma.vehicles.findMany(
+Can't reach database server at `127.0.0.1:3306`
+
+Please make sure your database server is running at `127.0.0.1:3306`.
+[2026-08-14 23:00:09] [INFO]: [0mGET /api/vehicles [31m503[0m 2081.932 ms - 129[0m
+[2026-08-14 23:00:18] [ERROR]: GET /api/vehicles - Error: 
+Invalid `prisma.vehicles.findMany()` invocation in
+D:\AutoRent\backend\src\repositories\vehicle.repository.ts:53:23
+
+  50 
+  51 static async findAll(options: { skip?: number; take?: number; orderBy?: any; where?: any }) {
+  52   const [vehicles, total] = await Promise.all([
+→ 53     prisma.vehicles.findMany(
+Can't reach database server at `127.0.0.1:3306`
+
+Please make sure your database server is running at `127.0.0.1:3306`.
+[2026-08-14 23:00:18] [INFO]: [0mGET /api/vehicles [31m503[0m 2059.914 ms - 129[0m
+[2026-08-14 23:00:20] [ERROR]: GET /api/vehicles - Error: 
+Invalid `prisma.vehicles.findMany()` invocation in
+D:\AutoRent\backend\src\repositories\vehicle.repository.ts:53:23
+
+  50 
+  51 static async findAll(options: { skip?: number; take?: number; orderBy?: any; where?: any }) {
+  52   const [vehicles, total] = await Promise.all([
+→ 53     prisma.vehicles.findMany(
+Can't reach database server at `127.0.0.1:3306`
+
+Please make sure your database server is running at `127.0.0.1:3306`.
+[2026-08-14 23:00:20] [INFO]: [0mGET /api/vehicles [31m503[0m 2027.188 ms - 129[0m

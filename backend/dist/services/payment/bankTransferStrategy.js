@@ -1,8 +1,8 @@
 export class BankTransferStrategy {
     async processPayment(paymentId, amount, bookingCode) {
-        const bankAccount = '1234567890';
-        const bankName = 'Vietcombank';
-        const accountName = 'CONG TY AUTORENT VIETNAM';
+        const bankAccount = '0905445901';
+        const bankName = 'MBBank';
+        const accountName = 'NGUYEN HUE MINH';
         // We generate payment reference matching the booking code
         const transferContent = `AUTORENT ${bookingCode}`;
         const qrUrl = `https://img.vietqr.io/image/${bankName}-${bankAccount}-compact.png?amount=${amount}&addInfo=${encodeURIComponent(transferContent)}&accountName=${encodeURIComponent(accountName)}`;
