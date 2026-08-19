@@ -59,7 +59,7 @@ export const CustomerProfile: React.FC = () => {
       <Row gutter={[24, 24]}>
         {/* Left Side: Avatar Panel */}
         <Col xs={24} md={8}>
-          <Card bordered={false} style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', textAlign: 'center' }}>
+          <Card variant="borderless" style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', textAlign: 'center' }}>
             <Avatar size={96} style={{ backgroundColor: '#1677ff', marginBottom: '16px' }} icon={<UserOutlined />} />
             <Title level={4} style={{ margin: '0 0 4px 0' }}>{customer.name}</Title>
             <Text type="secondary" style={{ display: 'block', fontSize: '13px', marginBottom: '16px' }}>
@@ -73,7 +73,7 @@ export const CustomerProfile: React.FC = () => {
 
         {/* Right Side: Details Form */}
         <Col xs={24} md={16}>
-          <Card bordered={false} style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+          <Card variant="borderless" style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
             <Form
               form={form}
               layout="vertical"

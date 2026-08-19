@@ -51,7 +51,7 @@ export const BookingStep1: React.FC = () => {
         <Text type="secondary">Cung cấp thông tin lịch trình di chuyển của bạn để hoàn tất đặt xe.</Text>
       </div>
 
-      <Card bordered={false} style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+      <Card variant="borderless" style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
         <Row gutter={[24, 24]}>
           <Col xs={24} md={10} style={{ textAlign: 'center', borderRight: '1px solid #f0eded', paddingRight: '24px' }}>
             <img 

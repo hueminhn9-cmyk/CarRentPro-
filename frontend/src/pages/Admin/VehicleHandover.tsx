@@ -77,7 +77,7 @@ export const VehicleHandover: React.FC = () => {
         <Text type="secondary">Danh mục kiểm tra kỹ thuật phương tiện trước khi giao cho khách hàng.</Text>
       </div>
 
-      <Card bordered={false} style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+      <Card variant="borderless" style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={16}>
             <div style={{ fontWeight: 600, fontSize: '15px', marginBottom: '8px' }}>{booking.vehicleName}</div>

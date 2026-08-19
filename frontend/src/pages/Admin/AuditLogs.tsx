@@ -132,7 +132,7 @@ export const AuditLogs: React.FC = () => {
         onReset={() => setSearch('')}
       />
 
-      <Card style={{ borderRadius: '12px', border: '1px solid #e2e8f0' }} bodyStyle={{ padding: 0 }}>
+      <Card style={{ borderRadius: '12px', border: '1px solid #e2e8f0' }} styles={{ body: { padding: 0 } }}>
         <Table
           dataSource={logs}
           columns={columns}

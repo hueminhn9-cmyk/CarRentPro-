@@ -58,7 +58,7 @@ export const SubmitReview: React.FC = () => {
         <Text type="secondary">Chia sẻ trải nghiệm thuê xe tự lái cùng chiếc {booking.vehicleName}.</Text>
       </div>
 
-      <Card bordered={false} style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+      <Card variant="borderless" style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
         <Form
           layout="vertical"
           onFinish={onFinish}

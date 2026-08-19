@@ -35,7 +35,7 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
           </div>
         </div>
       }
-      bodyStyle={{ padding: '16px' }}
+      styles={{ body: { padding: '16px' } }}
       style={{ borderRadius: '8px', overflow: 'hidden' }}
     >
       <Space direction="vertical" style={{ width: '100%' }} size={4}>
@@ -47,17 +47,17 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle }) => {
             <Text type="secondary" style={{ fontSize: '12px' }}>({vehicle.reviewsCount})</Text>
           </Space>
         </div>
-        
+
         <Title level={5} style={{ margin: '4px 0', fontSize: '16px' }}>{vehicle.name}</Title>
-        
+
         <Space size={12} style={{ fontSize: '13px', color: '#414755', margin: '8px 0' }}>
           <span><CarOutlined /> {vehicle.seats} chỗ</span>
           <span><DashboardOutlined /> {vehicle.transmission}</span>
           <span><EnvironmentOutlined /> {vehicle.location}</span>
         </Space>
-        
+
         <Divider style={{ margin: '12px 0' }} />
-        
+
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <div style={{ fontSize: '12px', color: '#414755' }}>Giá thuê</div>

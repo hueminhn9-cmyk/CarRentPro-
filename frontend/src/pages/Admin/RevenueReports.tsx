@@ -22,13 +22,15 @@ export const RevenueReports: React.FC = () => {
   };
 
   if (loading) return (
-    <div style={{ textAlign: 'center', padding: '100px 0' }}>
-      <Spin size="large" tip="Đang tải báo cáo doanh thu..." />
+    <div className="text-center py-24">
+      <Spin size="large" tip="Đang tải báo cáo doanh thu...">
+        <div className="pt-8" />
+      </Spin>
     </div>
   );
 
   if (!stats) return (
-    <div style={{ textAlign: 'center', padding: '100px 0', color: '#ef4444' }}>
+    <div className="text-center py-24 text-red-500 font-medium">
       Không thể tải dữ liệu. Vui lòng thử lại.
     </div>
   );
@@ -66,7 +68,7 @@ export const RevenueReports: React.FC = () => {
 
       <Row gutter={[24, 24]} style={{ marginBottom: '24px' }}>
         <Col xs={24} sm={8}>
-          <Card bordered={false} style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', borderLeft: '4px solid #1e3a8a' }}>
+          <Card variant="borderless" style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', borderLeft: '4px solid #1e3a8a' }}>
             <Statistic
               title="Tổng doanh thu thực tế"
               value={stats.revenue?.total || 0}
@@ -76,7 +78,7 @@ export const RevenueReports: React.FC = () => {
           </Card>
         </Col>
         <Col xs={24} sm={8}>
-          <Card bordered={false} style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', borderLeft: '4px solid #10b981' }}>
+          <Card variant="borderless" style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', borderLeft: '4px solid #10b981' }}>
             <Statistic
               title="Tổng số lượt đặt xe"
               value={stats.bookings?.total || 0}
@@ -85,7 +87,7 @@ export const RevenueReports: React.FC = () => {
           </Card>
         </Col>
         <Col xs={24} sm={8}>
-          <Card bordered={false} style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', borderLeft: '4px solid #d97706' }}>
+          <Card variant="borderless" style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', borderLeft: '4px solid #d97706' }}>
             <Statistic
               title="Doanh thu hôm nay"
               value={stats.revenue?.today || 0}
@@ -100,7 +102,7 @@ export const RevenueReports: React.FC = () => {
         <Col xs={24} lg={12}>
           <Card 
             title={<Title level={5} style={{ margin: 0 }}>Xu hướng doanh thu theo tháng</Title>} 
-            bordered={false} 
+            variant="borderless" 
             style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
           >
             <RevenueChart data={monthlyData} />
@@ -110,7 +112,7 @@ export const RevenueReports: React.FC = () => {
         <Col xs={24} lg={12}>
           <Card 
             title={<Title level={5} style={{ margin: 0 }}>Doanh thu theo loại phương tiện</Title>} 
-            bordered={false} 
+            variant="borderless" 
             style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
           >
             <TypeBarChart data={typeData} />
@@ -120,7 +122,7 @@ export const RevenueReports: React.FC = () => {
 
       <Card 
         title={<Title level={5} style={{ margin: 0 }}>Bảng phân tích dòng tiền chi tiết theo tháng</Title>} 
-        bordered={false} 
+        variant="borderless" 
         style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
       >
         <Table

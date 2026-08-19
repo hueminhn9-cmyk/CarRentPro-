@@ -46,7 +46,7 @@ export const MyRentals: React.FC = () => {
         renderItem={(booking) => (
           <Card 
             style={{ marginBottom: '16px', borderRadius: '8px', border: '1px solid #f0eded' }}
-            bodyStyle={{ padding: '16px' }}
+            styles={{ body: { padding: '16px' } }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
               <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>

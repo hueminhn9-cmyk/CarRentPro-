@@ -102,7 +102,7 @@ export const VehicleDetails: React.FC = () => {
         {/* Left Column: Gallery, Specs, Description, Reviews (2/3) */}
         <Col xs={24} lg={15}>
           {/* Gallery Main */}
-          <Card bodyStyle={{ padding: 0 }} style={{ overflow: 'hidden', borderRadius: '14px', border: '1px solid #e2e8f0', marginBottom: '14px' }}>
+          <Card styles={{ body: { padding: 0 } }} style={{ overflow: 'hidden', borderRadius: '14px', border: '1px solid #e2e8f0', marginBottom: '14px' }}>
             <img 
               alt={vehicle.name} 
               src={selectedImage} 
@@ -186,7 +186,7 @@ export const VehicleDetails: React.FC = () => {
               position: 'sticky',
               top: '88px'
             }}
-            bodyStyle={{ padding: '24px' }}
+            styles={{ body: { padding: '24px' } }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '16px' }}>
               <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600 }}>GIÁ THUÊ TỰ LÁI</span>

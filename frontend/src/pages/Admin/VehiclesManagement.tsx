@@ -169,7 +169,7 @@ export const VehiclesManagement: React.FC = () => {
       {loading ? (
         viewMode === 'card' ? <CardGridSkeleton count={6} /> : <TableSkeleton rows={6} />
       ) : viewMode === 'table' ? (
-        <Card style={{ borderRadius: '12px', border: '1px solid #e2e8f0' }} bodyStyle={{ padding: 0 }}>
+        <Card style={{ borderRadius: '12px', border: '1px solid #e2e8f0' }} styles={{ body: { padding: 0 } }}>
           <Table dataSource={filtered} columns={columns} rowKey="id" pagination={{ pageSize: 10 }} />
         </Card>
       ) : (
@@ -191,7 +191,7 @@ export const VehiclesManagement: React.FC = () => {
                     </div>
                   </div>
                 }
-                bodyStyle={{ padding: '16px' }}
+                styles={{ body: { padding: '16px' } }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
                   <div>

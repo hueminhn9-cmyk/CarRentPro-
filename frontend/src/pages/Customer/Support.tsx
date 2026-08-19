@@ -52,7 +52,7 @@ export const CustomerSupport: React.FC = () => {
                 <span>Câu hỏi thường gặp</span>
               </Space>
             } 
-            bordered={false} 
+            variant="borderless" 
             style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
           >
             <Collapse 
@@ -67,7 +67,7 @@ export const CustomerSupport: React.FC = () => {
         <Col xs={24} md={8}>
           <Card 
             title={<Title level={5} style={{ margin: 0, fontSize: '15px' }}>Liên hệ khẩn cấp</Title>} 
-            bordered={false} 
+            variant="borderless" 
             style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', backgroundColor: '#001529', color: '#ffffff' }}
             headStyle={{ borderBottom: '1px solid #002c54' }}
           >

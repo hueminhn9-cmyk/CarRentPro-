@@ -166,7 +166,7 @@ export const MaintenanceBoard: React.FC = () => {
       {loading ? (
         <TableSkeleton rows={5} />
       ) : (
-        <Card style={{ borderRadius: '12px', border: '1px solid #e2e8f0' }} bodyStyle={{ padding: '16px 20px' }}>
+        <Card style={{ borderRadius: '12px', border: '1px solid #e2e8f0' }} styles={{ body: { padding: '16px 20px' } }}>
           <Tabs
             defaultActiveKey="list"
             items={[

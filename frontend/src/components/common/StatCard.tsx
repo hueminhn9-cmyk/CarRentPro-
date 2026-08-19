@@ -38,7 +38,7 @@ export const StatCard: React.FC<StatCardProps> = ({
         cursor: onClick ? 'pointer' : 'default',
         ...style
       }}
-      bodyStyle={{ padding: '20px' }}
+      styles={{ body: { padding: '20px' } }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
         <Text type="secondary" style={{ fontSize: '13px', fontWeight: 600, color: '#64748b' }}>
@@ -66,8 +66,8 @@ export const StatCard: React.FC<StatCardProps> = ({
 
       {trend !== undefined && (
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px' }}>
-          <span style={{ 
-            color: isPositive ? '#16a34a' : '#dc2626', 
+          <span style={{
+            color: isPositive ? '#16a34a' : '#dc2626',
             fontWeight: 700,
             display: 'flex',
             alignItems: 'center',

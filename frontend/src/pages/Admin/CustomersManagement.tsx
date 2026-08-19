@@ -138,7 +138,7 @@ export const CustomersManagement: React.FC = () => {
         <Text type="secondary">Quản lý hồ sơ cá nhân, phê duyệt giấy phép lái xe (GPLX) và phân hạng thành viên.</Text>
       </div>
 
-      <Card bordered={false} style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+      <Card variant="borderless" style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
         <Table 
           loading={loading}
           dataSource={customers} 

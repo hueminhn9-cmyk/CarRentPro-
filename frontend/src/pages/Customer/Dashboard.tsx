@@ -137,7 +137,7 @@ export const CustomerDashboard: React.FC = () => {
             marginBottom: '28px',
             boxShadow: '0 4px 20px rgba(15, 23, 42, 0.06)'
           }}
-          bodyStyle={{ padding: 0 }}
+          styles={{ body: { padding: 0 } }}
         >
           <div style={{ background: 'linear-gradient(90deg, #0f172a 0%, #1e293b 100%)', padding: '12px 24px', color: '#ffffff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontSize: '13px', fontWeight: 700, letterSpacing: '0.05em', color: '#fbbf24' }}>

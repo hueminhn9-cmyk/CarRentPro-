@@ -26,7 +26,7 @@ export const BookingReceipt: React.FC = () => {
 
   return (
     <div style={{ maxWidth: '720px', margin: '0 auto' }}>
-      <Card bordered={false} style={{ borderRadius: '8px', boxShadow: '0 4px 16px rgba(0,0,0,0.04)' }}>
+      <Card variant="borderless" style={{ borderRadius: '8px', boxShadow: '0 4px 16px rgba(0,0,0,0.04)' }}>
         <Result
           status="success"
           title="Đặt xe thành công!"

@@ -88,7 +88,7 @@ export const VehicleForm: React.FC = () => {
         <Text type="secondary">Cung cấp các thông số kỹ thuật và hình ảnh mô tả cho xe.</Text>
       </div>
 
-      <Card bordered={false} style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+      <Card variant="borderless" style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
         <Form
           form={form}
           layout="vertical"

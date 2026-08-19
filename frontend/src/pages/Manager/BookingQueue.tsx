@@ -138,7 +138,7 @@ export const BookingQueue: React.FC = () => {
                         border: '1px solid #e2e8f0',
                         boxShadow: '0 1px 3px rgba(15,23,42,0.04)'
                       }}
-                      bodyStyle={{ padding: '12px' }}
+                      styles={{ body: { padding: '12px' } }}
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
                         <Text strong style={{ fontSize: '12px', color: '#1e3a8a' }}>#{item.id.slice(0, 8)}</Text>
@@ -372,7 +372,7 @@ export const BookingQueue: React.FC = () => {
       ) : viewMode === 'kanban' ? (
         renderKanban()
       ) : (
-        <Card style={{ borderRadius: '12px', border: '1px solid #e2e8f0' }} bodyStyle={{ padding: 0 }}>
+        <Card style={{ borderRadius: '12px', border: '1px solid #e2e8f0' }} styles={{ body: { padding: 0 } }}>
           <Table
             dataSource={filteredBookings}
             columns={columns}

@@ -80,7 +80,7 @@ export const VehicleListing: React.FC = () => {
         <Col xs={24} md={6}>
           <Card 
             title={<Title level={5} style={{ margin: 0 }}>Bộ lọc tìm kiếm</Title>} 
-            bordered={false} 
+            variant="borderless" 
             style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', position: 'sticky', top: '88px' }}
           >
             <Space direction="vertical" size={20} style={{ width: '100%' }}>
@@ -171,8 +171,10 @@ export const VehicleListing: React.FC = () => {
         {/* Right Side: Vehicle Grid */}
         <Col xs={24} md={18}>
           {loading ? (
-            <div style={{ textAlign: 'center', padding: '80px 0' }}>
-              <Spin size="large" tip="Đang tải danh sách xe..." />
+            <div className="text-center py-20">
+              <Spin size="large" tip="Đang tải danh sách xe...">
+                <div className="pt-8" />
+              </Spin>
             </div>
           ) : error ? (
             <Alert type="error" message={error} showIcon />
@@ -185,7 +187,7 @@ export const VehicleListing: React.FC = () => {
               ))}
             </Row>
           ) : (
-            <Card bordered={false} style={{ borderRadius: '8px', textAlign: 'center', padding: '40px 0' }}>
+            <Card variant="borderless" className="rounded-lg text-center py-10 shadow-sm">
               <Empty description="Không tìm thấy chiếc xe nào phù hợp với bộ lọc." />
             </Card>
           )}

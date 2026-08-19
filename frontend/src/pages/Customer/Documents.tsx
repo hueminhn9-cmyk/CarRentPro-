@@ -52,7 +52,7 @@ export const CustomerDocuments: React.FC = () => {
                 <span>Giấy phép lái xe (GPLX) hạng B1/B2</span>
               </Space>
             } 
-            bordered={false} 
+            variant="borderless" 
             style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
           >
             <Space direction="vertical" size={16} style={{ width: '100%' }}>
@@ -116,7 +116,7 @@ export const CustomerDocuments: React.FC = () => {
         <Col xs={24} md={8}>
           <Card 
             title={<Title level={5} style={{ margin: 0, fontSize: '14px' }}>Yêu cầu hồ sơ lái xe</Title>} 
-            bordered={false} 
+            variant="borderless" 
             style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
           >
             <Space direction="vertical" size={12} style={{ fontSize: '13px', color: '#414755' }}>

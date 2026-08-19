@@ -76,7 +76,7 @@ export const AdminBookingDetails: React.FC = () => {
           {/* Customer info card */}
           <Card 
             title={<Title level={5} style={{ margin: 0 }}>Thông tin khách hàng</Title>} 
-            bordered={false} 
+            variant="borderless" 
             style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', marginBottom: '24px' }}
           >
             <Descriptions column={2} size="small">
@@ -94,7 +94,7 @@ export const AdminBookingDetails: React.FC = () => {
           {/* Pricing detail */}
           <Card 
             title={<Title level={5} style={{ margin: 0 }}>Chi tiết thanh toán</Title>} 
-            bordered={false} 
+            variant="borderless" 
             style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', marginBottom: '24px' }}
           >
             <Descriptions column={1} size="small">
@@ -130,7 +130,7 @@ export const AdminBookingDetails: React.FC = () => {
           {/* Admin Operations Board */}
           <Card 
             title={<Title level={5} style={{ margin: 0 }}>Thao tác nghiệp vụ</Title>} 
-            bordered={false} 
+            variant="borderless" 
             style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
           >
             <Space size={16} wrap>
@@ -198,7 +198,7 @@ export const AdminBookingDetails: React.FC = () => {
 
         {/* Right Column: Vehicle Assigned & Progress */}
         <Col xs={24} md={8}>
-          <Card bordered={false} style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', marginBottom: '24px' }}>
+          <Card variant="borderless" style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', marginBottom: '24px' }}>
             <img 
               src={booking.vehicleImage} 
               alt={booking.vehicleName} 
@@ -217,7 +217,7 @@ export const AdminBookingDetails: React.FC = () => {
             </Space>
           </Card>
 
-          <Card bordered={false} style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+          <Card variant="borderless" style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
             <Title level={5} style={{ fontSize: '14px', marginBottom: '16px' }}>Hành trình thủ tục</Title>
             <Timeline
               items={[

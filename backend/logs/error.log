@@ -382,3 +382,9 @@ Please make sure your database server is running at `127.0.0.1:3306`.
     "message": "Loại giao dịch là bắt buộc"
   }
 ]
+[2026-08-19 20:44:46] [ERROR]: GET /api/bookings?limit=6 - Error: Token không hợp lệ hoặc đã hết hạn
+[2026-08-19 20:44:46] [ERROR]: GET /api/dashboard/stats - Error: Token không hợp lệ hoặc đã hết hạn
+[2026-08-19 20:44:46] [ERROR]: GET /api/bookings?limit=6 - Error: Token không hợp lệ hoặc đã hết hạn
+[2026-08-19 20:44:46] [ERROR]: GET /api/dashboard/stats - Error: Token không hợp lệ hoặc đã hết hạn
+[2026-08-19 20:44:46] [ERROR]: GET /api/dashboard/stats - Error: Token không hợp lệ hoặc đã hết hạn
+[2026-08-19 20:44:46] [ERROR]: GET /api/dashboard/stats - Error: Token không hợp lệ hoặc đã hết hạn

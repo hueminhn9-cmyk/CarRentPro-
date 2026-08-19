@@ -989,3 +989,57 @@ Please make sure your database server is running at `127.0.0.1:3306`.
 [2026-08-17 00:13:02] [INFO]: [0mGET /api/settings [32m200[0m 3.687 ms - 1801[0m
 [2026-08-17 00:13:02] [INFO]: [0mGET /api/health [32m200[0m 2.018 ms - 109[0m
 [2026-08-17 00:13:02] [INFO]: [0mGET /api/audit-logs [32m200[0m 6.649 ms - 3805[0m
+[2026-08-19 18:11:03] [INFO]: Swagger API documentation initialized under /api-docs
+[2026-08-19 18:11:03] [INFO]: Server started successfully on port 5000 in development mode
+[2026-08-19 18:15:16] [INFO]: [0mGET /api/vehicles?limit=100 [32m200[0m 39.570 ms - 16768[0m
+[2026-08-19 18:15:16] [INFO]: [0mGET /api/vehicles?limit=100 [36m304[0m 10.752 ms - -[0m
+[2026-08-19 20:40:42] [INFO]: [0mGET /api/vehicles?limit=100 [36m304[0m 30.279 ms - -[0m
+[2026-08-19 20:40:42] [INFO]: [0mGET /api/vehicles?limit=100 [36m304[0m 17.653 ms - -[0m
+[2026-08-19 20:40:44] [INFO]: [0mGET /api/vehicles/18 [32m200[0m 9.781 ms - 990[0m
+[2026-08-19 20:40:44] [INFO]: [0mGET /api/vehicles/18 [36m304[0m 5.522 ms - -[0m
+[2026-08-19 20:40:47] [INFO]: [0mGET /api/vehicles?limit=100 [36m304[0m 9.890 ms - -[0m
+[2026-08-19 20:40:47] [INFO]: [0mGET /api/vehicles?limit=100 [36m304[0m 15.657 ms - -[0m
+[2026-08-19 20:40:49] [INFO]: [0mGET /api/vehicles/18 [36m304[0m 4.489 ms - -[0m
+[2026-08-19 20:40:49] [INFO]: [0mGET /api/vehicles/18 [36m304[0m 5.423 ms - -[0m
+[2026-08-19 20:44:46] [ERROR]: GET /api/bookings?limit=6 - Error: Token không hợp lệ hoặc đã hết hạn
+[2026-08-19 20:44:46] [INFO]: [0mGET /api/bookings?limit=6 [33m401[0m 15.307 ms - 77[0m
+[2026-08-19 20:44:46] [ERROR]: GET /api/dashboard/stats - Error: Token không hợp lệ hoặc đã hết hạn
+[2026-08-19 20:44:46] [INFO]: [0mGET /api/dashboard/stats [33m401[0m 2.165 ms - 77[0m
+[2026-08-19 20:44:46] [ERROR]: GET /api/bookings?limit=6 - Error: Token không hợp lệ hoặc đã hết hạn
+[2026-08-19 20:44:46] [INFO]: [0mGET /api/bookings?limit=6 [33m401[0m 1.363 ms - 77[0m
+[2026-08-19 20:44:46] [ERROR]: GET /api/dashboard/stats - Error: Token không hợp lệ hoặc đã hết hạn
+[2026-08-19 20:44:46] [INFO]: [0mGET /api/dashboard/stats [33m401[0m 1.843 ms - 77[0m
+[2026-08-19 20:44:46] [ERROR]: GET /api/dashboard/stats - Error: Token không hợp lệ hoặc đã hết hạn
+[2026-08-19 20:44:46] [INFO]: [0mGET /api/dashboard/stats [33m401[0m 1.930 ms - 77[0m
+[2026-08-19 20:44:46] [ERROR]: GET /api/dashboard/stats - Error: Token không hợp lệ hoặc đã hết hạn
+[2026-08-19 20:44:46] [INFO]: [0mGET /api/dashboard/stats [33m401[0m 1.594 ms - 77[0m
+[2026-08-19 20:44:46] [INFO]: [AUTH] Token refreshed and rotated for user: admin@autorent.vn
+[2026-08-19 20:44:46] [INFO]: [0mPOST /api/auth/refresh-token [32m200[0m 53.129 ms - 439[0m
+[2026-08-19 20:44:46] [INFO]: [0mGET /api/bookings?limit=6 [32m200[0m 38.681 ms - 9115[0m
+[2026-08-19 20:44:46] [INFO]: [0mGET /api/bookings?limit=6 [36m304[0m 8.847 ms - -[0m
+[2026-08-19 20:44:46] [INFO]: [0mGET /api/dashboard/stats [36m304[0m 70.370 ms - -[0m
+[2026-08-19 20:44:46] [INFO]: [0mGET /api/dashboard/stats [36m304[0m 33.769 ms - -[0m
+[2026-08-19 20:44:46] [INFO]: [0mGET /api/dashboard/stats [36m304[0m 32.406 ms - -[0m
+[2026-08-19 20:44:46] [INFO]: [0mGET /api/dashboard/stats [36m304[0m 32.164 ms - -[0m
+[2026-08-19 20:44:52] [INFO]: [0mGET /api/vehicles/18 [36m304[0m 4.694 ms - -[0m
+[2026-08-19 20:44:53] [INFO]: [0mGET /api/vehicles/18 [36m304[0m 5.864 ms - -[0m
+[2026-08-19 20:44:54] [INFO]: [0mGET /api/vehicles/18 [36m304[0m 9.674 ms - -[0m
+[2026-08-19 20:44:54] [INFO]: [0mGET /api/vehicles/18 [36m304[0m 7.372 ms - -[0m
+[2026-08-19 20:44:54] [INFO]: [0mGET /api/users/profile [32m200[0m 21.996 ms - 502[0m
+[2026-08-19 20:44:54] [INFO]: [0mGET /api/users/profile [36m304[0m 4.083 ms - -[0m
+[2026-08-19 20:44:54] [INFO]: [0mGET /api/bookings?limit=6 [36m304[0m 7.896 ms - -[0m
+[2026-08-19 20:44:54] [INFO]: [0mGET /api/bookings?limit=6 [36m304[0m 7.815 ms - -[0m
+[2026-08-19 20:44:54] [INFO]: [0mGET /api/dashboard/stats [36m304[0m 52.071 ms - -[0m
+[2026-08-19 20:44:54] [INFO]: [0mGET /api/dashboard/stats [36m304[0m 30.994 ms - -[0m
+[2026-08-19 20:44:54] [INFO]: [0mGET /api/dashboard/stats [36m304[0m 30.944 ms - -[0m
+[2026-08-19 20:44:54] [INFO]: [0mGET /api/dashboard/stats [36m304[0m 32.377 ms - -[0m
+[2026-08-19 20:44:59] [INFO]: [AUTH] Token logged out / revoked
+[2026-08-19 20:44:59] [INFO]: [0mPOST /api/auth/logout [32m200[0m 27.106 ms - 55[0m
+[2026-08-19 21:09:37] [INFO]: Swagger API documentation initialized under /api-docs
+[2026-08-19 21:09:37] [INFO]: Server started successfully on port 5000 in development mode
+[2026-08-19 21:11:07] [INFO]: Swagger API documentation initialized under /api-docs
+[2026-08-19 21:11:07] [INFO]: Server started successfully on port 5000 in development mode
+[2026-08-19 21:17:34] [INFO]: [0mGET /api/vehicles?limit=100 [36m304[0m 75.896 ms - -[0m
+[2026-08-19 21:17:34] [INFO]: [0mGET /api/vehicles?limit=100 [36m304[0m 14.224 ms - -[0m
+[2026-08-19 21:17:51] [INFO]: [0mGET /api/vehicles?limit=100 [36m304[0m 9.462 ms - -[0m
+[2026-08-19 21:17:51] [INFO]: [0mGET /api/vehicles?limit=100 [36m304[0m 9.477 ms - -[0m

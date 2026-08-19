@@ -60,10 +60,12 @@ export const CustomerNotifications: React.FC = () => {
         <Button type="link" onClick={handleMarkAllRead}>Đánh dấu đã đọc tất cả</Button>
       </div>
 
-      <Card bordered={false} style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+      <Card variant="borderless" style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '40px 0' }}>
-            <Spin size="large" tip="Đang tải thông báo..." />
+          <div className="text-center py-10">
+            <Spin size="large" tip="Đang tải thông báo...">
+              <div className="pt-8" />
+            </Spin>
           </div>
         ) : notifications.length > 0 ? (
           <List

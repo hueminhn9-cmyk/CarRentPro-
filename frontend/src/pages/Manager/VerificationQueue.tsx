@@ -131,7 +131,7 @@ export const VerificationQueue: React.FC = () => {
                 </div>
               }
               style={{ borderRadius: '12px', border: '1px solid #e2e8f0' }}
-              bodyStyle={{ padding: '8px', maxHeight: '72vh', overflowY: 'auto' }}
+              styles={{ body: { padding: '8px', maxHeight: '72vh', overflowY: 'auto' } }}
             >
               {customers.map((c) => {
                 const isSelected = selectedCustomer?.id === c.id;

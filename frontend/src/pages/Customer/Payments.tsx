@@ -85,7 +85,7 @@ export const CustomerPayments: React.FC = () => {
         <Text type="secondary">Quản lý hóa đơn điện tử, lịch sử giao dịch và biên lai cọc của bạn.</Text>
       </div>
 
-      <Card bordered={false} style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+      <Card variant="borderless" style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
         <Table 
           loading={loading}
           dataSource={bookings} 

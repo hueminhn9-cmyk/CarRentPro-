@@ -364,7 +364,7 @@ export const LandingPage: React.FC = () => {
             ].map((stat, idx) => (
               <Col xs={12} sm={6} key={idx}>
                 <Card 
-                  bordered={false} 
+                  variant="borderless" 
                   className="hover-lift"
                   style={{ 
                     textAlign: 'center', 
@@ -426,7 +426,7 @@ export const LandingPage: React.FC = () => {
                     boxShadow: '0 6px 18px rgba(15,23,42,0.05)',
                     textAlign: 'center'
                   }}
-                  bodyStyle={{ padding: '20px 16px' }}
+                  styles={{ body: { padding: '20px 16px' } }}
                   onClick={() => navigate('/vehicles')}
                 >
                   <div style={{ fontSize: '36px', marginBottom: '12px' }}>{cat.icon}</div>
@@ -480,7 +480,7 @@ export const LandingPage: React.FC = () => {
                     boxShadow: '0 10px 30px rgba(15,23,42,0.06)',
                     backgroundColor: '#ffffff'
                   }}
-                  bodyStyle={{ padding: '22px' }}
+                  styles={{ body: { padding: '22px' } }}
                 >
                   <div style={{ position: 'relative', marginBottom: '18px', overflow: 'hidden', borderRadius: '14px' }}>
                     <img 
@@ -584,7 +584,7 @@ export const LandingPage: React.FC = () => {
             {whyChooseUs.map((feat, idx) => (
               <Col xs={24} sm={12} lg={4} key={idx}>
                 <Card 
-                  bordered={false} 
+                  variant="borderless" 
                   className="hover-lift"
                   style={{ 
                     borderRadius: '20px', 
@@ -678,7 +678,7 @@ export const LandingPage: React.FC = () => {
             {testimonials.map((item, idx) => (
               <Col xs={24} md={8} key={idx}>
                 <Card 
-                  bordered={false} 
+                  variant="borderless" 
                   style={{ 
                     borderRadius: '20px', 
                     height: '100%', 

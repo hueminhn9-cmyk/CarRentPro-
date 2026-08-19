@@ -115,7 +115,7 @@ export const MaintenanceManagement: React.FC = () => {
         <Text type="secondary">Theo dõi lịch bảo dưỡng sửa chữa định kỳ, chi phí kỹ thuật phương tiện.</Text>
       </div>
 
-      <Card bordered={false} style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+      <Card variant="borderless" style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
         <Table 
           loading={loading}
           dataSource={records} 

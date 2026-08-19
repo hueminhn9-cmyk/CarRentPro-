@@ -74,6 +74,10 @@ const NotFoundPage: React.FC = () => {
 };
 
 export const router = createBrowserRouter([
+  // Standalone Auth Routes (Clean Fullscreen Layout)
+  { path: '/auth/login', element: <LoginPage /> },
+  { path: '/auth/register', element: <RegisterPage /> },
+
   // Public Routes
   {
     path: '/',
@@ -82,8 +86,6 @@ export const router = createBrowserRouter([
       { index: true, element: <LandingPage /> },
       { path: 'vehicles', element: <VehicleListing /> },
       { path: 'vehicles/:id', element: <VehicleDetails /> },
-      { path: 'auth/login', element: <LoginPage /> },
-      { path: 'auth/register', element: <RegisterPage /> },
       { path: '404', element: <NotFoundPage /> }
     ]
   },

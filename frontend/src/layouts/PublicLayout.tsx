@@ -125,12 +125,12 @@ export const PublicLayout: React.FC = () => {
           <Select
             value={language}
             onChange={(val) => setLanguage(val as 'vi' | 'en')}
-            style={{ width: '125px' }}
-            bordered={false}
-            dropdownStyle={{ borderRadius: '10px' }}
+            className="w-[125px]"
+            variant="borderless"
+            styles={{ popup: { root: { borderRadius: '10px' } } }}
             options={[
-              { value: 'vi', label: <span style={{ fontWeight: 600 }}>🇻🇳 Tiếng Việt</span> },
-              { value: 'en', label: <span style={{ fontWeight: 600 }}>🇬🇧 English</span> }
+              { value: 'vi', label: <span className="font-semibold">🇻🇳 Tiếng Việt</span> },
+              { value: 'en', label: <span className="font-semibold">🇬🇧 English</span> }
             ]}
           />
 

@@ -81,7 +81,7 @@ export const ContractsManagement: React.FC = () => {
         <Text type="secondary">Tra cứu, lưu trữ và theo dõi pháp lý các bản hợp đồng thuê xe tự lái.</Text>
       </div>
 
-      <Card bordered={false} style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+      <Card variant="borderless" style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
         <Table 
           loading={loading}
           dataSource={contracts} 

@@ -145,7 +145,7 @@ export const AdminSettings: React.FC = () => {
         <Text type="secondary">Cấu hình các tham số kinh doanh, chính sách thuê xe và thông tin doanh nghiệp.</Text>
       </div>
 
-      <Card bordered={false} style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+      <Card variant="borderless" style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
         <Tabs 
           defaultActiveKey="general"
           items={[

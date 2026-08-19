@@ -96,13 +96,13 @@ export const ManagerManagement: React.FC = () => {
 
       <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
         <Col xs={24} sm={8}>
-          <Card bordered={false} style={{ borderRadius: '12px', borderLeft: '4px solid #2563eb' }}>
+          <Card variant="borderless" style={{ borderRadius: '12px', borderLeft: '4px solid #2563eb' }}>
             <Text type="secondary">Tổng số Manager</Text>
             <Title level={2} style={{ margin: '8px 0 0 0', fontWeight: 800 }}>{managers.length}</Title>
           </Card>
         </Col>
         <Col xs={24} sm={8}>
-          <Card bordered={false} style={{ borderRadius: '12px', borderLeft: '4px solid #10b981' }}>
+          <Card variant="borderless" style={{ borderRadius: '12px', borderLeft: '4px solid #10b981' }}>
             <Text type="secondary">Đang hoạt động</Text>
             <Title level={2} style={{ margin: '8px 0 0 0', color: '#10b981', fontWeight: 800 }}>
               {activeCount}
@@ -110,7 +110,7 @@ export const ManagerManagement: React.FC = () => {
           </Card>
         </Col>
         <Col xs={24} sm={8}>
-          <Card bordered={false} style={{ borderRadius: '12px', borderLeft: '4px solid #f59e0b' }}>
+          <Card variant="borderless" style={{ borderRadius: '12px', borderLeft: '4px solid #f59e0b' }}>
             <Text type="secondary">Tạm khóa</Text>
             <Title level={2} style={{ margin: '8px 0 0 0', color: '#f59e0b', fontWeight: 800 }}>
               {managers.length - activeCount}

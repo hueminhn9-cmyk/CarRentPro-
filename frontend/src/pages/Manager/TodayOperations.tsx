@@ -131,7 +131,7 @@ export const TodayOperations: React.FC = () => {
                   boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
                   overflow: 'hidden'
                 }}
-                bodyStyle={{ padding: '20px 24px' }}
+                styles={{ body: { padding: '20px 24px' } }}
               >
                 <Row gutter={[20, 16]} align="middle">
                   {/* Time badge */}

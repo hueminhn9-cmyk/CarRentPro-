@@ -204,7 +204,7 @@ export const BookingsManagement: React.FC = () => {
       ) : filtered.length === 0 ? (
         <EmptyState title="Không có đơn thuê phù hợp" description="Thử thay đổi bộ lọc tìm kiếm." />
       ) : viewMode === 'table' ? (
-        <Card style={{ borderRadius: '12px', border: '1px solid #e2e8f0' }} bodyStyle={{ padding: 0 }}>
+        <Card style={{ borderRadius: '12px', border: '1px solid #e2e8f0' }} styles={{ body: { padding: 0 } }}>
           <Table 
             dataSource={filtered} 
             columns={columns} 

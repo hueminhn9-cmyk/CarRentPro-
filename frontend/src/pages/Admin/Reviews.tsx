@@ -138,7 +138,7 @@ export const Reviews: React.FC = () => {
         <Text type="secondary" style={{ fontSize: '13px' }}>Quản lý phản hồi, xếp hạng sao của người dùng để nâng cao chất lượng dịch vụ</Text>
       </div>
 
-      <Card style={{ borderRadius: '12px', border: '1px solid #e2e8f0' }} bodyStyle={{ padding: 0 }}>
+      <Card style={{ borderRadius: '12px', border: '1px solid #e2e8f0' }} styles={{ body: { padding: 0 } }}>
         <Table dataSource={reviews} columns={columns} rowKey="id" pagination={{ pageSize: 10 }} />
       </Card>
     </div>
