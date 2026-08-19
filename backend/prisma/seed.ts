@@ -2175,7 +2175,7 @@ async function main() {
     // =========================================================================
     // 14. TABLE: maintenance_records (8 Maintenance History Records)
     // =========================================================================
-    const maintenanceData = [
+    const additionalMaintenanceData = [
       {
         veh: dbVehicles['RNG'],
         type: 'Bảo dưỡng định kỳ 30.000 km',
@@ -2255,7 +2255,7 @@ async function main() {
       }
     ];
 
-    for (const m of maintenanceData) {
+    for (const m of additionalMaintenanceData) {
       const existing = await prisma.maintenance_records.findFirst({
         where: { vehicle_id: m.veh.id, maintenance_type: m.type }
       });

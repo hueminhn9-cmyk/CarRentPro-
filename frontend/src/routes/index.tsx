@@ -28,22 +28,32 @@ import { CustomerPayments } from '@/pages/Customer/Payments';
 import { CustomerNotifications } from '@/pages/Customer/Notifications';
 import { CustomerSupport } from '@/pages/Customer/Support';
 
-// Manager Pages
+// Manager Pages (AutoRent 2.0 Ops Center)
 import { ManagerDashboard } from '@/pages/Manager/ManagerDashboard';
+import { BookingQueue } from '@/pages/Manager/BookingQueue';
+import { TodayOperations } from '@/pages/Manager/TodayOperations';
+import { PickupWizard } from '@/pages/Manager/PickupWizard';
+import { ReturnWizard } from '@/pages/Manager/ReturnWizard';
+import { VerificationQueue } from '@/pages/Manager/VerificationQueue';
+import { MaintenanceBoard } from '@/pages/Manager/MaintenanceBoard';
+import { FleetView } from '@/pages/Manager/FleetView';
 
-// Admin Pages
+// Admin Pages (AutoRent 2.0 Business Center)
 import { AdminDashboard } from '@/pages/Admin/Dashboard';
 import { ManagerManagement } from '@/pages/Admin/ManagerManagement';
 import { VehiclesManagement } from '@/pages/Admin/VehiclesManagement';
 import { VehicleForm } from '@/pages/Admin/VehicleForm';
 import { BookingsManagement } from '@/pages/Admin/BookingsManagement';
-import { AdminBookingDetails } from '@/pages/Admin/BookingDetails';
+import { BookingDetail } from '@/pages/Admin/BookingDetail';
 import { CustomersManagement } from '@/pages/Admin/CustomersManagement';
 import { RevenueReports } from '@/pages/Admin/RevenueReports';
 import { MaintenanceManagement } from '@/pages/Admin/MaintenanceManagement';
 import { ContractsManagement } from '@/pages/Admin/ContractsManagement';
 import { VehicleHandover } from '@/pages/Admin/VehicleHandover';
 import { AdminSettings } from '@/pages/Admin/Settings';
+import { Reviews } from '@/pages/Admin/Reviews';
+import { NotificationCenter } from '@/pages/Admin/NotificationCenter';
+import { AuditLogs } from '@/pages/Admin/AuditLogs';
 
 // 404 Page Component
 import { Result, Button } from 'antd';
@@ -87,9 +97,11 @@ export const router = createBrowserRouter([
       { path: 'dashboard', element: <CustomerDashboard /> },
       { path: 'vehicles', element: <Navigate to="/vehicles" replace /> },
       { path: 'vehicles/:id', element: <Navigate to="/vehicles" replace /> },
+      { path: 'checkout', element: <BookingCheckout /> },
       { path: 'booking/step1', element: <BookingStep1 /> },
       { path: 'booking/checkout', element: <BookingCheckout /> },
       { path: 'booking/receipt/:id', element: <BookingReceipt /> },
+      { path: 'my-rentals', element: <MyRentals /> },
       { path: 'rentals', element: <MyRentals /> },
       { path: 'rentals/:id', element: <RentalDetails /> },
       { path: 'rentals/:id/review', element: <SubmitReview /> },
@@ -101,23 +113,27 @@ export const router = createBrowserRouter([
     ]
   },
 
-  // Manager Protected Routes
+  // Manager Protected Routes (Operations Workspace)
   {
     path: '/manager',
     element: <ManagerLayout />,
     children: [
       { index: true, element: <Navigate to="/manager/dashboard" replace /> },
       { path: 'dashboard', element: <ManagerDashboard /> },
-      { path: 'bookings', element: <BookingsManagement /> },
-      { path: 'bookings/:id', element: <AdminBookingDetails /> },
+      { path: 'bookings', element: <BookingQueue /> },
+      { path: 'operations/today', element: <TodayOperations /> },
+      { path: 'pickup/:bookingId', element: <PickupWizard /> },
+      { path: 'return/:bookingId', element: <ReturnWizard /> },
+      { path: 'verification', element: <VerificationQueue /> },
+      { path: 'maintenance', element: <MaintenanceBoard /> },
+      { path: 'fleet', element: <FleetView /> },
       { path: 'contracts', element: <ContractsManagement /> },
       { path: 'handover/:id', element: <VehicleHandover /> },
-      { path: 'customers', element: <CustomersManagement /> },
-      { path: 'maintenance', element: <MaintenanceManagement /> }
+      { path: 'customers', element: <CustomersManagement /> }
     ]
   },
 
-  // Admin Protected Routes
+  // Admin Protected Routes (Business Workspace)
   {
     path: '/admin',
     element: <AdminLayout />,
@@ -128,13 +144,17 @@ export const router = createBrowserRouter([
       { path: 'vehicles', element: <VehiclesManagement /> },
       { path: 'vehicles/new', element: <VehicleForm /> },
       { path: 'vehicles/edit/:id', element: <VehicleForm /> },
+      { path: 'vehicles/:id/edit', element: <VehicleForm /> },
       { path: 'bookings', element: <BookingsManagement /> },
-      { path: 'bookings/:id', element: <AdminBookingDetails /> },
+      { path: 'bookings/:id', element: <BookingDetail /> },
       { path: 'customers', element: <CustomersManagement /> },
+      { path: 'reviews', element: <Reviews /> },
       { path: 'revenue', element: <RevenueReports /> },
       { path: 'maintenance', element: <MaintenanceManagement /> },
       { path: 'contracts', element: <ContractsManagement /> },
       { path: 'handover/:id', element: <VehicleHandover /> },
+      { path: 'notifications', element: <NotificationCenter /> },
+      { path: 'audit-logs', element: <AuditLogs /> },
       { path: 'settings', element: <AdminSettings /> }
     ]
   },

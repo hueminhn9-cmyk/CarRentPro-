@@ -26,6 +26,78 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// Response Interceptor: Automatically refresh expired token on 401
+let isRefreshing = false;
+let failedQueue: Array<{ resolve: (token: string) => void; reject: (err: any) => void }> = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token!);
+    }
+  });
+  failedQueue = [];
+};
+
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    
+    // If error is 401 and not already retried
+    if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url?.includes('/auth/')) {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        }).then(token => {
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          return axiosInstance(originalRequest);
+        }).catch(err => Promise.reject(err));
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      const refreshToken = localStorage.getItem('autorent_refresh_token');
+      if (refreshToken) {
+        try {
+          const res = await axios.post(`${API_BASE_URL}/auth/refresh-token`, { refreshToken });
+          const { accessToken, refreshToken: newRefreshToken } = res.data.data;
+          
+          localStorage.setItem('autorent_token', accessToken);
+          localStorage.setItem('autorent_refresh_token', newRefreshToken);
+          
+          axiosInstance.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+          
+          processQueue(null, accessToken);
+          return axiosInstance(originalRequest);
+        } catch (refreshError) {
+          processQueue(refreshError, null);
+          localStorage.removeItem('autorent_token');
+          localStorage.removeItem('autorent_refresh_token');
+          localStorage.removeItem('autorent_user');
+          if (window.location.pathname !== '/auth/login' && !window.location.pathname.startsWith('/vehicles') && window.location.pathname !== '/') {
+            window.location.href = '/auth/login?redirect=' + encodeURIComponent(window.location.pathname);
+          }
+          return Promise.reject(refreshError);
+        } finally {
+          isRefreshing = false;
+        }
+      } else {
+        localStorage.removeItem('autorent_token');
+        localStorage.removeItem('autorent_user');
+        if (window.location.pathname !== '/auth/login' && !window.location.pathname.startsWith('/vehicles') && window.location.pathname !== '/') {
+          window.location.href = '/auth/login?redirect=' + encodeURIComponent(window.location.pathname);
+        }
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 // Formatter Helpers to map Backend DB models to Frontend components expected models
 const formatVehicle = (v: any): Vehicle => {
   const catName = v.vehicle_categories?.name || 'Sedan';
@@ -190,10 +262,19 @@ export const api = {
     }
   },
 
+  // Dashboard API
+  dashboard: {
+    getKpis: async () => {
+      const res = await axiosInstance.get('/dashboard/stats');
+      return res.data.data;
+    }
+  },
+
   // Vehicles API
   vehicles: {
-    getAll: async (): Promise<Vehicle[]> => {
-      const res = await axiosInstance.get('/vehicles');
+    getAll: async (params?: { limit?: number; status?: string }): Promise<Vehicle[]> => {
+      const limit = params?.limit || 100;
+      const res = await axiosInstance.get(`/vehicles?limit=${limit}`);
       const list = res.data.data.vehicles || [];
       return list.map(formatVehicle);
     },
@@ -204,7 +285,6 @@ export const api = {
     },
     
     create: async (data: Omit<Vehicle, 'id' | 'rating' | 'reviewsCount'>): Promise<Vehicle> => {
-      // Fetch categories dynamically
       const catsRes = await axiosInstance.get('/vehicles/categories');
       const cats = catsRes.data.data;
       const typeMap: Record<string, string> = {
@@ -245,7 +325,6 @@ export const api = {
     },
     
     update: async (id: string, data: Partial<Vehicle>): Promise<Vehicle> => {
-      // Map properties to backend if they are updated
       const payload: any = {};
       if (data.name) {
         payload.name = data.name;
@@ -277,8 +356,9 @@ export const api = {
 
   // Bookings API
   bookings: {
-    getAll: async (): Promise<Booking[]> => {
-      const res = await axiosInstance.get('/bookings');
+    getAll: async (params?: { limit?: number; status?: string }): Promise<Booking[]> => {
+      const limit = params?.limit || 100;
+      const res = await axiosInstance.get(`/bookings?limit=${limit}`);
       const list = res.data.data.bookings || [];
       return list.map(formatBooking);
     },
@@ -289,46 +369,48 @@ export const api = {
     },
     
     getByCustomer: async (customerId: string): Promise<Booking[]> => {
-      // Behind the scenes, the backend auto-filters by customer_id based on JWT
-      const res = await axiosInstance.get('/bookings');
+      const res = await axiosInstance.get('/bookings?limit=100');
       const list = res.data.data.bookings || [];
       return list.map(formatBooking);
     },
     
-    create: async (data: Omit<Booking, 'id' | 'bookingCode' | 'createdAt' | 'contractSigned' | 'paymentStatus'>): Promise<Booking> => {
-      // Map to createBookingSchema
+    create: async (data: any): Promise<Booking> => {
       const payload = {
         vehicle_id: Number(data.vehicleId),
         pickup_datetime: new Date(data.startDate).toISOString(),
         return_datetime: new Date(data.endDate).toISOString(),
-        pickup_location: data.pickupLocation,
-        return_location: data.dropoffLocation,
+        pickup_location: data.pickupLocation || 'Showroom Đống Đa - Hà Nội',
+        return_location: data.dropoffLocation || 'Showroom Đống Đa - Hà Nội',
         customer_note: data.notes || '',
-        services: []
+        services: data.services || []
       };
       
       const res = await axiosInstance.post('/bookings', payload);
       return formatBooking(res.data.data);
     },
     
-    updateStatus: async (id: string, status: Booking['status'], paymentStatus?: Booking['paymentStatus']): Promise<Booking> => {
-      // Map status values:
-      // 'Chờ xác nhận' | 'Hoàn thành' | 'Đang thuê' | 'Đã hủy'
+    updateStatus: async (id: string, status: string, paymentStatus?: string): Promise<Booking> => {
       const statusMap: Record<string, string> = {
         'Chờ xác nhận': 'PENDING',
+        'PENDING': 'PENDING',
         'Đang thuê': 'ACTIVE',
+        'ACTIVE': 'ACTIVE',
+        'CONFIRMED': 'CONFIRMED',
+        'READY_FOR_PICKUP': 'READY_FOR_PICKUP',
         'Hoàn thành': 'COMPLETED',
-        'Đã hủy': 'CANCELLED'
+        'COMPLETED': 'COMPLETED',
+        'Đã hủy': 'CANCELLED',
+        'CANCELLED': 'CANCELLED',
+        'REJECTED': 'REJECTED'
       };
       
-      const backendStatus = statusMap[status] || 'PENDING';
+      const backendStatus = statusMap[status] || status;
       
       const res = await axiosInstance.put(`/bookings/${id}/status`, {
         status: backendStatus,
         reason: `Cập nhật trạng thái thành ${status}`
       });
       
-      // If payment status needs updating, we can mock it or check if payment endpoints exist
       return formatBooking(res.data.data);
     },
     
@@ -343,26 +425,23 @@ export const api = {
 
   // Customers API
   customers: {
-    getAll: async (): Promise<Customer[]> => {
-      const res = await axiosInstance.get('/users');
+    getAll: async (params?: { limit?: number }): Promise<Customer[]> => {
+      const limit = params?.limit || 100;
+      const res = await axiosInstance.get(`/users?role=CUSTOMER&limit=${limit}`);
       const list = res.data.data.users || [];
       return list.map(formatCustomer);
     },
     
     getById: async (id: string): Promise<Customer | undefined> => {
       try {
-        // First try to get own profile (works for all roles)
         const profileRes = await axiosInstance.get('/users/profile');
         const profileUser = profileRes.data.data;
-        // If the profile matches the requested ID, use it
         if (profileUser && profileUser.id?.toString() === id.toString()) {
           return formatCustomer(profileUser);
         }
-        // Otherwise fall back to admin endpoint (for admin viewing other users)
         const res = await axiosInstance.get(`/users/${id}`);
         return formatCustomer(res.data.data);
       } catch (err: any) {
-        // If admin endpoint fails (403), try own profile
         try {
           const profileRes = await axiosInstance.get('/users/profile');
           return formatCustomer(profileRes.data.data);
@@ -372,10 +451,15 @@ export const api = {
       }
     },
 
-    
+    verifyLicense: async (id: string, data: { status: string; reason?: string }): Promise<any> => {
+      const res = await axiosInstance.put(`/users/${id}/verify`, {
+        status: data.status,
+        reason: data.reason
+      });
+      return res.data;
+    },
+
     updateLicense: async (id: string, status: Customer['licenseStatus'], fileUrl?: string): Promise<Customer> => {
-      // Backend status maps:
-      // 'Đã xác minh' | 'Chờ duyệt' | 'Chưa cập nhật'
       const statusMap: Record<string, string> = {
         'Đã xác minh': 'VERIFIED',
         'Chờ duyệt': 'PENDING',
@@ -442,7 +526,7 @@ export const api = {
 
   // Maintenance API
   maintenance: {
-    getAll: async (): Promise<MaintenanceRecord[]> => {
+    getAll: async (params?: { limit?: number }): Promise<MaintenanceRecord[]> => {
       const res = await axiosInstance.get('/maintenance');
       return res.data.data || [];
     },
@@ -466,9 +550,9 @@ export const api = {
 
   // Contracts API
   contracts: {
-    getAll: async (): Promise<Contract[]> => {
-      const res = await axiosInstance.get('/contracts');
-      const list = res.data.data.contracts || [];
+    getAll: async (params?: { limit?: number }): Promise<Contract[]> => {
+      const res = await axiosInstance.get('/contracts?limit=100');
+      const list = res.data.data.contracts || res.data.data || [];
       return list.map(formatContract);
     }
   },
@@ -478,6 +562,33 @@ export const api = {
     getAdminStats: async () => {
       const res = await axiosInstance.get('/dashboard/stats');
       return res.data.data;
+    }
+  },
+
+  // Managers API
+  managers: {
+    getAll: async () => {
+      const res = await axiosInstance.get('/users?role=MANAGER&limit=100');
+      return res.data.data.users || [];
+    },
+    create: async (data: any) => {
+      const res = await axiosInstance.post('/users', {
+        email: data.email,
+        password: data.password || 'manager123',
+        full_name: data.name,
+        phone: data.phone,
+        role: 'MANAGER',
+        status: 'ACTIVE'
+      });
+      return res.data.data;
+    },
+    update: async (id: string, data: any) => {
+      const res = await axiosInstance.put(`/users/${id}`, data);
+      return res.data.data;
+    },
+    delete: async (id: string) => {
+      const res = await axiosInstance.delete(`/users/${id}`);
+      return res.data;
     }
   }
 };

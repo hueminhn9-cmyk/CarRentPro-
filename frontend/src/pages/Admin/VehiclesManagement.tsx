@@ -1,24 +1,36 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Table, Button, Typography, Space, Popconfirm, message, Image } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, ToolOutlined } from '@ant-design/icons';
+import { Card, Table, Button, Typography, Space, Tag, Segmented, Row, Col, message, Popconfirm } from 'antd';
+import {
+  CarOutlined,
+  PlusOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  AppstoreOutlined,
+  BarsOutlined,
+  ToolOutlined
+} from '@ant-design/icons';
 import { api } from '@/services/api';
-import { Vehicle } from '@/services/mockData';
 import { StatusBadge } from '@/components/common/StatusBadge';
+import { FilterBar } from '@/components/common/FilterBar';
+import { CardGridSkeleton, TableSkeleton } from '@/components/common/LoadingSkeleton';
 import { useNavigate } from 'react-router-dom';
 
 const { Title, Text } = Typography;
 
 export const VehiclesManagement: React.FC = () => {
   const navigate = useNavigate();
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [viewMode, setViewMode] = useState<'table' | 'card'>('card');
+  const [vehicles, setVehicles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
 
   const fetchVehicles = () => {
     setLoading(true);
-    api.vehicles.getAll().then(res => {
-      setVehicles(res);
-      setLoading(false);
-    });
+    api.vehicles.getAll({ limit: 50 }).then((res: any) => {
+      const list = Array.isArray(res) ? res : (res?.items || res?.data || []);
+      setVehicles(list);
+    }).finally(() => setLoading(false));
   };
 
   useEffect(() => {
@@ -28,53 +40,62 @@ export const VehiclesManagement: React.FC = () => {
   const handleDelete = async (id: string) => {
     try {
       await api.vehicles.delete(id);
-      message.success('Xóa xe thành công!');
+      message.success('Đã xóa phương tiện khỏi đội xe!');
       fetchVehicles();
     } catch (e) {
-      message.error('Không thể xóa xe lúc này!');
+      message.error('Không thể xóa xe đang trong hợp đồng thuê!');
     }
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(price);
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(price || 0);
   };
+
+  const filtered = vehicles.filter(v => {
+    const matchSearch = search ? (
+      (v.name || '').toLowerCase().includes(search.toLowerCase()) ||
+      (v.licensePlate || '').toLowerCase().includes(search.toLowerCase()) ||
+      (v.brand || '').toLowerCase().includes(search.toLowerCase())
+    ) : true;
+    const matchStatus = statusFilter ? v.status === statusFilter : true;
+    return matchSearch && matchStatus;
+  });
 
   const columns = [
     {
-      title: 'Ảnh xe',
-      dataIndex: 'image',
-      key: 'image',
-      render: (imgUrl: string, record: Vehicle) => (
-        <Image 
-          src={imgUrl} 
-          alt={record.name} 
-          width={80} 
-          height={50}
-          style={{ objectFit: 'cover', borderRadius: '4px' }} 
-        />
+      title: 'Xe & Hình ảnh',
+      key: 'vehicle',
+      render: (_: any, r: any) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <img 
+            src={r.imageUrl || "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=400&auto=format&fit=crop&q=60"} 
+            alt={r.name} 
+            style={{ width: '64px', height: '44px', objectFit: 'cover', borderRadius: '6px' }}
+          />
+          <div>
+            <div style={{ fontWeight: 700, color: '#0f172a' }}>{r.name}</div>
+            <div style={{ fontSize: '11px', color: '#64748b' }}>Hãng: {r.brand || 'VinFast'} • {r.transmission || 'Tự động'}</div>
+          </div>
+        </div>
       )
     },
     {
-      title: 'Tên xe',
-      dataIndex: 'name',
-      key: 'name',
-      render: (name: string) => <Text strong>{name}</Text>
-    },
-    {
-      title: 'Biển kiểm soát',
+      title: 'Biển số',
       dataIndex: 'licensePlate',
       key: 'licensePlate',
+      render: (plate: string) => <Tag color="geekblue" style={{ fontWeight: 700 }}>{plate || '30A-999.88'}</Tag>
     },
     {
-      title: 'Phân loại',
-      dataIndex: 'type',
-      key: 'type',
+      title: 'Phân khúc',
+      dataIndex: 'category',
+      key: 'category',
+      render: (cat: string) => <span>{cat || 'SUV 7 chỗ'}</span>
     },
     {
-      title: 'Giá thuê / ngày',
+      title: 'Giá thuê / Ngày',
       dataIndex: 'pricePerDay',
       key: 'pricePerDay',
-      render: (price: number) => <Text strong style={{ color: '#0053d0' }}>{formatPrice(price)}</Text>
+      render: (price: number) => <Text strong style={{ color: '#0f172a' }}>{formatPrice(price)}</Text>
     },
     {
       title: 'Trạng thái',
@@ -85,31 +106,15 @@ export const VehiclesManagement: React.FC = () => {
     {
       title: 'Thao tác',
       key: 'actions',
-      render: (_, record: Vehicle) => (
-        <Space size={12}>
+      render: (_: any, r: any) => (
+        <Space size={8}>
           <Button 
             type="text" 
             icon={<EditOutlined />} 
-            onClick={() => navigate(`/admin/vehicles/edit/${record.id}`)}
-          >
-            Sửa
-          </Button>
-          
-          <Popconfirm
-            title="Xóa phương tiện này?"
-            description="Bạn có chắc chắn muốn xóa xe này khỏi hạm đội không?"
-            onConfirm={() => handleDelete(record.id)}
-            okText="Xóa xe"
-            cancelText="Hủy"
-            okButtonProps={{ danger: true }}
-          >
-            <Button 
-              type="text" 
-              danger 
-              icon={<DeleteOutlined />}
-            >
-              Xóa
-            </Button>
+            onClick={() => navigate(`/admin/vehicles/${r.id}/edit`)}
+          />
+          <Popconfirm title="Xóa xe này khỏi hệ thống?" onConfirm={() => handleDelete(r.id)}>
+            <Button type="text" danger icon={<DeleteOutlined />} />
           </Popconfirm>
         </Space>
       )
@@ -117,30 +122,100 @@ export const VehiclesManagement: React.FC = () => {
   ];
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-      <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <div>
-          <Title level={3} style={{ margin: 0, fontWeight: 700 }}>Quản lý phương tiện</Title>
-          <Text type="secondary">Danh sách tất cả các xe trong hạm đội AutoRent.</Text>
+          <Title level={4} style={{ margin: 0, fontWeight: 800 }}>Chiến lược & Quản lý Đội xe (Fleet Strategy)</Title>
+          <Text type="secondary" style={{ fontSize: '13px' }}>Định cấu hình giá thuê, cập nhật thông số và theo dõi trạng thái phương tiện</Text>
         </div>
-        <Button 
-          type="primary" 
-          icon={<PlusOutlined />} 
-          onClick={() => navigate('/admin/vehicles/new')}
-          style={{ borderRadius: '6px' }}
-        >
-          Thêm xe mới
-        </Button>
+
+        <Space size={12}>
+          <Segmented
+            value={viewMode}
+            onChange={(val) => setViewMode(val as 'table' | 'card')}
+            options={[
+              { label: 'Card View', value: 'card', icon: <AppstoreOutlined /> },
+              { label: 'Table View', value: 'table', icon: <BarsOutlined /> }
+            ]}
+            style={{ background: '#e2e8f0', padding: '3px', borderRadius: '8px' }}
+          />
+
+          <Button 
+            type="primary" 
+            icon={<PlusOutlined />} 
+            onClick={() => navigate('/admin/vehicles/new')}
+            style={{ borderRadius: '8px', background: '#0f172a', borderColor: '#0f172a', fontWeight: 600 }}
+          >
+            Thêm xe mới
+          </Button>
+        </Space>
       </div>
 
-      <Card bordered={false} style={{ borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-        <Table 
-          loading={loading}
-          dataSource={vehicles} 
-          columns={columns} 
-          rowKey="id"
-        />
-      </Card>
+      <FilterBar
+        searchPlaceholder="Tìm theo tên xe, biển số, phân khúc..."
+        searchValue={search}
+        onSearchChange={setSearch}
+        statusOptions={[
+          { label: 'Tất cả trạng thái', value: '' },
+          { label: 'Có sẵn (AVAILABLE)', value: 'AVAILABLE' },
+          { label: 'Đang thuê (RENTED)', value: 'RENTED' },
+          { label: 'Bảo dưỡng (MAINTENANCE)', value: 'MAINTENANCE' }
+        ]}
+        statusValue={statusFilter}
+        onStatusChange={setStatusFilter}
+        onReset={() => { setSearch(''); setStatusFilter(undefined); }}
+      />
+
+      {loading ? (
+        viewMode === 'card' ? <CardGridSkeleton count={6} /> : <TableSkeleton rows={6} />
+      ) : viewMode === 'table' ? (
+        <Card style={{ borderRadius: '12px', border: '1px solid #e2e8f0' }} bodyStyle={{ padding: 0 }}>
+          <Table dataSource={filtered} columns={columns} rowKey="id" pagination={{ pageSize: 10 }} />
+        </Card>
+      ) : (
+        <Row gutter={[20, 20]}>
+          {filtered.map(v => (
+            <Col xs={24} sm={12} md={8} lg={6} key={v.id}>
+              <Card
+                hoverable
+                style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid #e2e8f0' }}
+                cover={
+                  <div style={{ height: '160px', overflow: 'hidden', position: 'relative' }}>
+                    <img 
+                      src={v.imageUrl || "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=600&auto=format&fit=crop&q=60"} 
+                      alt={v.name} 
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                    />
+                    <div style={{ position: 'absolute', top: '10px', right: '10px' }}>
+                      <StatusBadge status={v.status || 'AVAILABLE'} />
+                    </div>
+                  </div>
+                }
+                bodyStyle={{ padding: '16px' }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                  <div>
+                    <div style={{ fontWeight: 800, fontSize: '15px', color: '#0f172a' }}>{v.name}</div>
+                    <Tag color="geekblue" style={{ marginTop: '4px' }}>{v.licensePlate || '30A-999.88'}</Tag>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px', paddingTop: '12px', borderTop: '1px solid #f1f5f9' }}>
+                  <div>
+                    <div style={{ fontSize: '11px', color: '#64748b' }}>GIÁ THUÊ/NGÀY</div>
+                    <div style={{ fontWeight: 800, fontSize: '15px', color: '#1e3a8a' }}>{formatPrice(v.pricePerDay)}</div>
+                  </div>
+                  <Space>
+                    <Button size="small" icon={<EditOutlined />} onClick={() => navigate(`/admin/vehicles/${v.id}/edit`)}>
+                      Sửa
+                    </Button>
+                  </Space>
+                </div>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      )}
     </div>
   );
 };
