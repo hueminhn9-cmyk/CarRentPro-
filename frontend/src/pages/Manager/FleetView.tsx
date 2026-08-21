@@ -54,7 +54,7 @@ export const FleetView: React.FC = () => {
       render: (_: any, r: any) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <img 
-            src={r.imageUrl || "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=400&auto=format&fit=crop&q=60"} 
+            src={r.image || r.imageUrl || "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=400&auto=format&fit=crop&q=60"} 
             alt={r.name} 
             style={{ width: '64px', height: '44px', objectFit: 'cover', borderRadius: '6px' }}
           />
