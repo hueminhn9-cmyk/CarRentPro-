@@ -261,7 +261,7 @@ export const PublicLayout: React.FC = () => {
               <Space direction="vertical" size={12} style={{ color: '#cbd5e1', fontSize: '14px' }}>
                 <div><PhoneOutlined style={{ color: '#2563eb', marginRight: '8px' }} /> Hotline 24/7: <strong>1900 6868</strong></div>
                 <div><MailOutlined style={{ color: '#facc15', marginRight: '8px' }} /> Email: contact@autorent.vn</div>
-                <div><SafetyCertificateOutlined style={{ color: '#ef4444', marginRight: '8px' }} /> Trụ sở: Quận Cầu Giấy, Hà Nội</div>
+                <div><SafetyCertificateOutlined style={{ color: '#ef4444', marginRight: '8px' }} /> Trụ sở: Quận Hải Châu, Đà Nẵng</div>
               </Space>
             </Col>
 

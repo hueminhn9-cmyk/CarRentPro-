@@ -135,7 +135,7 @@ const formatVehicle = (v: any): Vehicle => {
     transmission: v.transmission === 'AUTO' ? 'Tự động' : 'Số sàn',
     fuel: v.fuel_type === 'ELECTRIC' ? 'Điện' : (v.fuel_type === 'DIESEL' ? 'Dầu' : 'Xăng'),
     seats: v.seat_count,
-    location: v.location,
+    location: v.locations?.name || 'Showroom Trung Tâm (Hải Châu, Đà Nẵng)',
     color: v.color || 'Trắng',
     year: v.manufacture_year || 2023,
     fuelConsumption,
@@ -186,10 +186,12 @@ const formatCustomer = (u: any): Customer => {
     idCard: profile.citizen_id || 'N/A',
     driverLicense: profile.driver_license_number || 'N/A',
     licenseStatus: profile.verification_status === 'VERIFIED' ? 'Đã xác minh' : (profile.verification_status === 'PENDING' ? 'Chờ duyệt' : 'Chưa cập nhật'),
-    loyaltyPoints: 0,
-    tier: 'Bạc',
-    bookingCount: 0,
-    createdAt: u.created_at || ''
+    loyaltyPoints: profile.loyalty_points || 0,
+    tier: profile.loyalty_tier || 'Bạc',
+    bookingCount: profile.booking_count || 0,
+    createdAt: u.created_at || '',
+    frontImage: profile.driver_license_front || 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&auto=format&fit=crop&q=60',
+    backImage: profile.driver_license_back || 'https://images.unsplash.com/photo-1554224154-26032ffc0d07?w=600&auto=format&fit=crop&q=60'
   };
 };
 
@@ -379,8 +381,8 @@ export const api = {
         vehicle_id: Number(data.vehicleId),
         pickup_datetime: new Date(data.startDate).toISOString(),
         return_datetime: new Date(data.endDate).toISOString(),
-        pickup_location: data.pickupLocation || 'Showroom Đống Đa - Hà Nội',
-        return_location: data.dropoffLocation || 'Showroom Đống Đa - Hà Nội',
+        pickup_location: data.pickupLocation || 'Showroom Hải Châu - Đà Nẵng',
+        return_location: data.dropoffLocation || 'Showroom Hải Châu - Đà Nẵng',
         customer_note: data.notes || '',
         services: data.services || []
       };

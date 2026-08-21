@@ -38,6 +38,7 @@ export class VehicleRepository {
       where: { id },
       include: {
         vehicle_categories: true,
+        locations: true,
       },
     });
   }
@@ -54,6 +55,7 @@ export class VehicleRepository {
         ...options,
         include: {
           vehicle_categories: true,
+          locations: true,
         },
       }),
       prisma.vehicles.count({ where: options.where }),
@@ -74,6 +76,7 @@ export class VehicleRepository {
       data,
       include: {
         vehicle_categories: true,
+        locations: true,
       },
     });
   }

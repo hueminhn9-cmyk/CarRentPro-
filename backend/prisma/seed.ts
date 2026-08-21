@@ -12,6 +12,27 @@ async function main() {
     const passwordHashCustomer = bcrypt.hashSync('user123', 10);
 
     // =========================================================================
+    // 0. TABLE: locations (Locations in Đà Nẵng)
+    // =========================================================================
+    const locationsToSeed = [
+      { name: 'Showroom Trung Tâm - Hải Châu, Đà Nẵng', city: 'Đà Nẵng', district: 'Hải Châu', address: '123 Nguyễn Văn Linh, Phường Nam Dương, Quận Hải Châu, Đà Nẵng' },
+      { name: 'Sân bay Quốc tế Đà Nẵng', city: 'Đà Nẵng', district: 'Hải Châu', address: 'Đường Nguyễn Văn Linh, Quận Hải Châu, Đà Nẵng' },
+      { name: 'Chi nhánh Sơn Trà - Đà Nẵng', city: 'Đà Nẵng', district: 'Sơn Trà', address: '45 Võ Văn Kiệt, Phường Phước Mỹ, Quận Sơn Trà, Đà Nẵng' },
+      { name: 'Chi nhánh Thanh Khê - Đà Nẵng', city: 'Đà Nẵng', district: 'Thanh Khê', address: '210 Điện Biên Phủ, Phường Chính Gián, Quận Thanh Khê, Đà Nẵng' },
+      { name: 'Chi nhánh Ngũ Hành Sơn - Đà Nẵng', city: 'Đà Nẵng', district: 'Ngũ Hành Sơn', address: '88 Lê Văn Hiến, Phường Khuê Mỹ, Quận Ngũ Hành Sơn, Đà Nẵng' },
+      { name: 'Chi nhánh Cẩm Lệ - Đà Nẵng', city: 'Đà Nẵng', district: 'Cẩm Lệ', address: '15 Cách Mạng Tháng 8, Phường Khuê Trung, Quận Cẩm Lệ, Đà Nẵng' },
+    ];
+
+    for (const loc of locationsToSeed) {
+      await prisma.locations.upsert({
+        where: { name: loc.name },
+        update: loc,
+        create: loc,
+      });
+    }
+    console.log('✓ 0. Table `locations`: Seeded 6 locations in Đà Nẵng.');
+
+    // =========================================================================
     // 1. TABLE: users (15 Users: 1 Admin, 3 Managers, 11 Customers)
     // =========================================================================
     const usersToSeed = [
@@ -310,6 +331,12 @@ async function main() {
     const dbCategories = await prisma.vehicle_categories.findMany();
     const getCatId = (name: string) => dbCategories.find(c => c.name === name)!.id;
 
+    const dbLocations = await prisma.locations.findMany();
+    const mainShowroomLoc = dbLocations.find(l => l.name.includes('Hải Châu')) || dbLocations[0];
+    const airportLoc = dbLocations.find(l => l.name.includes('Sân bay')) || mainShowroomLoc;
+    const sonTraLoc = dbLocations.find(l => l.name.includes('Sơn Trà')) || mainShowroomLoc;
+    const thanhKheLoc = dbLocations.find(l => l.name.includes('Thanh Khê')) || mainShowroomLoc;
+
     // =========================================================================
     // 4. TABLE: vehicles (42 Vehicles across 3 Branches & 6 Segments)
     // =========================================================================
@@ -319,6 +346,7 @@ async function main() {
       // ============================================================
       {
         category_id: getCatId('SUV'),
+        location_id: mainShowroomLoc.id,
         code: 'VF3',
         name: 'VinFast VF 3',
         brand: 'VinFast',
@@ -331,7 +359,7 @@ async function main() {
         fuel_type: 'ELECTRIC' as const,
         price_per_day: new Prisma.Decimal(500000),
         deposit_amount: new Prisma.Decimal(5000000),
-        location: 'Hà Nội',
+        location: 'Đà Nẵng',
         description: 'VinFast VF 3 mini city car điện tiết kiệm, nhỏ gọn lý tưởng di chuyển nội đô Hà Nội.',
         status: 'AVAILABLE' as const,
         image: 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=600&auto=format&fit=crop&q=60'
@@ -350,7 +378,7 @@ async function main() {
         fuel_type: 'ELECTRIC' as const,
         price_per_day: new Prisma.Decimal(700000),
         deposit_amount: new Prisma.Decimal(7000000),
-        location: 'TP. Hồ Chí Minh',
+        location: 'Đà Nẵng',
         description: 'VinFast VF 5 Plus crossover điện đô thị, tầm hoạt động 326km, sạc đầy trong 6 giờ.',
         status: 'AVAILABLE' as const,
         image: 'https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?w=600&auto=format&fit=crop&q=60'
@@ -388,7 +416,7 @@ async function main() {
         fuel_type: 'ELECTRIC' as const,
         price_per_day: new Prisma.Decimal(1100000),
         deposit_amount: new Prisma.Decimal(11000000),
-        location: 'Hà Nội',
+        location: 'Đà Nẵng',
         description: 'VinFast VF 7 Plus SUV điện phân khúc C với tầm hoạt động 431km và mâm 19 inch.',
         status: 'RENTED' as const,
         image: 'https://images.unsplash.com/photo-1610647752706-3bb12232b3ab?w=600&auto=format&fit=crop&q=60'
@@ -407,7 +435,7 @@ async function main() {
         fuel_type: 'ELECTRIC' as const,
         price_per_day: new Prisma.Decimal(1500000),
         deposit_amount: new Prisma.Decimal(15000000),
-        location: 'Hà Nội',
+        location: 'Đà Nẵng',
         description: 'VinFast VF 8 Plus là dòng xe điện thông minh phân khúc D, thiết kế bởi Pininfarina, hỗ trợ lái nâng cao ADAS.',
         status: 'AVAILABLE' as const,
         image: 'https://images.unsplash.com/photo-1563720223185-11003d516935?w=600&auto=format&fit=crop&q=60'
@@ -426,7 +454,7 @@ async function main() {
         fuel_type: 'ELECTRIC' as const,
         price_per_day: new Prisma.Decimal(2200000),
         deposit_amount: new Prisma.Decimal(20000000),
-        location: 'TP. Hồ Chí Minh',
+        location: 'Đà Nẵng',
         description: 'VinFast VF 9 là dòng SUV điện Full-size sang trọng 7 chỗ, tầm hoạt động vượt trội 594km.',
         status: 'RENTED' as const,
         image: 'https://images.unsplash.com/photo-1617788138017-80ad40651399?w=600&auto=format&fit=crop&q=60'
@@ -449,7 +477,7 @@ async function main() {
         fuel_type: 'DIESEL' as const,
         price_per_day: new Prisma.Decimal(1600000),
         deposit_amount: new Prisma.Decimal(20000000),
-        location: 'TP. Hồ Chí Minh',
+        location: 'Đà Nẵng',
         description: 'Toyota Fortuner Legender sở hữu thiết kế hầm hố, động cơ dầu bền bỉ, thích hợp du lịch gia đình.',
         status: 'RENTED' as const,
         image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=600&auto=format&fit=crop&q=60'
@@ -487,7 +515,7 @@ async function main() {
         fuel_type: 'DIESEL' as const,
         price_per_day: new Prisma.Decimal(1500000),
         deposit_amount: new Prisma.Decimal(15000000),
-        location: 'Hà Nội',
+        location: 'Đà Nẵng',
         description: 'Hyundai SantaFe thiết kế hiện đại, trang bị dải đèn LED đặc trưng, nội thất da cao cấp.',
         status: 'AVAILABLE' as const,
         image: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=600&auto=format&fit=crop&q=60'
@@ -506,7 +534,7 @@ async function main() {
         fuel_type: 'GASOLINE' as const,
         price_per_day: new Prisma.Decimal(1200000),
         deposit_amount: new Prisma.Decimal(12000000),
-        location: 'TP. Hồ Chí Minh',
+        location: 'Đà Nẵng',
         description: 'Mazda CX-5 Premium sở hữu thiết kế KODO tinh tế, âm thanh 10 loa Bose cao cấp.',
         status: 'AVAILABLE' as const,
         image: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=600&auto=format&fit=crop&q=60'
@@ -544,7 +572,7 @@ async function main() {
         fuel_type: 'GASOLINE' as const,
         price_per_day: new Prisma.Decimal(1100000),
         deposit_amount: new Prisma.Decimal(11000000),
-        location: 'Hà Nội',
+        location: 'Đà Nẵng',
         description: 'Hyundai Tucson thế hệ mới thiết kế Parametric Dynamics ấn tượng, trang bị đầy đủ.',
         status: 'AVAILABLE' as const,
         image: 'https://images.unsplash.com/photo-1546614042-7df3c24c9e5d?w=600&auto=format&fit=crop&q=60'
@@ -582,7 +610,7 @@ async function main() {
         fuel_type: 'GASOLINE' as const,
         price_per_day: new Prisma.Decimal(950000),
         deposit_amount: new Prisma.Decimal(9500000),
-        location: 'TP. Hồ Chí Minh',
+        location: 'Đà Nẵng',
         description: 'Hyundai Kona nhỏ gọn năng động, phù hợp cho các cặp đôi và gia đình nhỏ đi phố.',
         status: 'INCIDENT' as const,
         image: 'https://images.unsplash.com/photo-1555652736-e92021d28a10?w=600&auto=format&fit=crop&q=60'
@@ -624,7 +652,7 @@ async function main() {
         fuel_type: 'GASOLINE' as const,
         price_per_day: new Prisma.Decimal(1500000),
         deposit_amount: new Prisma.Decimal(15000000),
-        location: 'Hà Nội',
+        location: 'Đà Nẵng',
         description: 'Toyota Camry 2.5Q là biểu tượng sedan doanh nhân sang trọng, tiện nghi đỉnh cao.',
         status: 'AVAILABLE' as const,
         image: 'https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=600&auto=format&fit=crop&q=60'
@@ -643,7 +671,7 @@ async function main() {
         fuel_type: 'GASOLINE' as const,
         price_per_day: new Prisma.Decimal(800000),
         deposit_amount: new Prisma.Decimal(8000000),
-        location: 'TP. Hồ Chí Minh',
+        location: 'Đà Nẵng',
         description: 'Hyundai Accent là dòng sedan cỡ B tiết kiệm nhiên liệu, dễ dàng di chuyển trong phố.',
         status: 'AVAILABLE' as const,
         image: 'https://images.unsplash.com/photo-1617469767053-d3b523a0b982?w=600&auto=format&fit=crop&q=60'
@@ -681,7 +709,7 @@ async function main() {
         fuel_type: 'GASOLINE' as const,
         price_per_day: new Prisma.Decimal(900000),
         deposit_amount: new Prisma.Decimal(9000000),
-        location: 'Hà Nội',
+        location: 'Đà Nẵng',
         description: 'Kia K3 thiết kế thể thao trẻ trung, trang bị công nghệ tiện nghi phong phú.',
         status: 'AVAILABLE' as const,
         image: 'https://images.unsplash.com/photo-1541348263662-e08266273f2a?w=600&auto=format&fit=crop&q=60'
@@ -700,7 +728,7 @@ async function main() {
         fuel_type: 'GASOLINE' as const,
         price_per_day: new Prisma.Decimal(750000),
         deposit_amount: new Prisma.Decimal(7500000),
-        location: 'TP. Hồ Chí Minh',
+        location: 'Đà Nẵng',
         description: 'Toyota Vios G CVT tiết kiệm nhiên liệu, đơn giản dễ lái, hộp số CVT mượt mà.',
         status: 'AVAILABLE' as const,
         image: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=600&auto=format&fit=crop&q=60'
@@ -761,7 +789,7 @@ async function main() {
         fuel_type: 'GASOLINE' as const,
         price_per_day: new Prisma.Decimal(550000),
         deposit_amount: new Prisma.Decimal(5000000),
-        location: 'Hà Nội',
+        location: 'Đà Nẵng',
         description: 'Kia Morning AT – xe hatchback cỡ A giá rẻ nhất đội, tiết kiệm xăng chỉ 5L/100km.',
         status: 'AVAILABLE' as const,
         image: 'https://images.unsplash.com/photo-1534093607318-f025413f49cb?w=600&auto=format&fit=crop&q=60'
@@ -780,7 +808,7 @@ async function main() {
         fuel_type: 'GASOLINE' as const,
         price_per_day: new Prisma.Decimal(600000),
         deposit_amount: new Prisma.Decimal(5500000),
-        location: 'TP. Hồ Chí Minh',
+        location: 'Đà Nẵng',
         description: 'Hyundai Grand i10 nhỏ gọn, mức tiêu hao nhiên liệu thấp 4.9L/100km, lý tưởng nội đô.',
         status: 'AVAILABLE' as const,
         image: 'https://images.unsplash.com/photo-1576220258822-0f91a89b4fc3?w=600&auto=format&fit=crop&q=60'
@@ -818,7 +846,7 @@ async function main() {
         fuel_type: 'GASOLINE' as const,
         price_per_day: new Prisma.Decimal(680000),
         deposit_amount: new Prisma.Decimal(6500000),
-        location: 'Hà Nội',
+        location: 'Đà Nẵng',
         description: 'Kia Cerato số sàn 1.6L, thú vị cho những ai thích kiểm soát tay số, tiết kiệm chi phí.',
         status: 'AVAILABLE' as const,
         image: 'https://images.unsplash.com/photo-1541348263662-e08266273f2a?w=600&auto=format&fit=crop&q=60'
@@ -841,7 +869,7 @@ async function main() {
         fuel_type: 'DIESEL' as const,
         price_per_day: new Prisma.Decimal(1300000),
         deposit_amount: new Prisma.Decimal(15000000),
-        location: 'Hà Nội',
+        location: 'Đà Nẵng',
         description: 'Ford Ranger Wildtrak cơ bắp Mỹ, khả năng lội nước 800mm và thùng chở đồ rộng rãi.',
         status: 'MAINTENANCE' as const,
         image: 'https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=600&auto=format&fit=crop&q=60'
@@ -879,7 +907,7 @@ async function main() {
         fuel_type: 'DIESEL' as const,
         price_per_day: new Prisma.Decimal(1350000),
         deposit_amount: new Prisma.Decimal(15000000),
-        location: 'TP. Hồ Chí Minh',
+        location: 'Đà Nẵng',
         description: 'Toyota Hilux 2.8G bán tải đa dụng dẫn động 4 cầu, thùng lớn phù hợp chở hàng và du lịch.',
         status: 'AVAILABLE' as const,
         image: 'https://images.unsplash.com/photo-1541348263662-e08266273f2a?w=600&auto=format&fit=crop&q=60'
@@ -898,7 +926,7 @@ async function main() {
         fuel_type: 'DIESEL' as const,
         price_per_day: new Prisma.Decimal(1150000),
         deposit_amount: new Prisma.Decimal(12000000),
-        location: 'Hà Nội',
+        location: 'Đà Nẵng',
         description: 'Nissan Navara EL Premium R có hệ treo độc lập sau Intelligent Ride Control, cabin ồn ít.',
         status: 'AVAILABLE' as const,
         image: 'https://images.unsplash.com/photo-1504215680853-026ed2a45def?w=600&auto=format&fit=crop&q=60'
@@ -940,7 +968,7 @@ async function main() {
         fuel_type: 'GASOLINE' as const,
         price_per_day: new Prisma.Decimal(4500000),
         deposit_amount: new Prisma.Decimal(50000000),
-        location: 'TP. Hồ Chí Minh',
+        location: 'Đà Nẵng',
         description: 'Mercedes-Benz GLE 450 là mẫu SUV hạng sang cao cấp, trang bị động cơ EQ Boost 367 mã lực, hệ thống treo E-ACTIVE BODY CONTROL.',
         status: 'AVAILABLE' as const,
         image: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=600&auto=format&fit=crop&q=60'
@@ -959,7 +987,7 @@ async function main() {
         fuel_type: 'GASOLINE' as const,
         price_per_day: new Prisma.Decimal(4200000),
         deposit_amount: new Prisma.Decimal(45000000),
-        location: 'Hà Nội',
+        location: 'Đà Nẵng',
         description: 'BMW X5 mang lại cảm giác lái đỉnh cao, dẫn động 4 bánh xDrive thông minh, nội thất da Merino.',
         status: 'RENTED' as const,
         image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=600&auto=format&fit=crop&q=60'
@@ -1044,23 +1072,46 @@ async function main() {
 
     const dbVehicles: Record<string, any> = {};
 
-    for (const veh of sampleVehicles) {
-      const { image, ...vehData } = veh;
+    for (let i = 0; i < sampleVehicles.length; i++) {
+      const veh = sampleVehicles[i];
+      const { image, location, ...vehData } = veh as any;
+      
+      // Cycle through Đà Nẵng locations for all 42 vehicles
+      const targetLoc = dbLocations[i % dbLocations.length];
+      const vehDataWithLoc = {
+        ...vehData,
+        location_id: vehData.location_id || targetLoc.id
+      };
+
       const existing = await prisma.vehicles.findUnique({
         where: { code: veh.code }
       });
       let vObj = existing;
       if (!existing) {
-        vObj = await prisma.vehicles.create({ data: vehData });
+        vObj = await prisma.vehicles.create({ data: vehDataWithLoc });
       } else {
         vObj = await prisma.vehicles.update({
           where: { code: veh.code },
-          data: vehData
+          data: vehDataWithLoc
         });
       }
       dbVehicles[veh.code] = vObj;
     }
     console.log('✓ 4. Table `vehicles`: Seeded 42 vehicles (Electric×6, SUV×8, Sedan×7, Hatchback×5, Pickup×5, Luxury×6, + 5 legacy).');
+
+    // Global DB Sync: Force-update ALL vehicle rows in MySQL table `vehicles`
+    // to point location_id to Da Nang showrooms
+    const allDbVehicles = await prisma.vehicles.findMany();
+    for (let i = 0; i < allDbVehicles.length; i++) {
+      const loc = dbLocations[i % dbLocations.length];
+      await prisma.vehicles.update({
+        where: { id: allDbVehicles[i].id },
+        data: {
+          location_id: loc.id
+        }
+      });
+    }
+    console.log('✓ Updated ALL vehicle records in MySQL database table `vehicles` to Da Nang Showroom location_id.');
 
     // =========================================================================
     // 5. TABLE: media_files (Primary + Multi-angle images, License images)

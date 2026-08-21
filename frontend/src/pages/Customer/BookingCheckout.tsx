@@ -22,7 +22,7 @@ const { Title, Text } = Typography;
 export const BookingCheckout: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  
+
   const vehicleId = searchParams.get('vehicleId');
   const days = Number(searchParams.get('days')) || 4;
 
@@ -132,7 +132,7 @@ export const BookingCheckout: React.FC = () => {
   return (
     <div style={{ maxWidth: '1080px', margin: '0 auto', padding: '0 16px' }}>
       <div style={{ marginBottom: '24px' }}>
-        <Title level={3} style={{ margin: 0, fontWeight: 800 }}>Quy trình Đặt xe & Thanh toán (Booking Wizard)</Title>
+        <Title level={3} style={{ margin: 0, fontWeight: 800 }}>Quy trình Đặt xe & Thanh toán </Title>
         <Text type="secondary">Hoàn tất 4 bước đơn giản để ký hợp đồng và nhận xe tự lái</Text>
       </div>
 
@@ -247,8 +247,8 @@ export const BookingCheckout: React.FC = () => {
         <Row gutter={[24, 24]}>
           <Col xs={24} md={13}>
             <Card title={<span style={{ fontWeight: 700 }}>Phương thức thanh toán cọc & tiền thuê</span>} style={{ borderRadius: '14px', border: '1px solid #e2e8f0', marginBottom: '20px' }}>
-              <Radio.Group 
-                value={paymentMethod} 
+              <Radio.Group
+                value={paymentMethod}
                 onChange={(e) => setPaymentMethod(e.target.value)}
                 style={{ width: '100%' }}
               >

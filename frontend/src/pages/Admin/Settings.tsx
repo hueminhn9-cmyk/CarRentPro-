@@ -31,7 +31,7 @@ export const AdminSettings: React.FC = () => {
         companyName: 'Công ty Cổ phần AutoRent Việt Nam',
         hotline: '1900 6868',
         email: 'info@autorent.vn',
-        address: 'Lô C15, Đường Cầu Giấy, Phường Dịch Vọng, Quận Cầu Giấy, Hà Nội'
+        address: 'Lô C15, Đường Nguyễn Văn Linh, Phường Nam Dương, Quận Hải Châu, Đà Nẵng'
       }}
     >
       <Form.Item

@@ -64,6 +64,8 @@ export interface Customer {
   tier: 'Bạc' | 'Vàng' | 'Kim cương';
   bookingCount: number;
   createdAt: string;
+  frontImage?: string;
+  backImage?: string;
 }
 
 export interface Manager {
@@ -85,7 +87,7 @@ export const INITIAL_MANAGERS: Manager[] = [
     name: "Lê Văn Quản Lý",
     email: "manager@autorent.vn",
     phone: "0911223344",
-    branch: "Chi nhánh Hà Nội - Đống Đa",
+    branch: "Chi nhánh Đà Nẵng - Hải Châu",
     status: "Đang hoạt động",
     processedContractsCount: 45,
     verifiedCustomersCount: 38,
@@ -142,7 +144,7 @@ export const INITIAL_VEHICLES: Vehicle[] = [
     transmission: "Tự động",
     fuel: "Điện",
     seats: 5,
-    location: "Hà Nội",
+    location: "Đà Nẵng",
     color: "Xanh dương",
     year: 2023,
     fuelConsumption: "0 l/100km (Pin 82 kWh)",
@@ -163,7 +165,7 @@ export const INITIAL_VEHICLES: Vehicle[] = [
     transmission: "Tự động",
     fuel: "Dầu",
     seats: 7,
-    location: "TP. Hồ Chí Minh",
+    location: "Đà Nẵng",
     color: "Trắng",
     year: 2022,
     fuelConsumption: "7.9 l/100km",
@@ -205,7 +207,7 @@ export const INITIAL_VEHICLES: Vehicle[] = [
     transmission: "Tự động",
     fuel: "Dầu",
     seats: 5,
-    location: "Hà Nội",
+    location: "Đà Nẵng",
     color: "Cam",
     year: 2022,
     fuelConsumption: "8.0 l/100km",
@@ -228,7 +230,7 @@ export const INITIAL_VEHICLES: Vehicle[] = [
     transmission: "Tự động",
     fuel: "Xăng",
     seats: 5,
-    location: "Hà Nội",
+    location: "Đà Nẵng",
     color: "Trắng",
     year: 2023,
     fuelConsumption: "7.2 l/100km",
@@ -249,7 +251,7 @@ export const INITIAL_VEHICLES: Vehicle[] = [
     transmission: "Tự động",
     fuel: "Xăng",
     seats: 5,
-    location: "TP. Hồ Chí Minh",
+    location: "Đà Nẵng",
     color: "Đen",
     year: 2022,
     fuelConsumption: "6.0 l/100km",

@@ -94,7 +94,7 @@ export const CustomerSupport: React.FC = () => {
                   <strong style={{ color: '#ffffff' }}>Showroom chính:</strong>
                 </Space>
                 <div style={{ fontSize: '13px', marginTop: '4px' }}>
-                  Lô C15, Đường Cầu Giấy, Phường Dịch Vọng, Quận Cầu Giấy, Hà Nội
+                  Lô C15, Đường Nguyễn Văn Linh, Phường Nam Dương, Quận Hải Châu, Đà Nẵng
                 </div>
               </div>
 

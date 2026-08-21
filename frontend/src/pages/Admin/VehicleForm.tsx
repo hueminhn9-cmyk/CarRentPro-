@@ -99,7 +99,7 @@ export const VehicleForm: React.FC = () => {
             transmission: 'Tự động',
             fuel: 'Xăng',
             seats: 5,
-            location: 'Hà Nội'
+            location: 'Đà Nẵng'
           }}
         >
           <Row gutter={16}>
@@ -192,9 +192,10 @@ export const VehicleForm: React.FC = () => {
                 rules={[{ required: true }]}
               >
                 <Select style={{ height: '40px' }} options={[
-                  { value: 'Hà Nội', label: 'Hà Nội' },
-                  { value: 'TP. Hồ Chí Minh', label: 'TP. Hồ Chí Minh' },
-                  { value: 'Đà Nẵng', label: 'Đà Nẵng' }
+                  { value: 'Đà Nẵng', label: 'Đà Nẵng (Showroom Hải Châu)' },
+                  { value: 'Sân bay Đà Nẵng', label: 'Sân bay Quốc tế Đà Nẵng' },
+                  { value: 'Sơn Trà', label: 'Chi nhánh Sơn Trà (Đà Nẵng)' },
+                  { value: 'Thanh Khê', label: 'Chi nhánh Thanh Khê (Đà Nẵng)' }
                 ]} />
               </Form.Item>
             </Col>

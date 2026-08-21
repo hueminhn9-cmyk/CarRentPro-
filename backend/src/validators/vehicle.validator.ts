@@ -17,7 +17,7 @@ export const createVehicleSchema = z.object({
   deposit_amount: z.coerce.number().nonnegative('Tiền đặt cọc không được âm'),
   included_km_per_day: z.coerce.number().int().nonnegative().optional().default(200),
   extra_km_fee: z.coerce.number().nonnegative().optional().default(3000.00),
-  location: z.string().optional().nullable(),
+  location_id: z.coerce.number().optional().nullable(),
   description: z.string().optional(),
   status: z.enum(['AVAILABLE', 'RESERVED', 'RENTED', 'MAINTENANCE', 'INACTIVE', 'INCIDENT']).optional().default('AVAILABLE'),
 });

@@ -124,51 +124,63 @@ export const ManagerManagement: React.FC = () => {
           loading={loading}
           dataSource={managers}
           rowKey="id"
+          tableLayout="fixed"
           columns={[
             {
-              title: 'Nhân viên Manager',
+              title: <span style={{ fontWeight: 700, color: '#334155' }}>Nhân viên Manager</span>,
               dataIndex: 'name',
+              width: '30%',
+              onHeaderCell: () => ({ style: { textAlign: 'center' } }),
+              onCell: () => ({ style: { textAlign: 'left' } }),
               render: (name, record: Manager) => (
                 <Space size={12}>
                   <Avatar style={{ backgroundColor: '#f59e0b' }} icon={<SafetyCertificateOutlined />} />
                   <div>
-                    <Text strong style={{ display: 'block' }}>{name}</Text>
-                    <Text type="secondary" style={{ fontSize: '12px' }}>{record.email}</Text>
+                    <Text strong style={{ display: 'block', color: '#0f172a', whiteSpace: 'nowrap' }}>{name}</Text>
+                    <Text type="secondary" style={{ fontSize: '12px', whiteSpace: 'nowrap' }}>{record.email}</Text>
                   </div>
                 </Space>
               )
             },
             {
-              title: 'Số điện thoại',
+              title: <span style={{ fontWeight: 700, color: '#334155' }}>Số điện thoại</span>,
               dataIndex: 'phone',
+              width: '20%',
+              align: 'center' as const,
+              render: (phone: string) => <span style={{ whiteSpace: 'nowrap' }}>{phone}</span>
             },
             {
-              title: 'Ngày tham gia',
+              title: <span style={{ fontWeight: 700, color: '#334155' }}>Ngày tham gia</span>,
               dataIndex: 'joinedDate',
-              render: (date: string) => date || 'N/A',
+              width: '18%',
+              align: 'center' as const,
+              render: (date: string) => <span style={{ whiteSpace: 'nowrap' }}>{date || 'N/A'}</span>,
             },
             {
-              title: 'Trạng thái',
+              title: <span style={{ fontWeight: 700, color: '#334155' }}>Trạng thái</span>,
               dataIndex: 'status',
+              width: '16%',
+              align: 'center' as const,
               render: (status: string) => (
-                <Tag color={status === 'Đang hoạt động' ? 'green' : 'red'}>
+                <Tag color={status === 'Đang hoạt động' ? 'green' : 'red'} style={{ borderRadius: '6px', fontWeight: 600, margin: 0 }}>
                   {status}
                 </Tag>
               )
             },
             {
-              title: 'Hành động Admin',
+              title: <span style={{ fontWeight: 700, color: '#334155' }}>Hành động Admin</span>,
+              width: '16%',
+              align: 'center' as const,
               render: (_, record: Manager) => (
-                <Space>
-                  <Button
-                    size="small"
-                    type={record.status === 'Đang hoạt động' ? 'default' : 'primary'}
-                    danger={record.status === 'Đang hoạt động'}
-                    onClick={() => toggleStatus(record.id, record.status)}
-                  >
-                    {record.status === 'Đang hoạt động' ? 'Khóa tài khoản' : 'Kích hoạt lại'}
-                  </Button>
-                </Space>
+                <Button
+                  size="small"
+                  type={record.status === 'Đang hoạt động' ? 'default' : 'primary'}
+                  danger={record.status === 'Đang hoạt động'}
+                  style={{ borderRadius: '6px' }}
+                  onClick={() => toggleStatus(record.id, record.status)}
+                >
+                  {record.status === 'Đang hoạt động' ? 'Khóa tài khoản' : 'Kích hoạt lại'}
+                </Button>
               )
             }
           ]}

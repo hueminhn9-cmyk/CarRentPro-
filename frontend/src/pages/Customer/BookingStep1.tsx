@@ -71,8 +71,8 @@ export const BookingStep1: React.FC = () => {
               layout="vertical"
               onFinish={onFinish}
               initialValues={{
-                pickup: 'Hà Nội',
-                dropoff: 'Hà Nội'
+                pickup: 'Đà Nẵng',
+                dropoff: 'Đà Nẵng'
               }}
               requiredMark={false}
             >
@@ -82,9 +82,10 @@ export const BookingStep1: React.FC = () => {
                 rules={[{ required: true, message: 'Chọn nơi nhận xe!' }]}
               >
                 <Select options={[
-                  { value: 'Hà Nội', label: 'Hà Nội (Showroom Cầu Giấy)' },
-                  { value: 'TP. Hồ Chí Minh', label: 'TP. Hồ Chí Minh (Showroom Quận 3)' },
-                  { value: 'Đà Nẵng', label: 'Đà Nẵng (Showroom Hải Châu)' }
+                  { value: 'Đà Nẵng', label: 'Showroom Trung Tâm (Hải Châu, Đà Nẵng)' },
+                  { value: 'Sân bay Đà Nẵng', label: 'Sân bay Quốc tế Đà Nẵng' },
+                  { value: 'Sơn Trà', label: 'Chi nhánh Sơn Trà (Đà Nẵng)' },
+                  { value: 'Thanh Khê', label: 'Chi nhánh Thanh Khê (Đà Nẵng)' }
                 ]} style={{ height: '40px' }} />
               </Form.Item>
 
@@ -94,9 +95,10 @@ export const BookingStep1: React.FC = () => {
                 rules={[{ required: true, message: 'Chọn nơi trả xe!' }]}
               >
                 <Select options={[
-                  { value: 'Hà Nội', label: 'Hà Nội (Showroom Cầu Giấy)' },
-                  { value: 'TP. Hồ Chí Minh', label: 'TP. Hồ Chí Minh (Showroom Quận 3)' },
-                  { value: 'Đà Nẵng', label: 'Đà Nẵng (Showroom Hải Châu)' }
+                  { value: 'Đà Nẵng', label: 'Showroom Trung Tâm (Hải Châu, Đà Nẵng)' },
+                  { value: 'Sân bay Đà Nẵng', label: 'Sân bay Quốc tế Đà Nẵng' },
+                  { value: 'Sơn Trà', label: 'Chi nhánh Sơn Trà (Đà Nẵng)' },
+                  { value: 'Thanh Khê', label: 'Chi nhánh Thanh Khê (Đà Nẵng)' }
                 ]} style={{ height: '40px' }} />
               </Form.Item>
 

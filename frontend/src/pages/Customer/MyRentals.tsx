@@ -92,7 +92,7 @@ export const MyRentals: React.FC = () => {
   };
 
   return (
-    <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
       <div style={{ marginBottom: '24px' }}>
         <Title level={3} style={{ margin: 0, fontWeight: 700 }}>Đơn thuê của tôi</Title>
         <Text type="secondary">Theo dõi tiến độ, xem hóa đơn và ký hợp đồng các xe tự lái của bạn.</Text>

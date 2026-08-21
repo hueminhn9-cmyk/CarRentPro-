@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Button, Card, Space, Row, Col, Input, DatePicker, Select, Carousel, Tag, Avatar, Divider, Rate } from 'antd';
+import { Typography, Button, Card, Space, Row, Col, Input, Select, Carousel, Tag, Avatar, Divider, Rate } from 'antd';
 import {
   ArrowRightOutlined,
   SearchOutlined,
@@ -12,7 +12,7 @@ import {
   UsergroupAddOutlined,
   TrophyOutlined,
   EnvironmentOutlined,
-  CalendarOutlined,
+  DollarOutlined,
   CustomerServiceOutlined,
   SwapOutlined,
   FileDoneOutlined,
@@ -22,7 +22,10 @@ import {
   CompassOutlined,
   SendOutlined,
   PhoneOutlined,
-  MailOutlined
+  MailOutlined,
+  CrownOutlined,
+  DashboardOutlined,
+  AppstoreOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/services/api';
@@ -37,11 +40,23 @@ export const LandingPage: React.FC = () => {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
 
+  const [searchLocation, setSearchLocation] = useState<string>('all');
+  const [searchType, setSearchType] = useState<string>('all');
+
   useEffect(() => {
     api.vehicles.getAll().then(res => {
       setVehicles(res);
     });
   }, []);
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    if (searchLocation && searchLocation !== 'all') params.set('location', searchLocation);
+    if (searchType && searchType !== 'all') params.set('type', searchType);
+
+    const queryString = params.toString();
+    navigate(queryString ? `/vehicles?${queryString}` : '/vehicles');
+  };
 
   const toggleFavorite = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -92,21 +107,21 @@ export const LandingPage: React.FC = () => {
   ];
 
   const vehicleCategories = [
-    { title: 'SUV', desc: 'Sports Utility Vehicles (Fortuner, GLE, X5)', icon: '🚘', count: 180, color: '#2563eb', img: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=600&auto=format&fit=crop&q=60' },
-    { title: 'Sedan', desc: 'Executive & Business (Camry, Civic RS, E-Class)', icon: '🏎️', count: 140, color: '#fbbf24', img: 'https://images.unsplash.com/photo-1542282088-fe8426682b8f?w=600&auto=format&fit=crop&q=60' },
-    { title: 'Luxury', desc: 'Ultra-Premium Fleet (Porsche, Maybach, BMW 7)', icon: '👑', count: 65, color: '#ef4444', img: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=600&auto=format&fit=crop&q=60' },
-    { title: 'Electric', desc: 'Smart EV (VinFast VF8/VF9, Tesla Model X)', icon: '⚡', count: 95, color: '#10b981', img: 'https://images.unsplash.com/photo-1563720223185-11003d516935?w=600&auto=format&fit=crop&q=60' },
-    { title: 'MPV', desc: 'Family & Executive Shuttle (Carnival, Alphard)', icon: '🚐', count: 80, color: '#8b5cf6', img: 'https://images.unsplash.com/photo-1617469767053-d3b523a0b982?w=600&auto=format&fit=crop&q=60' },
-    { title: 'Van', desc: 'Corporate Group Transit (Ford Transit, Solati)', icon: '🚌', count: 40, color: '#06b6d4', img: 'https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=600&auto=format&fit=crop&q=60' }
+    { title: 'SUV', desc: 'Gầm cao đa dụng (Fortuner, VF 8, CX-5)', icon: <CarOutlined style={{ fontSize: '28px', color: '#2563eb' }} />, count: 180 },
+    { title: 'Sedan', desc: 'Thanh lịch & Doanh nhân (Camry, Civic, E-Class)', icon: <DashboardOutlined style={{ fontSize: '28px', color: '#2563eb' }} />, count: 140 },
+    { title: 'Luxury', desc: 'Dòng xe hạng sang (Porsche, BMW 7, Mercedes)', icon: <CrownOutlined style={{ fontSize: '28px', color: '#2563eb' }} />, count: 65 },
+    { title: 'Xe điện', desc: 'Công nghệ xanh (VinFast VF 5, VF 8, VF 9)', icon: <ThunderboltOutlined style={{ fontSize: '28px', color: '#2563eb' }} />, count: 95 },
+    { title: 'MPV', desc: 'Xe gia đình rộng rãi (Carnival, Innova, Xpander)', icon: <RocketOutlined style={{ fontSize: '28px', color: '#2563eb' }} />, count: 80 },
+    { title: 'Bán tải', desc: 'Mạnh mẽ vượt địa hình (Ranger, Hilux, Triton)', icon: <AppstoreOutlined style={{ fontSize: '28px', color: '#2563eb' }} />, count: 40 }
   ];
 
   const whyChooseUs = [
-    { title: t('why.fastBooking'), desc: t('why.fastBookingDesc'), icon: <RocketOutlined />, color: '#ef4444' },
-    { title: t('why.verified'), desc: t('why.verifiedDesc'), icon: <SafetyCertificateOutlined />, color: '#2563eb' },
-    { title: t('why.support'), desc: t('why.supportDesc'), icon: <CustomerServiceOutlined />, color: '#fbbf24' },
-    { title: t('why.insurance'), desc: t('why.insuranceDesc'), icon: <SafetyCertificateOutlined />, color: '#10b981' },
-    { title: t('why.digitalContract'), desc: t('why.digitalContractDesc'), icon: <FileDoneOutlined />, color: '#8b5cf6' },
-    { title: t('why.gpsTracking'), desc: t('why.gpsTrackingDesc'), icon: <AimOutlined />, color: '#06b6d4' }
+    { title: t('why.fastBooking'), desc: t('why.fastBookingDesc'), icon: <RocketOutlined /> },
+    { title: t('why.verified'), desc: t('why.verifiedDesc'), icon: <SafetyCertificateOutlined /> },
+    { title: t('why.support'), desc: t('why.supportDesc'), icon: <CustomerServiceOutlined /> },
+    { title: t('why.insurance'), desc: t('why.insuranceDesc'), icon: <SafetyCertificateOutlined /> },
+    { title: t('why.digitalContract'), desc: t('why.digitalContractDesc'), icon: <FileDoneOutlined /> },
+    { title: t('why.gpsTracking'), desc: t('why.gpsTrackingDesc'), icon: <AimOutlined /> }
   ];
 
   const timelineSteps = [
@@ -145,39 +160,16 @@ export const LandingPage: React.FC = () => {
   ];
 
   return (
-    <div className="fade-in" style={{ backgroundColor: '#f8fafc', color: '#0f172a', position: 'relative', overflow: 'hidden' }}>
+    <div className="fade-in" style={{ backgroundColor: '#ffffff', color: '#0f172a', position: 'relative' }}>
       
-      {/* Ambient Glowing Background Circle Effects */}
-      <div style={{
-        position: 'absolute',
-        top: '100px',
-        left: '-150px',
-        width: '500px',
-        height: '500px',
-        borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(37,99,235,0.08) 0%, rgba(248,250,252,0) 70%)',
-        pointerEvents: 'none'
-      }} />
-
-      <div style={{
-        position: 'absolute',
-        top: '900px',
-        right: '-150px',
-        width: '600px',
-        height: '600px',
-        borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(251,191,36,0.06) 0%, rgba(248,250,252,0) 70%)',
-        pointerEvents: 'none'
-      }} />
-
       {/* SECTION 1: Cinematic Full-Width Auto-Playing Hero Carousel */}
-      <section style={{ position: 'relative', overflow: 'hidden', height: '780px' }}>
-        <Carousel autoplay autoplaySpeed={5000} effect="fade" style={{ height: '780px' }}>
+      <section style={{ position: 'relative', overflow: 'hidden', height: '700px' }}>
+        <Carousel autoplay autoplaySpeed={5000} effect="fade" style={{ height: '700px' }}>
           {cinematicSlides.map((slide, index) => (
             <div key={index}>
               <div style={{
-                height: '780px',
-                backgroundImage: `linear-gradient(180deg, rgba(15, 23, 42, 0.70) 0%, rgba(15, 23, 42, 0.88) 100%), url(${slide.image})`,
+                height: '700px',
+                backgroundImage: `linear-gradient(180deg, rgba(15, 23, 42, 0.65) 0%, rgba(15, 23, 42, 0.85) 100%), url(${slide.image})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 display: 'flex',
@@ -185,71 +177,64 @@ export const LandingPage: React.FC = () => {
                 padding: '0 32px',
                 position: 'relative'
               }}>
-                <div style={{ maxWidth: '1280px', margin: '0 auto', width: '100%', paddingBottom: '90px' }}>
+                <div style={{ maxWidth: '1280px', margin: '0 auto', width: '100%', paddingBottom: '70px' }}>
                   <Row align="middle">
                     <Col xs={24} lg={16}>
-                      <Space direction="vertical" size={24}>
+                      <Space direction="vertical" size={20}>
                         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                          <Tag color="#2563eb" style={{ padding: '6px 16px', borderRadius: '20px', fontWeight: 800, fontSize: '13px', border: 'none', boxShadow: '0 4px 14px rgba(37,99,235,0.4)' }}>
+                          <Tag style={{ padding: '6px 16px', borderRadius: '6px', fontWeight: 700, fontSize: '13px', backgroundColor: '#2563eb', color: '#ffffff', border: 'none' }}>
                             {slide.badge}
                           </Tag>
-                          <Tag color="#fbbf24" style={{ padding: '6px 16px', borderRadius: '20px', fontWeight: 800, fontSize: '13px', color: '#000', border: 'none' }}>
+                          <Tag style={{ padding: '6px 16px', borderRadius: '6px', fontWeight: 700, fontSize: '13px', backgroundColor: 'rgba(255, 255, 255, 0.2)', color: '#ffffff', border: 'none' }}>
                             {slide.carModel}
                           </Tag>
                         </div>
 
-                        <Title level={1} style={{ color: '#ffffff', margin: 0, fontSize: '54px', fontWeight: 900, lineHeight: 1.15, letterSpacing: '-1.5px' }}>
+                        <Title level={1} style={{ color: '#ffffff', margin: 0, fontSize: '50px', fontWeight: 800, lineHeight: 1.15, letterSpacing: '-1px' }}>
                           {slide.title}
                         </Title>
 
-                        <Paragraph style={{ color: '#cbd5e1', fontSize: '19px', margin: 0, lineHeight: 1.6, maxWidth: '680px', fontWeight: 500 }}>
+                        <Paragraph style={{ color: '#e2e8f0', fontSize: '18px', margin: 0, lineHeight: 1.6, maxWidth: '680px', fontWeight: 400 }}>
                           {slide.subtitle}
                         </Paragraph>
 
-                        <Space size={18} wrap style={{ marginTop: '16px' }}>
-                          {/* Primary Prominent Red CTA Button */}
+                        <Space size={16} wrap style={{ marginTop: '12px' }}>
                           <Button 
                             type="primary" 
                             size="large" 
-                            icon={<RocketOutlined />}
+                            icon={<CarOutlined />}
                             onClick={() => navigate('/vehicles')}
                             style={{ 
-                              height: '56px', 
-                              padding: '0 36px', 
-                              borderRadius: '14px', 
-                              fontWeight: 800, 
-                              fontSize: '16px', 
-                              backgroundColor: '#ef4444', 
-                              borderColor: '#ef4444',
-                              boxShadow: '0 8px 24px rgba(239, 68, 68, 0.45)',
-                              transition: 'all 0.3s ease'
+                              height: '52px', 
+                              padding: '0 32px', 
+                              borderRadius: '8px', 
+                              fontWeight: 700, 
+                              fontSize: '15px', 
+                              backgroundColor: '#2563eb', 
+                              borderColor: '#2563eb',
+                              boxShadow: '0 4px 14px rgba(37, 99, 235, 0.35)'
                             }}
                             className="hover-lift"
                           >
                             {t('hero.btnRentNow')}
                           </Button>
 
-                          {/* Glassmorphism Secondary CTA */}
                           <Button 
                             type="default" 
                             size="large"
-                            icon={<CarOutlined />}
                             onClick={() => navigate('/vehicles')}
                             style={{ 
-                              height: '56px', 
-                              padding: '0 32px', 
-                              borderRadius: '14px', 
-                              fontWeight: 700, 
-                              fontSize: '16px', 
-                              backgroundColor: 'rgba(255, 255, 255, 0.12)',
-                              borderColor: 'rgba(255, 255, 255, 0.25)',
-                              color: '#ffffff',
-                              backdropFilter: 'blur(12px)',
-                              WebkitBackdropFilter: 'blur(12px)'
+                              height: '52px', 
+                              padding: '0 28px', 
+                              borderRadius: '8px', 
+                              fontWeight: 600, 
+                              fontSize: '15px', 
+                              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                              borderColor: 'rgba(255, 255, 255, 0.3)',
+                              color: '#ffffff'
                             }}
-                            className="hover-lift"
                           >
-                            {t('hero.btnExplore')}
+                            {t('hero.btnExploreFleet')}
                           </Button>
                         </Space>
                       </Space>
@@ -260,70 +245,65 @@ export const LandingPage: React.FC = () => {
             </div>
           ))}
         </Carousel>
-      </section>
 
-      {/* SECTION 2: Floating Glassmorphism Search Panel Overlapping Hero */}
-      <section style={{ marginTop: '-85px', padding: '0 24px', position: 'relative', zIndex: 20 }}>
-        <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+        {/* Floating Search Bar */}
+        <div style={{ 
+          position: 'absolute', 
+          bottom: '24px', 
+          left: '50%', 
+          transform: 'translateX(-50%)', 
+          width: 'calc(100% - 48px)',
+          maxWidth: '1280px',
+          zIndex: 10
+        }}>
           <Card style={{ 
-            borderRadius: '24px', 
-            boxShadow: '0 25px 50px rgba(15, 23, 42, 0.15)',
-            border: '1px solid rgba(255, 255, 255, 0.8)',
-            backgroundColor: 'rgba(255, 255, 255, 0.96)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
+            borderRadius: '16px', 
+            boxShadow: '0 20px 40px rgba(15, 23, 42, 0.12)',
+            border: '1px solid #e2e8f0',
+            backgroundColor: '#ffffff',
             padding: '16px 20px'
           }}>
             <Row gutter={[16, 16]} align="bottom">
-              <Col xs={24} sm={12} md={5}>
+              <Col xs={24} sm={12} md={10}>
                 <Space direction="vertical" size={6} style={{ width: '100%' }}>
                   <Text strong style={{ fontSize: '13px', color: '#475569', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700 }}>
                     <EnvironmentOutlined style={{ color: '#2563eb', fontSize: '16px' }} /> {t('search.location')}
                   </Text>
                   <Select 
-                    defaultValue="hanoi" 
+                    value={searchLocation} 
+                    onChange={setSearchLocation}
                     style={{ width: '100%', height: '46px' }} 
                     options={[
-                      { value: 'hanoi', label: '📍 Hà Nội (Cầu Giấy / Đống Đa / Sân bay)' },
-                      { value: 'hcm', label: '📍 TP. HCM (Quận 1 / Quận 3 / Tân Sơn Nhất)' },
-                      { value: 'danang', label: '📍 Đà Nẵng (Hải Châu / Sân bay Đà Nẵng)' }
+                      { value: 'all', label: <span><EnvironmentOutlined style={{ color: '#2563eb', marginRight: 6 }} /> Tất cả các điểm tại Đà Nẵng</span> },
+                      { value: 'Hải Châu', label: <span><EnvironmentOutlined style={{ color: '#2563eb', marginRight: 6 }} /> Showroom Trung Tâm (Hải Châu)</span> },
+                      { value: 'Sân bay', label: <span><EnvironmentOutlined style={{ color: '#2563eb', marginRight: 6 }} /> Sân bay Quốc tế Đà Nẵng</span> },
+                      { value: 'Sơn Trà', label: <span><EnvironmentOutlined style={{ color: '#2563eb', marginRight: 6 }} /> Chi nhánh Sơn Trà</span> },
+                      { value: 'Thanh Khê', label: <span><EnvironmentOutlined style={{ color: '#2563eb', marginRight: 6 }} /> Chi nhánh Thanh Khê</span> },
+                      { value: 'Ngũ Hành Sơn', label: <span><EnvironmentOutlined style={{ color: '#2563eb', marginRight: 6 }} /> Chi nhánh Ngũ Hành Sơn</span> }
                     ]}
                   />
                 </Space>
               </Col>
               
-              <Col xs={24} sm={12} md={5}>
-                <Space direction="vertical" size={6} style={{ width: '100%' }}>
-                  <Text strong style={{ fontSize: '13px', color: '#475569', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700 }}>
-                    <CalendarOutlined style={{ color: '#fbbf24', fontSize: '16px' }} /> {t('search.pickupDate')}
-                  </Text>
-                  <DatePicker showTime style={{ width: '100%', height: '46px', borderRadius: '10px' }} />
-                </Space>
-              </Col>
-              
-              <Col xs={24} sm={12} md={5}>
-                <Space direction="vertical" size={6} style={{ width: '100%' }}>
-                  <Text strong style={{ fontSize: '13px', color: '#475569', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700 }}>
-                    <CalendarOutlined style={{ color: '#ef4444', fontSize: '16px' }} /> {t('search.returnDate')}
-                  </Text>
-                  <DatePicker showTime style={{ width: '100%', height: '46px', borderRadius: '10px' }} />
-                </Space>
-              </Col>
-              
-              <Col xs={24} sm={12} md={4}>
+              <Col xs={24} sm={12} md={9}>
                 <Space direction="vertical" size={6} style={{ width: '100%' }}>
                   <Text strong style={{ fontSize: '13px', color: '#475569', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700 }}>
                     <CarOutlined style={{ color: '#2563eb', fontSize: '16px' }} /> {t('search.type')}
                   </Text>
-                  <Select defaultValue="all" style={{ width: '100%', height: '46px' }} options={[
-                    { value: 'all', label: t('search.allTypes') },
-                    { value: 'suv', label: '🚘 SUV' },
-                    { value: 'sedan', label: '🏎️ Sedan' },
-                    { value: 'luxury', label: '👑 Luxury' },
-                    { value: 'electric', label: '⚡ Electric' },
-                    { value: 'mpv', label: '🚐 MPV' },
-                    { value: 'van', label: '🚌 Van' }
-                  ]} />
+                  <Select 
+                    value={searchType} 
+                    onChange={setSearchType}
+                    style={{ width: '100%', height: '46px' }} 
+                    options={[
+                      { value: 'all', label: t('search.allTypes') },
+                      { value: 'SUV', label: <span><CarOutlined style={{ color: '#2563eb', marginRight: 6 }} /> SUV</span> },
+                      { value: 'Sedan', label: <span><DashboardOutlined style={{ color: '#2563eb', marginRight: 6 }} /> Sedan</span> },
+                      { value: 'Luxury', label: <span><CrownOutlined style={{ color: '#2563eb', marginRight: 6 }} /> Luxury</span> },
+                      { value: 'Xe điện', label: <span><ThunderboltOutlined style={{ color: '#2563eb', marginRight: 6 }} /> Electric (Xe điện)</span> },
+                      { value: 'Bán tải', label: <span><RocketOutlined style={{ color: '#2563eb', marginRight: 6 }} /> Bán tải</span> },
+                      { value: 'Hatchback', label: <span><AppstoreOutlined style={{ color: '#2563eb', marginRight: 6 }} /> Hatchback</span> }
+                    ]} 
+                  />
                 </Space>
               </Col>
               
@@ -334,14 +314,14 @@ export const LandingPage: React.FC = () => {
                   style={{ 
                     width: '100%', 
                     height: '46px', 
-                    borderRadius: '12px', 
-                    fontWeight: 800, 
+                    borderRadius: '8px', 
+                    fontWeight: 700, 
                     fontSize: '15px',
                     backgroundColor: '#2563eb',
                     borderColor: '#2563eb',
-                    boxShadow: '0 6px 18px rgba(37,99,235,0.4)'
+                    boxShadow: '0 4px 12px rgba(37,99,235,0.25)'
                   }}
-                  onClick={() => navigate('/vehicles')}
+                  onClick={handleSearch}
                   className="hover-lift"
                 >
                   {t('search.btn')}
@@ -352,91 +332,70 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* SECTION 3: Animated Metric Statistics Grid */}
-      <section style={{ padding: '70px 24px 40px 24px' }}>
+      {/* SECTION 3: Key Statistics Bar */}
+      <section style={{ padding: '60px 24px 30px 24px', backgroundColor: '#ffffff' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
           <Row gutter={[24, 24]}>
             {[
-              { num: '520+', label: t('stats.vehicles'), color: '#2563eb', icon: <CarOutlined /> },
-              { num: '12,000+', label: t('stats.customers'), color: '#10b981', icon: <UsergroupAddOutlined /> },
-              { num: '450+', label: t('stats.companies'), color: '#fbbf24', icon: <TrophyOutlined /> },
-              { num: '4.9★', label: t('stats.rating'), color: '#ef4444', icon: <StarFilled /> }
+              { num: '500+', label: t('stat.vehicles'), icon: <CarOutlined style={{ color: '#2563eb' }} /> },
+              { num: '12,500+', label: t('stat.customers'), icon: <UsergroupAddOutlined style={{ color: '#2563eb' }} /> },
+              { num: '99.2%', label: t('stat.satisfaction'), icon: <TrophyOutlined style={{ color: '#2563eb' }} /> },
+              { num: '6 Showrooms', label: t('stat.branches'), icon: <EnvironmentOutlined style={{ color: '#2563eb' }} /> }
             ].map((stat, idx) => (
               <Col xs={12} sm={6} key={idx}>
-                <Card 
-                  variant="borderless" 
-                  className="hover-lift"
-                  style={{ 
-                    textAlign: 'center', 
-                    borderRadius: '20px', 
-                    backgroundColor: '#ffffff',
-                    border: '1px solid #e2e8f0',
-                    boxShadow: '0 6px 20px rgba(15,23,42,0.04)',
-                    padding: '12px 16px'
-                  }}
-                >
-                  <div style={{ 
-                    width: '54px', 
-                    height: '54px', 
-                    borderRadius: '16px', 
-                    backgroundColor: stat.color + '15', 
-                    color: stat.color,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    margin: '0 auto 16px auto',
-                    fontSize: '24px'
-                  }}>
-                    {stat.icon}
-                  </div>
-                  <Title level={2} style={{ margin: 0, color: '#0f172a', fontWeight: 900, fontSize: '32px', letterSpacing: '-0.5px' }}>
+                <div style={{ 
+                  textAlign: 'center',
+                  padding: '20px 16px',
+                  borderRadius: '12px',
+                  border: '1px solid #f1f5f9',
+                  backgroundColor: '#f8fafc'
+                }}>
+                  <div style={{ fontSize: '24px', marginBottom: '8px' }}>{stat.icon}</div>
+                  <Title level={3} style={{ margin: 0, color: '#0f172a', fontWeight: 800, fontSize: '28px' }}>
                     {stat.num}
                   </Title>
-                  <Text strong style={{ fontSize: '14px', color: '#1e293b', display: 'block', marginTop: '4px' }}>{stat.label}</Text>
-                </Card>
+                  <Text style={{ fontSize: '13px', color: '#64748b', display: 'block', marginTop: '4px' }}>{stat.label}</Text>
+                </div>
               </Col>
             ))}
           </Row>
         </div>
       </section>
 
-      {/* SECTION 4: Vehicle Categories (Rounded 20px Cards with Gradient Borders) */}
-      <section style={{ padding: '50px 24px 70px 24px' }}>
+      {/* SECTION 4: Vehicle Categories */}
+      <section style={{ padding: '60px 24px', backgroundColor: '#f8fafc' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-            <Tag color="#2563eb" style={{ borderRadius: '12px', padding: '4px 16px', fontWeight: 800, fontSize: '12px' }}>
-              {t('cat.tag')}
-            </Tag>
-            <Title level={2} style={{ margin: '10px 0 0 0', fontWeight: 900, color: '#0f172a', fontSize: '36px', letterSpacing: '-0.5px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+            <Title level={2} style={{ margin: 0, fontWeight: 800, color: '#0f172a', fontSize: '32px' }}>
               {t('cat.title')}
             </Title>
-            <Text type="secondary" style={{ fontSize: '16px' }}>{t('cat.subtitle')}</Text>
+            <Text type="secondary" style={{ fontSize: '15px', marginTop: '6px', display: 'block' }}>{t('cat.subtitle')}</Text>
           </div>
 
-          <Row gutter={[24, 24]}>
+          <Row gutter={[20, 20]}>
             {vehicleCategories.map((cat, idx) => (
               <Col xs={24} sm={12} lg={4} key={idx}>
                 <Card 
                   hoverable 
                   className="hover-lift"
                   style={{ 
-                    borderRadius: '20px', 
-                    overflow: 'hidden',
-                    border: `1px solid ${cat.color}30`,
-                    boxShadow: '0 6px 18px rgba(15,23,42,0.05)',
-                    textAlign: 'center'
+                    borderRadius: '12px', 
+                    border: '1px solid #e2e8f0',
+                    boxShadow: '0 2px 8px rgba(15,23,42,0.04)',
+                    textAlign: 'center',
+                    backgroundColor: '#ffffff'
                   }}
-                  styles={{ body: { padding: '20px 16px' } }}
+                  styles={{ body: { padding: '20px 14px' } }}
                   onClick={() => navigate('/vehicles')}
                 >
-                  <div style={{ fontSize: '36px', marginBottom: '12px' }}>{cat.icon}</div>
-                  <Tag color={cat.color} style={{ borderRadius: '10px', fontWeight: 800, marginBottom: '8px' }}>
-                    {cat.count}+ xe
-                  </Tag>
-                  <Title level={4} style={{ margin: '6px 0 4px 0', fontSize: '18px', fontWeight: 800, color: '#0f172a' }}>
+                  <div style={{ marginBottom: '10px' }}>{cat.icon}</div>
+                  <Title level={4} style={{ margin: '4px 0 2px 0', fontSize: '16px', fontWeight: 700, color: '#0f172a' }}>
                     {cat.title}
                   </Title>
-                  <Text type="secondary" style={{ fontSize: '11px', display: 'block', height: '32px', overflow: 'hidden' }}>
+                  <Text type="secondary" style={{ fontSize: '12px', display: 'block', marginBottom: '8px' }}>
+                    {cat.count}+ xe sẵn sàng
+                  </Text>
+                  <Text type="secondary" style={{ fontSize: '11px', display: 'block', height: '32px', overflow: 'hidden', color: '#94a3b8' }}>
                     {cat.desc}
                   </Text>
                 </Card>
@@ -446,22 +405,20 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* SECTION 5: Featured Vehicles Showcase (Zoom Hover & Spec Badges) */}
-      <section style={{ padding: '70px 24px', backgroundColor: '#f1f5f9' }}>
+      {/* SECTION 5: Featured Vehicles Showcase */}
+      <section style={{ padding: '70px 24px', backgroundColor: '#ffffff' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px', flexWrap: 'wrap', gap: '16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '36px', flexWrap: 'wrap', gap: '16px' }}>
             <div>
-              <Tag color="#ef4444" style={{ borderRadius: '12px', padding: '4px 16px', fontWeight: 800, fontSize: '12px' }}>
-                {t('fleet.tag')}
-              </Tag>
-              <Title level={2} style={{ margin: '8px 0 0 0', fontWeight: 900, color: '#0f172a', fontSize: '36px', letterSpacing: '-0.5px' }}>
+              <Title level={2} style={{ margin: 0, fontWeight: 800, color: '#0f172a', fontSize: '32px' }}>
                 {t('fleet.title')}
               </Title>
+              <Text type="secondary" style={{ fontSize: '15px', marginTop: '4px', display: 'block' }}>Xe được kiểm định 160+ điểm kỹ thuật tiêu chuẩn</Text>
             </div>
             <Button 
               type="primary" 
               onClick={() => navigate('/vehicles')} 
-              style={{ borderRadius: '12px', height: '44px', fontWeight: 800, backgroundColor: '#2563eb', padding: '0 24px' }}
+              style={{ borderRadius: '8px', height: '42px', fontWeight: 700, backgroundColor: '#0f172a', borderColor: '#0f172a', padding: '0 20px' }}
             >
               {t('fleet.viewAll')} <ArrowRightOutlined />
             </Button>
@@ -474,72 +431,72 @@ export const LandingPage: React.FC = () => {
                   hoverable
                   className="hover-lift"
                   style={{ 
-                    borderRadius: '20px', 
+                    borderRadius: '12px', 
                     border: '1px solid #e2e8f0', 
                     overflow: 'hidden',
-                    boxShadow: '0 10px 30px rgba(15,23,42,0.06)',
+                    boxShadow: '0 4px 16px rgba(15,23,42,0.05)',
                     backgroundColor: '#ffffff'
                   }}
-                  styles={{ body: { padding: '22px' } }}
+                  styles={{ body: { padding: '20px' } }}
                 >
-                  <div style={{ position: 'relative', marginBottom: '18px', overflow: 'hidden', borderRadius: '14px' }}>
+                  <div style={{ position: 'relative', marginBottom: '16px', overflow: 'hidden', borderRadius: '8px' }}>
                     <img 
                       alt={v.name} 
                       src={v.image} 
                       className="card-img-zoom"
                       style={{ 
                         width: '100%', 
-                        height: '210px', 
+                        height: '200px', 
                         objectFit: 'cover', 
-                        borderRadius: '14px',
-                        transition: 'transform 0.5s ease'
+                        borderRadius: '8px'
                       }}
                     />
-                    <div style={{ position: 'absolute', top: '12px', left: '12px' }}>
-                      <Tag color="#2563eb" style={{ borderRadius: '12px', padding: '4px 14px', fontWeight: 800, border: 'none' }}>{v.type}</Tag>
+                    <div style={{ position: 'absolute', top: '10px', left: '10px' }}>
+                      <Tag style={{ borderRadius: '4px', padding: '2px 10px', fontWeight: 700, backgroundColor: '#0f172a', color: '#ffffff', border: 'none', fontSize: '12px' }}>{v.type}</Tag>
                     </div>
 
-                    {/* Favorite Heart Button */}
                     <div 
                       onClick={(e) => toggleFavorite(v.id, e)}
                       style={{ 
                         position: 'absolute', 
-                        top: '12px', 
-                        right: '12px', 
-                        backgroundColor: 'rgba(255,255,255,0.9)', 
-                        width: '36px',
-                        height: '36px',
+                        top: '10px', 
+                        right: '10px', 
+                        backgroundColor: '#ffffff', 
+                        width: '32px',
+                        height: '32px',
                         borderRadius: '50%',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         cursor: 'pointer',
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.12)'
                       }}
                     >
-                      {favorites[v.id] ? <HeartFilled style={{ color: '#ef4444', fontSize: '18px' }} /> : <HeartOutlined style={{ color: '#64748b', fontSize: '18px' }} />}
+                      {favorites[v.id] ? <HeartFilled style={{ color: '#ef4444', fontSize: '16px' }} /> : <HeartOutlined style={{ color: '#64748b', fontSize: '16px' }} />}
                     </div>
 
-                    <div style={{ position: 'absolute', bottom: '12px', right: '12px', backgroundColor: 'rgba(15,23,42,0.85)', padding: '4px 12px', borderRadius: '12px', color: '#fbbf24', fontWeight: 800, fontSize: '12px' }}>
+                    <div style={{ position: 'absolute', bottom: '10px', right: '10px', backgroundColor: 'rgba(15,23,42,0.85)', padding: '3px 10px', borderRadius: '4px', color: '#f59e0b', fontWeight: 700, fontSize: '12px' }}>
                       <StarFilled /> {v.rating} ({v.reviewsCount})
                     </div>
                   </div>
 
-                  <Title level={4} style={{ margin: 0, fontWeight: 900, color: '#0f172a', fontSize: '20px' }}>{v.name}</Title>
-                  <Text type="secondary" style={{ fontSize: '13px', display: 'block', marginBottom: '14px' }}>📍 {v.location} • BKS {v.licensePlate}</Text>
+                  <Title level={4} style={{ margin: 0, fontWeight: 700, color: '#0f172a', fontSize: '18px' }}>{v.name}</Title>
+                  <Text type="secondary" style={{ fontSize: '13px', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '12px', marginTop: '4px' }}>
+                    <EnvironmentOutlined style={{ color: '#2563eb' }} /> {v.location}
+                  </Text>
 
-                  <Space size={[8, 8]} wrap style={{ marginBottom: '18px' }}>
-                    <Tag color="default" style={{ borderRadius: '8px', padding: '4px 10px', fontWeight: 600 }}>{v.transmission}</Tag>
-                    <Tag color="default" style={{ borderRadius: '8px', padding: '4px 10px', fontWeight: 600 }}>{v.fuel}</Tag>
-                    <Tag color="default" style={{ borderRadius: '8px', padding: '4px 10px', fontWeight: 600 }}>{v.seats} {t('fleet.seats')}</Tag>
+                  <Space size={[6, 6]} wrap style={{ marginBottom: '16px' }}>
+                    <Tag color="default" style={{ borderRadius: '4px', padding: '2px 8px', fontWeight: 500, fontSize: '12px' }}>{v.transmission}</Tag>
+                    <Tag color="default" style={{ borderRadius: '4px', padding: '2px 8px', fontWeight: 500, fontSize: '12px' }}>{v.fuel}</Tag>
+                    <Tag color="default" style={{ borderRadius: '4px', padding: '2px 8px', fontWeight: 500, fontSize: '12px' }}>{v.seats} {t('fleet.seats')}</Tag>
                   </Space>
 
-                  <Divider style={{ margin: '14px 0' }} />
+                  <Divider style={{ margin: '12px 0' }} />
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
                       <Text type="secondary" style={{ fontSize: '12px', display: 'block' }}>{t('fleet.dailyRate')}</Text>
-                      <Text strong style={{ fontSize: '22px', color: '#ef4444', fontWeight: 900 }}>
+                      <Text strong style={{ fontSize: '20px', color: '#2563eb', fontWeight: 800 }}>
                         {formatPrice(v.pricePerDay)}
                       </Text>
                     </div>
@@ -548,13 +505,12 @@ export const LandingPage: React.FC = () => {
                       type="primary"
                       onClick={() => navigate(`/vehicles/${v.id}`)}
                       style={{ 
-                        borderRadius: '10px', 
-                        height: '42px', 
-                        fontWeight: 800, 
-                        backgroundColor: '#ef4444',
-                        borderColor: '#ef4444',
-                        boxShadow: '0 4px 14px rgba(239,68,68,0.35)',
-                        padding: '0 20px'
+                        borderRadius: '6px', 
+                        height: '38px', 
+                        fontWeight: 700, 
+                        backgroundColor: '#2563eb',
+                        borderColor: '#2563eb',
+                        padding: '0 18px'
                       }}
                     >
                       {t('fleet.bookNow')}
@@ -567,92 +523,81 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* SECTION 6: Why Choose Us (Luxury Icon Cards) */}
-      <section style={{ padding: '90px 24px' }}>
+      {/* SECTION 6: Why Choose Us */}
+      <section style={{ padding: '70px 24px', backgroundColor: '#f8fafc' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '56px' }}>
-            <Tag color="#10b981" style={{ borderRadius: '12px', padding: '4px 16px', fontWeight: 800, fontSize: '12px' }}>
-              {t('why.tag')}
-            </Tag>
-            <Title level={2} style={{ margin: '10px 0 0 0', fontWeight: 900, color: '#0f172a', fontSize: '36px', letterSpacing: '-0.5px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+            <Title level={2} style={{ margin: 0, fontWeight: 800, color: '#0f172a', fontSize: '32px' }}>
               {t('why.title')}
             </Title>
-            <Text type="secondary" style={{ fontSize: '16px' }}>{t('why.subtitle')}</Text>
+            <Text type="secondary" style={{ fontSize: '15px', marginTop: '6px', display: 'block' }}>{t('why.subtitle')}</Text>
           </div>
 
           <Row gutter={[24, 24]}>
             {whyChooseUs.map((feat, idx) => (
               <Col xs={24} sm={12} lg={4} key={idx}>
-                <Card 
-                  variant="borderless" 
-                  className="hover-lift"
-                  style={{ 
-                    borderRadius: '20px', 
-                    height: '100%', 
-                    backgroundColor: '#ffffff',
-                    border: '1px solid #e2e8f0',
-                    boxShadow: '0 6px 20px rgba(15,23,42,0.04)',
-                    padding: '8px',
-                    textAlign: 'center'
-                  }}
-                >
+                <div style={{ 
+                  borderRadius: '12px', 
+                  height: '100%', 
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #e2e8f0',
+                  padding: '24px 16px',
+                  textAlign: 'center'
+                }}>
                   <div style={{ 
-                    width: '56px', 
-                    height: '56px', 
-                    borderRadius: '16px', 
-                    backgroundColor: feat.color + '15', 
-                    color: feat.color,
+                    width: '48px', 
+                    height: '48px', 
+                    borderRadius: '10px', 
+                    backgroundColor: '#eff6ff', 
+                    color: '#2563eb',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: '26px',
-                    margin: '0 auto 18px auto'
+                    fontSize: '22px',
+                    margin: '0 auto 16px auto'
                   }}>
                     {feat.icon}
                   </div>
-                  <Title level={4} style={{ margin: '0 0 10px 0', fontSize: '17px', fontWeight: 800, color: '#0f172a' }}>
+                  <Title level={4} style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: 700, color: '#0f172a' }}>
                     {feat.title}
                   </Title>
-                  <Paragraph style={{ color: '#64748b', fontSize: '13px', lineHeight: 1.6, margin: 0 }}>
+                  <Paragraph style={{ color: '#64748b', fontSize: '13px', lineHeight: 1.5, margin: 0 }}>
                     {feat.desc}
                   </Paragraph>
-                </Card>
+                </div>
               </Col>
             ))}
           </Row>
         </div>
       </section>
 
-      {/* SECTION 7: How It Works (Horizontal Step Timeline) */}
-      <section style={{ padding: '90px 24px', backgroundColor: '#0f172a', color: '#ffffff' }}>
+      {/* SECTION 7: How It Works */}
+      <section style={{ padding: '80px 24px', backgroundColor: '#0f172a', color: '#ffffff' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '60px' }}>
-            <Tag color="#ef4444" style={{ borderRadius: '12px', padding: '4px 16px', fontWeight: 800, fontSize: '12px' }}>
-              {t('step.tag')}
-            </Tag>
-            <Title level={2} style={{ margin: '10px 0 0 0', fontWeight: 900, color: '#ffffff', fontSize: '36px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '50px' }}>
+            <Title level={2} style={{ margin: 0, fontWeight: 800, color: '#ffffff', fontSize: '32px' }}>
               {t('step.title')}
             </Title>
+            <Text style={{ color: '#94a3b8', fontSize: '15px', marginTop: '6px', display: 'block' }}>Quy trình thuê xe nhanh chóng, minh bạch và dễ dàng trong 5 bước</Text>
           </div>
 
           <Row gutter={[20, 24]}>
             {timelineSteps.map((st, idx) => (
               <Col xs={24} sm={12} lg={4.8 as any} key={idx}>
                 <div style={{ 
-                  backgroundColor: 'rgba(255, 255, 255, 0.05)', 
+                  backgroundColor: 'rgba(255, 255, 255, 0.04)', 
                   border: '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: '20px',
+                  borderRadius: '12px',
                   padding: '24px 18px',
-                  height: '100%',
-                  position: 'relative'
+                  height: '100%'
                 }}>
-                  <div style={{ fontSize: '42px', fontWeight: 900, color: '#fbbf24', opacity: 0.9, lineHeight: 1, marginBottom: '16px' }}>
+                  <div style={{ fontSize: '36px', fontWeight: 800, color: '#38bdf8', lineHeight: 1, marginBottom: '14px' }}>
                     {st.step}
                   </div>
-                  <Title level={4} style={{ color: '#ffffff', margin: '0 0 10px 0', fontSize: '17px', fontWeight: 800 }}>
+                  <Title level={4} style={{ color: '#ffffff', margin: '0 0 8px 0', fontSize: '16px', fontWeight: 700 }}>
                     {st.title}
                   </Title>
-                  <Paragraph style={{ color: '#94a3b8', fontSize: '13px', margin: 0, lineHeight: 1.6 }}>
+                  <Paragraph style={{ color: '#94a3b8', fontSize: '13px', margin: 0, lineHeight: 1.5 }}>
                     {st.desc}
                   </Paragraph>
                 </div>
@@ -663,15 +608,13 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* SECTION 8: Customer Testimonials */}
-      <section style={{ padding: '90px 24px', backgroundColor: '#f8fafc' }}>
+      <section style={{ padding: '80px 24px', backgroundColor: '#f8fafc' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '52px' }}>
-            <Tag color="#fbbf24" style={{ borderRadius: '12px', padding: '4px 16px', fontWeight: 800, fontSize: '12px', color: '#000' }}>
-              {t('testi.tag')}
-            </Tag>
-            <Title level={2} style={{ margin: '10px 0 0 0', fontWeight: 900, color: '#0f172a', fontSize: '36px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+            <Title level={2} style={{ margin: 0, fontWeight: 800, color: '#0f172a', fontSize: '32px' }}>
               {t('testi.title')}
             </Title>
+            <Text type="secondary" style={{ fontSize: '15px', marginTop: '6px', display: 'block' }}>Hơn 12,000 khách hàng doanh nghiệp và cá nhân đã tin tưởng sử dụng dịch vụ</Text>
           </div>
 
           <Row gutter={[24, 24]}>
@@ -680,25 +623,25 @@ export const LandingPage: React.FC = () => {
                 <Card 
                   variant="borderless" 
                   style={{ 
-                    borderRadius: '20px', 
+                    borderRadius: '12px', 
                     height: '100%', 
                     backgroundColor: '#ffffff',
                     border: '1px solid #e2e8f0',
-                    boxShadow: '0 8px 24px rgba(15,23,42,0.05)',
-                    padding: '16px'
+                    boxShadow: '0 2px 8px rgba(15,23,42,0.04)',
+                    padding: '8px'
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                    <Rate disabled defaultValue={item.rating} style={{ color: '#fbbf24', fontSize: '16px' }} />
-                    <Tag color="#2563eb" style={{ borderRadius: '8px', fontWeight: 700 }}>{item.company}</Tag>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                    <Rate disabled defaultValue={item.rating} style={{ color: '#f59e0b', fontSize: '14px' }} />
+                    <Tag style={{ borderRadius: '4px', fontWeight: 700, backgroundColor: '#f1f5f9', color: '#0f172a', border: '1px solid #cbd5e1' }}>{item.company}</Tag>
                   </div>
-                  <Paragraph style={{ fontSize: '15px', color: '#475569', lineHeight: 1.6, fontStyle: 'italic', marginBottom: '24px' }}>
+                  <Paragraph style={{ fontSize: '14px', color: '#475569', lineHeight: 1.6, fontStyle: 'italic', marginBottom: '20px' }}>
                     "{item.content}"
                   </Paragraph>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                    <Avatar src={item.avatar} size={50} style={{ backgroundColor: '#2563eb' }} />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <Avatar src={item.avatar} size={44} style={{ backgroundColor: '#2563eb' }} />
                     <div>
-                      <Text strong style={{ display: 'block', color: '#0f172a', fontSize: '16px', fontWeight: 800 }}>{item.name}</Text>
+                      <Text strong style={{ display: 'block', color: '#0f172a', fontSize: '15px', fontWeight: 700 }}>{item.name}</Text>
                       <Text type="secondary" style={{ fontSize: '12px' }}>{item.role}</Text>
                     </div>
                   </div>
@@ -710,22 +653,21 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* SECTION 9: Partner Brand Logos */}
-      <section style={{ padding: '50px 24px 70px 24px', backgroundColor: '#ffffff', borderTop: '1px solid #e2e8f0' }}>
+      <section style={{ padding: '50px 24px', backgroundColor: '#ffffff', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto', textAlign: 'center' }}>
-          <Text type="secondary" style={{ fontSize: '13px', fontWeight: 800, letterSpacing: '1.5px', textTransform: 'uppercase', display: 'block', marginBottom: '30px' }}>
+          <Text type="secondary" style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', display: 'block', marginBottom: '24px' }}>
             {t('partners.title')}
           </Text>
-          <Row gutter={[24, 16]} justify="center" align="middle">
+          <Row gutter={[16, 16]} justify="center" align="middle">
             {['VinFast', 'Toyota', 'Mercedes-Benz', 'BMW', 'Audi', 'Hyundai', 'Ford', 'Honda'].map((brand, bIdx) => (
               <Col xs={12} sm={6} md={3} key={bIdx}>
                 <div style={{ 
-                  padding: '14px 18px', 
-                  borderRadius: '14px', 
-                  backgroundColor: '#f1f5f9', 
-                  fontWeight: 900, 
+                  padding: '12px 16px', 
+                  borderRadius: '8px', 
+                  backgroundColor: '#f8fafc', 
+                  fontWeight: 800, 
                   color: '#334155',
-                  fontSize: '16px',
-                  letterSpacing: '-0.3px',
+                  fontSize: '15px',
                   border: '1px solid #e2e8f0'
                 }}>
                   {brand}
@@ -737,32 +679,29 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* SECTION 10: Enterprise Bottom CTA Banner */}
-      <section style={{ padding: '90px 24px', background: 'linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%)', color: '#ffffff', textAlign: 'center' }}>
-        <div style={{ maxWidth: '850px', margin: '0 auto' }}>
-          <Tag color="#ef4444" style={{ borderRadius: '12px', padding: '4px 16px', fontWeight: 800, fontSize: '13px', marginBottom: '16px' }}>
-            {t('cta.tag')}
-          </Tag>
-          <Title level={1} style={{ color: '#ffffff', fontWeight: 900, fontSize: '42px', marginBottom: '20px', letterSpacing: '-0.5px' }}>
+      <section style={{ padding: '80px 24px', backgroundColor: '#0f172a', color: '#ffffff', textAlign: 'center' }}>
+        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+          <Title level={2} style={{ color: '#ffffff', fontWeight: 800, fontSize: '36px', marginBottom: '16px' }}>
             {t('cta.title')}
           </Title>
-          <Paragraph style={{ color: '#cbd5e1', fontSize: '18px', marginBottom: '36px', lineHeight: 1.6, fontWeight: 500 }}>
+          <Paragraph style={{ color: '#cbd5e1', fontSize: '16px', marginBottom: '32px', lineHeight: 1.6 }}>
             {t('cta.subtitle')}
           </Paragraph>
-          <Space size={18} wrap style={{ justifyContent: 'center' }}>
+          <Space size={16} wrap style={{ justifyContent: 'center' }}>
             <Button 
               type="primary"
               size="large"
-              icon={<RocketOutlined />}
-              onClick={() => navigate('/customer/vehicles')}
+              icon={<CarOutlined />}
+              onClick={() => navigate('/vehicles')}
               style={{ 
-                height: '56px', 
-                padding: '0 40px', 
-                borderRadius: '14px', 
-                fontWeight: 800, 
-                fontSize: '16px',
-                backgroundColor: '#ef4444',
-                borderColor: '#ef4444',
-                boxShadow: '0 8px 24px rgba(239, 68, 68, 0.45)'
+                height: '50px', 
+                padding: '0 36px', 
+                borderRadius: '8px', 
+                fontWeight: 700, 
+                fontSize: '15px',
+                backgroundColor: '#2563eb',
+                borderColor: '#2563eb',
+                boxShadow: '0 4px 14px rgba(37, 99, 235, 0.4)'
               }}
               className="hover-lift"
             >
@@ -773,13 +712,13 @@ export const LandingPage: React.FC = () => {
               size="large"
               onClick={() => navigate('/auth/login')}
               style={{ 
-                height: '56px', 
-                padding: '0 32px', 
-                borderRadius: '14px', 
-                fontWeight: 700, 
-                fontSize: '16px',
+                height: '50px', 
+                padding: '0 28px', 
+                borderRadius: '8px', 
+                fontWeight: 600, 
+                fontSize: '15px',
                 backgroundColor: 'transparent',
-                borderColor: '#ffffff',
+                borderColor: 'rgba(255, 255, 255, 0.3)',
                 color: '#ffffff'
               }}
             >
