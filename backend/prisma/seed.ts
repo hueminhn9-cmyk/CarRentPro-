@@ -480,7 +480,7 @@ async function main() {
         location: 'Đà Nẵng',
         description: 'Toyota Fortuner Legender sở hữu thiết kế hầm hố, động cơ dầu bền bỉ, thích hợp du lịch gia đình.',
         status: 'RENTED' as const,
-        image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=600&auto=format&fit=crop&q=60'
+        image: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=600&auto=format&fit=crop&q=60'
       },
       {
         category_id: getCatId('SUV'),
@@ -891,7 +891,7 @@ async function main() {
         location: 'Đà Nẵng',
         description: 'Mitsubishi Triton Athlete vận hành mạnh mẽ với hệ truyền động Super Select 4WD-II.',
         status: 'AVAILABLE' as const,
-        image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=600&auto=format&fit=crop&q=60'
+        image: 'https://images.unsplash.com/photo-1559416523-140ddc3d238c?w=600&auto=format&fit=crop&q=60'
       },
       {
         category_id: getCatId('Pickup'),
@@ -1028,7 +1028,7 @@ async function main() {
         location: 'Hà Nội',
         description: 'Audi Q7 Quattro với hệ thống Virtual Cockpit, màn hình MMI Touch Response, không khí thượng lưu.',
         status: 'AVAILABLE' as const,
-        image: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=600&auto=format&fit=crop&q=60'
+        image: 'https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?w=600&auto=format&fit=crop&q=60'
       },
       {
         category_id: getCatId('Luxury'),
@@ -1047,7 +1047,7 @@ async function main() {
         location: 'TP. Hồ Chí Minh',
         description: 'Range Rover Sport HSE Dynamic – off-road hạng sang tuyệt vời, Terrain Response 2, vượt địa hình cực đỉnh.',
         status: 'AVAILABLE' as const,
-        image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=600&auto=format&fit=crop&q=60'
+        image: 'https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?w=600&auto=format&fit=crop&q=60'
       },
       {
         category_id: getCatId('Luxury'),
@@ -1066,7 +1066,7 @@ async function main() {
         location: 'Đà Nẵng',
         description: 'Lexus LC 500h coupe hạng sang Hybrid đỉnh cao, 0-100 trong 5.0s, thiết kế Manga-inspired.',
         status: 'AVAILABLE' as const,
-        image: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=600&auto=format&fit=crop&q=60'
+        image: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=600&auto=format&fit=crop&q=60'
       }
     ];
 
@@ -1096,6 +1096,31 @@ async function main() {
         });
       }
       dbVehicles[veh.code] = vObj;
+
+      // Seed/update primary media_files image for vehicle
+      if (image && vObj) {
+        const existingMedia = await prisma.media_files.findFirst({
+          where: { entity_type: 'VEHICLE', entity_id: vObj.id, is_primary: true }
+        });
+        if (existingMedia) {
+          await prisma.media_files.update({
+            where: { id: existingMedia.id },
+            data: { file_path: image }
+          });
+        } else {
+          await prisma.media_files.create({
+            data: {
+              entity_type: 'VEHICLE',
+              entity_id: vObj.id,
+              original_name: `${veh.code}.jpg`,
+              stored_name: `${veh.code}.jpg`,
+              file_path: image,
+              is_primary: true,
+              storage_provider: 'LOCAL'
+            }
+          });
+        }
+      }
     }
     console.log('✓ 4. Table `vehicles`: Seeded 42 vehicles (Electric×6, SUV×8, Sedan×7, Hatchback×5, Pickup×5, Luxury×6, + 5 legacy).');
 
