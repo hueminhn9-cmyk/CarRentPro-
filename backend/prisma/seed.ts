@@ -7,9 +7,9 @@ async function main() {
   console.log('🚀 Starting FULL Database Seeding for ALL 16 Tables in AutoRent...\n');
 
   try {
-    const passwordHashAdmin = bcrypt.hashSync('admin123', 10);
-    const passwordHashManager = bcrypt.hashSync('manager123', 10);
-    const passwordHashCustomer = bcrypt.hashSync('user123', 10);
+    const passwordHashAdmin = bcrypt.hashSync('123456', 10);
+    const passwordHashManager = bcrypt.hashSync('123456', 10);
+    const passwordHashCustomer = bcrypt.hashSync('123456', 10);
 
     // =========================================================================
     // 0. TABLE: locations (Locations in Đà Nẵng)

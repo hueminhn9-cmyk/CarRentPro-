@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌟 BẮT ĐẦU NẠP DỮ LIỆU ĐỒ SỘ CỰC ĐẠI (ULTIMATE ENTERPRISE DATA SEEDER)...');
 
-  const passwordHash = bcrypt.hashSync('user123', 10);
+  const passwordHash = bcrypt.hashSync('123456', 10);
 
   // 1. Danh mục xe
   const categories = await prisma.vehicle_categories.findMany();

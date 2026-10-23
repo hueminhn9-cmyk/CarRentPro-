@@ -6,8 +6,8 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🚀 Bắt đầu nạp BỘ DỮ LIỆU KHỦNG (MEGA FLEET & HISTORICAL REVENUE SEEDER)...');
 
-  const passwordHashCustomer = bcrypt.hashSync('user123', 10);
-  const passwordHashManager = bcrypt.hashSync('manager123', 10);
+  const passwordHashCustomer = bcrypt.hashSync('123456', 10);
+  const passwordHashManager = bcrypt.hashSync('123456', 10);
 
   // 1. More Locations
   const locations = [
