@@ -111,7 +111,7 @@ export const NotificationCenter: React.FC = () => {
     <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <div>
-          <Title level={4} style={{ margin: 0, fontWeight: 800 }}>Trung tâm Thông báo (Notification Center)</Title>
+          <Title level={4} style={{ margin: 0, fontWeight: 800 }}>Trung tâm Thông báo</Title>
           <Text type="secondary" style={{ fontSize: '13px' }}>Cập nhật các sự kiện quan trọng về đơn hàng, thanh toán và kiểm định hệ thống</Text>
         </div>
 

@@ -161,12 +161,12 @@ export const BookingsManagement: React.FC = () => {
         onSearchChange={setSearch}
         statusOptions={[
           { label: 'Tất cả trạng thái', value: '' },
-          { label: 'Chờ duyệt (PENDING)', value: 'PENDING' },
-          { label: 'Đã duyệt (CONFIRMED)', value: 'CONFIRMED' },
-          { label: 'Sẵn sàng giao (READY_FOR_PICKUP)', value: 'READY_FOR_PICKUP' },
-          { label: 'Đang thuê (ACTIVE)', value: 'ACTIVE' },
-          { label: 'Hoàn thành (COMPLETED)', value: 'COMPLETED' },
-          { label: 'Đã hủy (CANCELLED)', value: 'CANCELLED' }
+          { label: 'Chờ duyệt', value: 'PENDING' },
+          { label: 'Đã duyệt', value: 'CONFIRMED' },
+          { label: 'Sẵn sàng giao', value: 'READY_FOR_PICKUP' },
+          { label: 'Đang thuê', value: 'ACTIVE' },
+          { label: 'Hoàn thành', value: 'COMPLETED' },
+          { label: 'Đã hủy', value: 'CANCELLED' }
         ]}
         statusValue={statusFilter}
         onStatusChange={setStatusFilter}

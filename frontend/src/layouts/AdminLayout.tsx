@@ -327,7 +327,7 @@ export const AdminLayout: React.FC = () => {
                 gap: '6px'
               }}
             >
-              <CrownFilled style={{ color: '#d97706' }} /> PHÂN HỆ QUẢN TRỊ TOÀN QUYỀN (ADMIN)
+              <CrownFilled style={{ color: '#d97706' }} /> PHÂN HỆ QUẢN TRỊ TOÀN QUYỀN
             </Tag>
             <Tag color="success" icon={<DatabaseOutlined />} style={{ borderRadius: '6px', fontWeight: 600, padding: '4px 10px' }}>
               MySQL 8.4: Trực tiếp
@@ -348,7 +348,7 @@ export const AdminLayout: React.FC = () => {
                 height: '38px'
               }}
             >
-              Chuyển sang Bàn Vận hành (Manager Ops)
+              Chuyển sang Bàn Vận hành
             </Button>
 
             <Tooltip title="Trung tâm Thông báo Quản trị">

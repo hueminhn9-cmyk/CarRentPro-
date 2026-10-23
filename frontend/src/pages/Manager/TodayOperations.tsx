@@ -50,7 +50,7 @@ export const TodayOperations: React.FC = () => {
             time: '09:00',
             date: b.startDate,
             vehicle: b.vehicleName || 'Xe AutoRent',
-            plate: b.vehiclePlate || 'Biển số đang cấp',
+            plate: b.vehicleLicensePlate || b.vehiclePlate || b.vehicle?.licensePlate || 'Biển số đang cấp',
             customer: b.customerName || 'Khách hàng',
             phone: b.customerPhone || 'N/A',
             pickupLocation: b.pickupLocation || 'Showroom AutoRent',
@@ -68,7 +68,7 @@ export const TodayOperations: React.FC = () => {
             time: '17:30',
             date: b.endDate,
             vehicle: b.vehicleName || 'Xe AutoRent',
-            plate: b.vehiclePlate || 'Biển số xe',
+            plate: b.vehicleLicensePlate || b.vehiclePlate || b.vehicle?.licensePlate || 'Biển số xe',
             customer: b.customerName || 'Khách hàng',
             phone: b.customerPhone || 'N/A',
             dropoffLocation: b.dropoffLocation || 'Showroom AutoRent',
@@ -113,7 +113,7 @@ export const TodayOperations: React.FC = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <Title level={4} style={{ margin: 0, fontWeight: 800, color: '#0f172a' }}>
-            Lịch trình Vận hành trong ngày (Today's Operations)
+            Lịch trình Vận hành trong ngày
           </Title>
           <Text type="secondary" style={{ fontSize: '13px' }}>
             <CalendarOutlined style={{ marginRight: '6px' }} />
@@ -123,10 +123,10 @@ export const TodayOperations: React.FC = () => {
 
         <Space size={12}>
           <Tag color="blue" style={{ padding: '4px 12px', fontSize: '13px', borderRadius: '6px' }}>
-            {pickupCount} Lượt Giao xe (Pickup)
+            {pickupCount} Lượt Giao xe
           </Tag>
           <Tag color="purple" style={{ padding: '4px 12px', fontSize: '13px', borderRadius: '6px' }}>
-            {returnCount} Lượt Nhận xe (Return)
+            {returnCount} Lượt Nhận xe
           </Tag>
           <Button icon={<ReloadOutlined />} onClick={fetchOperations} size="small" style={{ borderRadius: '6px' }}>
             Làm mới

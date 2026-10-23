@@ -199,7 +199,7 @@ export const ReturnWizard: React.FC = () => {
           </Button>
           <div>
             <Title level={4} style={{ margin: 0, fontWeight: 800 }}>
-              Quy trình Nhận xe trả & Quyết toán (Return Wizard)
+              Quy trình Nhận xe trả & Quyết toán
             </Title>
             <Text type="secondary" style={{ fontSize: '12px' }}>
               Mã đơn: #{booking.bookingCode} • {vehicleName} ({licensePlate})

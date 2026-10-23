@@ -101,7 +101,7 @@ export const BookingDetail: React.FC = () => {
   const handleEmergencyOverride = async () => {
     if (!booking?.id) return;
     if (!emergencyReason.trim()) {
-      message.warning('Vui lòng nhập lý do can thiệp khẩn cấp (Emergency Override)');
+      message.warning('Vui lòng nhập lý do can thiệp khẩn cấp');
       return;
     }
     setUpdating(true);
@@ -199,7 +199,7 @@ export const BookingDetail: React.FC = () => {
       tag: 'Hợp đồng'
     },
     {
-      title: 'Biên bản Bàn giao xe (Manager Pickup)',
+      title: 'Biên bản Bàn giao xe',
       timestamp: dayjs(booking.startDate).format('DD/MM/YYYY 08:30'),
       description: status === 'ACTIVE' || status === 'COMPLETED'
         ? `Quản lý ${managerName} đã hoàn tất kiểm tra 6 góc xe và bàn giao chìa khóa cho khách.`
@@ -270,7 +270,7 @@ export const BookingDetail: React.FC = () => {
             onClick={() => setHandoverModalVisible(true)}
             style={{ borderColor: '#0891b2', color: '#0891b2', fontWeight: 600, borderRadius: '8px' }}
           >
-            Xem Biên bản Bàn giao (Manager)
+            Xem Biên bản Bàn giao
           </Button>
 
           {/* In phiếu đơn kiểm toán */}
@@ -298,7 +298,7 @@ export const BookingDetail: React.FC = () => {
             title={
               <Space>
                 <SafetyCertificateOutlined style={{ color: '#0284c7' }} />
-                <span style={{ fontWeight: 700 }}>Chi nhánh Tiếp nhận & Nhân sự Phụ trách (Assigned Manager)</span>
+                <span style={{ fontWeight: 700 }}>Chi nhánh Tiếp nhận & Nhân sự Phụ trách</span>
               </Space>
             }
             style={{ borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '24px' }}
@@ -344,7 +344,7 @@ export const BookingDetail: React.FC = () => {
             title={
               <Space>
                 <CarOutlined style={{ color: '#10b981' }} />
-                <span style={{ fontWeight: 700 }}>Thông tin Phương tiện bàn giao (Vehicle Asset)</span>
+                <span style={{ fontWeight: 700 }}>Thông tin Phương tiện bàn giao</span>
               </Space>
             }
             style={{ borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '24px' }}
@@ -379,7 +379,7 @@ export const BookingDetail: React.FC = () => {
             title={
               <Space>
                 <HistoryOutlined style={{ color: '#6366f1' }} />
-                <span style={{ fontWeight: 700 }}>Nhật ký Vòng đời Đơn thuê (Lifecycle Timeline)</span>
+                <span style={{ fontWeight: 700 }}>Nhật ký Vòng đời Đơn thuê</span>
               </Space>
             }
             style={{ borderRadius: '12px', border: '1px solid #e2e8f0' }}
@@ -410,7 +410,7 @@ export const BookingDetail: React.FC = () => {
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: '12px', fontWeight: 700, color: isPaid ? '#166534' : '#92400e' }}>
-                  {isPaid ? 'ĐÃ NHẬN TIỀN CỌC (ESCROW SECURED)' : 'CHỜ THANH TOÁN TIỀN CỌC'}
+                  {isPaid ? 'ĐÃ NHẬN TIỀN CỌC' : 'CHỜ THANH TOÁN TIỀN CỌC'}
                 </span>
                 <Tag color={isPaid ? 'success' : 'warning'} style={{ margin: 0, fontWeight: 700 }}>
                   {isPaid ? 'AN TOÀN' : 'CHỜ DUYỆT'}
@@ -519,7 +519,7 @@ export const BookingDetail: React.FC = () => {
         title={
           <Space>
             <AuditOutlined style={{ color: '#0891b2' }} />
-            <span>Đối soát Biên bản Bàn giao & Hình ảnh Hiện trạng Xe (Manager Audit)</span>
+            <span>Đối soát Biên bản Bàn giao & Hình ảnh Hiện trạng Xe</span>
           </Space>
         }
         open={handoverModalVisible}
@@ -593,7 +593,7 @@ export const BookingDetail: React.FC = () => {
         title={
           <Space>
             <ExclamationCircleOutlined style={{ color: '#dc2626' }} />
-            <span style={{ color: '#dc2626' }}>Can thiệp Khẩn cấp Đơn thuê (Admin Emergency Override)</span>
+            <span style={{ color: '#dc2626' }}>Can thiệp Khẩn cấp Đơn thuê</span>
           </Space>
         }
         open={emergencyModalVisible}
@@ -611,7 +611,7 @@ export const BookingDetail: React.FC = () => {
           type="warning"
           showIcon
           message="Lưu ý quan trọng dành cho Quản trị viên"
-          description="Tính năng Can thiệp Khẩn cấp chỉ được sử dụng khi phát hiện tranh chấp pháp lý nghiêm trọng, nghi ngờ hành vi gian lận hoặc sự cố đặc biệt ngoài bãi xe. Quyết định can thiệp sẽ được ghi nhận vào Nhật ký Kiểm toán (Audit Logs) của hệ thống."
+          description="Tính năng Can thiệp Khẩn cấp chỉ được sử dụng khi phát hiện tranh chấp pháp lý nghiêm trọng, nghi ngờ hành vi gian lận hoặc sự cố đặc biệt ngoài bãi xe. Quyết định can thiệp sẽ được ghi nhận vào Nhật ký Kiểm toán của hệ thống."
           style={{ marginBottom: '16px' }}
         />
 

@@ -59,9 +59,10 @@ export const BookingQueue: React.FC = () => {
   const filteredBookings = bookings.filter((b) => {
     const matchSearch = search ? (
       (b.id || '').toLowerCase().includes(search.toLowerCase()) ||
-      (b.vehicle?.name || '').toLowerCase().includes(search.toLowerCase()) ||
-      (b.customer?.name || '').toLowerCase().includes(search.toLowerCase()) ||
-      (b.vehicle?.licensePlate || '').toLowerCase().includes(search.toLowerCase())
+      (b.bookingCode || '').toLowerCase().includes(search.toLowerCase()) ||
+      (b.vehicleName || b.vehicle?.name || '').toLowerCase().includes(search.toLowerCase()) ||
+      (b.customerName || b.customer?.name || '').toLowerCase().includes(search.toLowerCase()) ||
+      (b.vehicleLicensePlate || b.vehiclePlate || b.vehicle?.licensePlate || '').toLowerCase().includes(search.toLowerCase())
     ) : true;
 
     const s = b.rawStatus || b.status;
@@ -142,27 +143,27 @@ export const BookingQueue: React.FC = () => {
                       styles={{ body: { padding: '12px' } }}
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                        <Text strong style={{ fontSize: '12px', color: '#1e3a8a' }}>#{item.id.slice(0, 8)}</Text>
+                        <Text strong style={{ fontSize: '12px', color: '#1e3a8a' }}>#{item.bookingCode || item.id.slice(0, 8)}</Text>
                         <Text type="secondary" style={{ fontSize: '11px' }}>
-                          {item.totalDays || 3} ngày
+                          {item.totalDays || 1} ngày
                         </Text>
                       </div>
 
                       <div style={{ fontWeight: 700, fontSize: '13px', color: '#0f172a', marginBottom: '2px' }}>
-                        {item.vehicle?.name || 'VinFast VF8'}
+                        {item.vehicleName || item.vehicle?.name || 'Chưa gán xe'}
                       </div>
                       <div style={{ fontSize: '11px', color: '#64748b', marginBottom: '8px' }}>
-                        Biển số: {item.vehicle?.licensePlate || '30H-888.66'}
+                        Biển số: {item.vehicleLicensePlate || item.vehiclePlate || item.vehicle?.licensePlate || 'Chưa có biển'}
                       </div>
 
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#475569', marginBottom: '10px' }}>
                         <UserOutlined style={{ fontSize: '11px', color: '#94a3b8' }} />
-                        <span>{item.customer?.name || 'Nguyễn Văn An'}</span>
+                        <span>{item.customerName || item.customer?.name || 'Khách vãng lai'}</span>
                       </div>
 
                       <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <span style={{ fontSize: '12px', fontWeight: 700, color: '#0f172a' }}>
-                          {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.totalAmount || 3500000)}
+                          {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.totalAmount || 0)}
                         </span>
 
                         <Space size={4}>
@@ -238,8 +239,8 @@ export const BookingQueue: React.FC = () => {
       key: 'vehicle',
       render: (_: any, r: any) => (
         <div>
-          <div style={{ fontWeight: 600 }}>{r.vehicle?.name || 'Chưa gán xe'}</div>
-          <div style={{ fontSize: '12px', color: '#64748b' }}>{r.vehicle?.licensePlate || 'N/A'}</div>
+          <div style={{ fontWeight: 600 }}>{r.vehicleName || r.vehicle?.name || 'Chưa gán xe'}</div>
+          <div style={{ fontSize: '12px', color: '#64748b' }}>{r.vehicleLicensePlate || r.vehiclePlate || r.vehicle?.licensePlate || 'N/A'}</div>
         </div>
       )
     },
@@ -248,8 +249,8 @@ export const BookingQueue: React.FC = () => {
       key: 'customer',
       render: (_: any, r: any) => (
         <div>
-          <div style={{ fontWeight: 500 }}>{r.customer?.name || 'Khách vãng lai'}</div>
-          <div style={{ fontSize: '11px', color: '#64748b' }}>{r.customer?.phone || '0901234567'}</div>
+          <div style={{ fontWeight: 500 }}>{r.customerName || r.customer?.name || 'Khách vãng lai'}</div>
+          <div style={{ fontSize: '11px', color: '#64748b' }}>{r.customerPhone || r.customer?.phone || 'N/A'}</div>
         </div>
       )
     },
@@ -325,7 +326,7 @@ export const BookingQueue: React.FC = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <div>
           <Title level={4} style={{ margin: 0, fontWeight: 800, color: '#0f172a' }}>
-            Hàng đợi Đơn thuê (Booking Queue)
+            Hàng đợi Đơn thuê
           </Title>
           <Text type="secondary" style={{ fontSize: '13px' }}>
             Quản lý vòng đời đơn thuê từ tiếp nhận, duyệt đơn đến giao nhận xe
@@ -336,8 +337,8 @@ export const BookingQueue: React.FC = () => {
           value={viewMode}
           onChange={(val) => setViewMode(val as 'table' | 'kanban')}
           options={[
-            { label: 'Kanban Board', value: 'kanban', icon: <AppstoreOutlined /> },
-            { label: 'Danh sách Table', value: 'table', icon: <BarsOutlined /> }
+            { label: 'Bảng Kanban', value: 'kanban', icon: <AppstoreOutlined /> },
+            { label: 'Danh sách', value: 'table', icon: <BarsOutlined /> }
           ]}
           style={{ background: '#e2e8f0', padding: '3px', borderRadius: '8px' }}
         />
@@ -350,12 +351,12 @@ export const BookingQueue: React.FC = () => {
         onSearchChange={setSearch}
         statusOptions={[
           { label: 'Tất cả trạng thái', value: '' },
-          { label: 'Chờ duyệt (PENDING)', value: 'PENDING' },
-          { label: 'Đã duyệt (CONFIRMED)', value: 'CONFIRMED' },
-          { label: 'Sẵn sàng giao (READY)', value: 'READY_FOR_PICKUP' },
-          { label: 'Đang thuê (ACTIVE)', value: 'ACTIVE' },
-          { label: 'Chờ nhận xe (RETURN)', value: 'WAITING_FOR_RETURN' },
-          { label: 'Hoàn thành (COMPLETED)', value: 'COMPLETED' }
+          { label: 'Chờ duyệt', value: 'PENDING' },
+          { label: 'Đã duyệt', value: 'CONFIRMED' },
+          { label: 'Sẵn sàng giao', value: 'READY_FOR_PICKUP' },
+          { label: 'Đang thuê', value: 'ACTIVE' },
+          { label: 'Chờ nhận xe', value: 'WAITING_FOR_RETURN' },
+          { label: 'Hoàn thành', value: 'COMPLETED' }
         ]}
         statusValue={statusFilter}
         onStatusChange={setStatusFilter}

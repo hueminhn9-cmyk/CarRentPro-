@@ -81,7 +81,7 @@ export const ManagerManagement: React.FC = () => {
     <div className="fade-in">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <div>
-          <Title level={3} style={{ margin: 0, fontWeight: 800 }}>Quản lý Nhân sự (Managers)</Title>
+          <Title level={3} style={{ margin: 0, fontWeight: 800 }}>Quản lý Nhân sự</Title>
           <Text type="secondary">Cấp quyền và quản lý tài khoản nhân viên vận hành doanh nghiệp</Text>
         </div>
         <Button

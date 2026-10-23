@@ -199,7 +199,7 @@ export const PickupWizard: React.FC = () => {
           </Button>
           <div>
             <Title level={4} style={{ margin: 0, fontWeight: 800 }}>
-              Quy trình Bàn giao xe (Pickup Wizard)
+              Quy trình Bàn giao xe
             </Title>
             <Text type="secondary" style={{ fontSize: '12px' }}>
               Mã đơn: #{booking.bookingCode} • {vehicleName} ({licensePlate})

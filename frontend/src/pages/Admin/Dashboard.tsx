@@ -94,7 +94,7 @@ export const AdminDashboard: React.FC = () => {
       <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <Title level={4} style={{ margin: 0, fontWeight: 800, color: '#0f172a' }}>
-            Bảng điều hành Tổng giám đốc (Executive Dashboard)
+            Bảng điều hành Tổng giám đốc
           </Title>
           <Text type="secondary" style={{ fontSize: '13px' }}>
             Theo dõi chỉ số kinh doanh, hiệu suất đội xe và các hành động cần can thiệp

@@ -110,7 +110,7 @@ export const VerificationQueue: React.FC = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <Title level={4} style={{ margin: 0, fontWeight: 800 }}>
-            Hàng đợi Kiểm duyệt GPLX & Danh tính (Verification Queue)
+            Hàng đợi Kiểm duyệt GPLX & Danh tính
           </Title>
           <Text type="secondary" style={{ fontSize: '13px' }}>
             Đối chiếu bằng lái xe và căn cước công dân trước khi xác nhận đơn thuê

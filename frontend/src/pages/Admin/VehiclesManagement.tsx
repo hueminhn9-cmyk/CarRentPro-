@@ -125,7 +125,7 @@ export const VehiclesManagement: React.FC = () => {
     <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <div>
-          <Title level={4} style={{ margin: 0, fontWeight: 800 }}>Chiến lược & Quản lý Đội xe (Fleet Strategy)</Title>
+          <Title level={4} style={{ margin: 0, fontWeight: 800 }}>Chiến lược & Quản lý Đội xe</Title>
           <Text type="secondary" style={{ fontSize: '13px' }}>Định cấu hình giá thuê, cập nhật thông số và theo dõi trạng thái phương tiện</Text>
         </div>
 
@@ -134,8 +134,8 @@ export const VehiclesManagement: React.FC = () => {
             value={viewMode}
             onChange={(val) => setViewMode(val as 'table' | 'card')}
             options={[
-              { label: 'Card View', value: 'card', icon: <AppstoreOutlined /> },
-              { label: 'Table View', value: 'table', icon: <BarsOutlined /> }
+              { label: 'Dạng thẻ', value: 'card', icon: <AppstoreOutlined /> },
+              { label: 'Dạng bảng', value: 'table', icon: <BarsOutlined /> }
             ]}
             style={{ background: '#e2e8f0', padding: '3px', borderRadius: '8px' }}
           />
@@ -157,9 +157,9 @@ export const VehiclesManagement: React.FC = () => {
         onSearchChange={setSearch}
         statusOptions={[
           { label: 'Tất cả trạng thái', value: '' },
-          { label: 'Có sẵn (AVAILABLE)', value: 'AVAILABLE' },
-          { label: 'Đang thuê (RENTED)', value: 'RENTED' },
-          { label: 'Bảo dưỡng (MAINTENANCE)', value: 'MAINTENANCE' }
+          { label: 'Có sẵn', value: 'AVAILABLE' },
+          { label: 'Đang thuê', value: 'RENTED' },
+          { label: 'Bảo dưỡng', value: 'MAINTENANCE' }
         ]}
         statusValue={statusFilter}
         onStatusChange={setStatusFilter}

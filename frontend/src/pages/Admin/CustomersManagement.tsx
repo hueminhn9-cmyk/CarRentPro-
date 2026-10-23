@@ -239,7 +239,7 @@ export const CustomersManagement: React.FC = () => {
       <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <Title level={3} style={{ margin: 0, fontWeight: 800, color: '#0f172a' }}>
-            Quản lý Khách hàng & Hồ sơ Định danh (KYC)
+            Quản lý Khách hàng & Hồ sơ Định danh
           </Title>
           <Text type="secondary" style={{ fontSize: '13px' }}>
             Giám sát danh sách khách hàng, kiểm toán hồ sơ định danh và phân quyền nhân sự toàn hệ thống

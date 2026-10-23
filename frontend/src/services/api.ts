@@ -192,6 +192,19 @@ const formatBooking = (b: any): Booking & { vehicleGallery?: string[] } => {
     notes: b.customer_note || '',
     adminNote: b.admin_note || '',
     vehicleLicensePlate: b.vehicles?.license_plate || 'N/A',
+    vehiclePlate: b.vehicles?.license_plate || 'N/A',
+    vehicle: {
+      id: b.vehicle_id?.toString() || '',
+      name: b.vehicles?.name || 'N/A',
+      licensePlate: b.vehicles?.license_plate || 'N/A',
+      image: vehicleImage
+    },
+    customer: {
+      id: b.customer_id?.toString() || '',
+      name: b.users?.full_name || 'Khách hàng',
+      phone: b.users?.phone || 'N/A',
+      email: b.users?.email || 'N/A'
+    },
     payments: b.payments || [],
     handoverRecords: b.handover_records || [],
     contracts: b.contracts || null,

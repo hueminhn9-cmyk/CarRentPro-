@@ -167,7 +167,7 @@ export const Reviews: React.FC = () => {
   return (
     <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
       <div style={{ marginBottom: '20px' }}>
-        <Title level={4} style={{ margin: 0, fontWeight: 800 }}>Kiểm duyệt Đánh giá Khách hàng (Reviews Moderation)</Title>
+        <Title level={4} style={{ margin: 0, fontWeight: 800 }}>Kiểm duyệt Đánh giá Khách hàng</Title>
         <Text type="secondary" style={{ fontSize: '13px' }}>Quản lý phản hồi, xếp hạng sao của người dùng để nâng cao chất lượng dịch vụ</Text>
       </div>
 

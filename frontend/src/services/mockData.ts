@@ -53,6 +53,21 @@ export interface Booking {
   notes?: string;
   adminNote?: string;
   vehicleLicensePlate?: string;
+  vehiclePlate?: string;
+  vehicle?: {
+    id?: string;
+    name?: string;
+    licensePlate?: string;
+    image?: string;
+    [key: string]: any;
+  };
+  customer?: {
+    id?: string;
+    name?: string;
+    phone?: string;
+    email?: string;
+    [key: string]: any;
+  };
   payments?: any[];
   handoverRecords?: any[];
   contracts?: any;

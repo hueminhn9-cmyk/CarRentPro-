@@ -109,12 +109,12 @@ export const ManagerLayout: React.FC = () => {
         {
           key: '/manager/pickup/quick',
           icon: <ExportOutlined style={{ fontSize: '16px', color: '#16a34a' }} />,
-          label: '3. Giao xe (Pickup)',
+          label: '3. Giao xe',
         },
         {
           key: '/manager/return/quick',
           icon: <ImportOutlined style={{ fontSize: '16px', color: '#ea580c' }} />,
-          label: '4. Nhận xe trả (Return)',
+          label: '4. Nhận xe trả',
         }
       ]
     },
@@ -132,7 +132,7 @@ export const ManagerLayout: React.FC = () => {
           icon: <SafetyCertificateOutlined style={{ fontSize: '16px', color: '#7c3aed' }} />,
           label: (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span>Duyệt GPLX / Verification</span>
+              <span>Duyệt GPLX & Danh tính</span>
               {stats.pendingVerifications ? <Badge count={stats.pendingVerifications} size="small" style={{ backgroundColor: '#2563eb' }} /> : null}
             </div>
           ),
@@ -177,7 +177,7 @@ export const ManagerLayout: React.FC = () => {
 
   const userDropdownItems = [
     { key: 'role-switch', label: 'Chi nhánh Hải Châu - Đà Nẵng', icon: <SafetyCertificateOutlined />, disabled: true },
-    ...(currentUser.role === 'admin' ? [{ key: 'switch-admin', label: 'Chuyển sang Bàn Quản trị (Admin)', icon: <CrownOutlined />, onClick: () => navigate('/admin/dashboard') }] : []),
+    ...(currentUser.role === 'admin' ? [{ key: 'switch-admin', label: 'Chuyển sang Bàn Quản trị', icon: <CrownOutlined />, onClick: () => navigate('/admin/dashboard') }] : []),
     { type: 'divider' as const },
     { key: 'logout', label: 'Đăng xuất', icon: <LogoutOutlined />, onClick: handleLogout }
   ];
@@ -315,7 +315,7 @@ export const ManagerLayout: React.FC = () => {
                   height: '38px'
                 }}
               >
-                Chuyển sang Bàn Quản trị (Admin Suite)
+                Chuyển sang Bàn Quản trị
               </Button>
             )}
 

@@ -177,7 +177,7 @@ export const AuditLogs: React.FC = () => {
     <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <div>
-          <Title level={4} style={{ margin: 0, fontWeight: 800 }}>Nhật ký Hoạt động Hệ thống (Audit Logs)</Title>
+          <Title level={4} style={{ margin: 0, fontWeight: 800 }}>Nhật ký Hoạt động Hệ thống</Title>
           <Text type="secondary" style={{ fontSize: '13px' }}>Theo dõi lịch sử truy cập, thay đổi dữ liệu và đảm bảo tính minh bạch bảo mật</Text>
         </div>
 
