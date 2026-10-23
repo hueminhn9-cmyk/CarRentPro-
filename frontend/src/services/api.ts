@@ -99,7 +99,7 @@ axiosInstance.interceptors.response.use(
 );
 
 // Formatter Helpers to map Backend DB models to Frontend components expected models
-const formatVehicle = (v: any): Vehicle => {
+const formatVehicle = (v: any): Vehicle & { gallery?: string[] } => {
   const catName = v.vehicle_categories?.name || 'Sedan';
   let type = catName;
   if (catName === 'Pickup') type = 'Bán tải';
@@ -124,6 +124,12 @@ const formatVehicle = (v: any): Vehicle => {
     features = ["Bản đồ GPS", "Camera lùi", "Ghế bọc da", "Bluetooth/USB", "Kiểm soát hành trình Cruise Control"];
   }
 
+  const gallery = (v.media_files || [])
+    .map((m: any) => m.file_path ? (m.file_path.startsWith('http') ? m.file_path : `http://localhost:5000/${m.file_path.replace(/\\/g, '/')}`) : null)
+    .filter(Boolean);
+
+  const mainImage = v.image || (gallery.length > 0 ? gallery[0] : 'https://images.unsplash.com/photo-1563720223185-11003d516935?w=600&auto=format&fit=crop&q=60');
+
   return {
     id: v.id.toString(),
     name: v.name,
@@ -131,7 +137,8 @@ const formatVehicle = (v: any): Vehicle => {
     licensePlate: v.license_plate,
     pricePerDay: Number(v.price_per_day),
     status: v.status === 'AVAILABLE' ? 'Có sẵn' : (v.status === 'MAINTENANCE' ? 'Bảo dưỡng' : 'Đang thuê'),
-    image: v.image || 'https://images.unsplash.com/photo-1563720223185-11003d516935?w=600&auto=format&fit=crop&q=60',
+    image: mainImage,
+    gallery: gallery.length > 0 ? gallery : [mainImage],
     transmission: v.transmission === 'AUTO' ? 'Tự động' : 'Số sàn',
     fuel: v.fuel_type === 'ELECTRIC' ? 'Điện' : (v.fuel_type === 'DIESEL' ? 'Dầu' : 'Xăng'),
     seats: v.seat_count,
@@ -147,36 +154,69 @@ const formatVehicle = (v: any): Vehicle => {
   };
 };
 
-const formatBooking = (b: any): Booking => ({
-  id: b.id.toString(),
-  bookingCode: b.booking_code,
-  customerId: b.customer_id.toString(),
-  customerName: b.users?.full_name || 'N/A',
-  customerPhone: b.users?.phone || 'N/A',
-  customerEmail: b.users?.email || 'N/A',
-  vehicleId: b.vehicle_id.toString(),
-  vehicleName: b.vehicles?.name || 'N/A',
-  vehicleImage: b.vehicles?.image || 'https://images.unsplash.com/photo-1563720223185-11003d516935?w=600&auto=format&fit=crop&q=60',
-  startDate: b.pickup_datetime ? b.pickup_datetime.split('T')[0] : '',
-  endDate: b.return_datetime ? b.return_datetime.split('T')[0] : '',
-  pickupLocation: b.pickup_location,
-  dropoffLocation: b.return_location,
-  totalDays: b.rental_days,
-  pricePerDay: b.vehicles?.price_per_day ? Number(b.vehicles.price_per_day) : 0,
-  subtotal: b.rental_fee ? Number(b.rental_fee) : 0,
-  insuranceFee: 0,
-  serviceFee: b.service_fee ? Number(b.service_fee) : 0,
-  totalAmount: b.total_amount ? Number(b.total_amount) : 0,
-  status: b.status === 'PENDING' || b.status === 'CONFIRMED' || b.status === 'READY_FOR_PICKUP' ? 'Chờ xác nhận' : (b.status === 'COMPLETED' ? 'Hoàn thành' : (b.status === 'CANCELLED' || b.status === 'REJECTED' ? 'Đã hủy' : 'Đang thuê')),
-  paymentMethod: b.payments?.[0]?.payment_method === 'VNPAY' ? 'Ví điện tử' : (b.payments?.[0]?.payment_method === 'BANK_TRANSFER' ? 'Chuyển khoản' : 'Thẻ tín dụng'),
-  paymentStatus: b.payment_status === 'PAID' ? 'Đã thanh toán' : (b.payment_status === 'REFUNDED' ? 'Hoàn tiền' : 'Chờ thanh toán'),
-  createdAt: b.created_at || '',
-  contractSigned: b.contracts?.status === 'SIGNED' || b.contract_signed || false,
-  notes: b.customer_note || ''
-});
+const formatBooking = (b: any): Booking & { vehicleGallery?: string[] } => {
+  const vehicleGallery = (b.vehicles?.media_files || [])
+    .map((m: any) => m.file_path ? (m.file_path.startsWith('http') ? m.file_path : `http://localhost:5000/${m.file_path.replace(/\\/g, '/')}`) : null)
+    .filter(Boolean);
 
-const formatCustomer = (u: any): Customer => {
+  const vehicleImage = b.vehicles?.image || (vehicleGallery.length > 0 ? vehicleGallery[0] : 'https://images.unsplash.com/photo-1563720223185-11003d516935?w=600&auto=format&fit=crop&q=60');
+
+  return {
+    id: b.id.toString(),
+    bookingCode: b.booking_code,
+    customerId: b.customer_id.toString(),
+    customerName: b.users?.full_name || 'N/A',
+    customerPhone: b.users?.phone || 'N/A',
+    customerEmail: b.users?.email || 'N/A',
+    vehicleId: b.vehicle_id.toString(),
+    vehicleName: b.vehicles?.name || 'N/A',
+    vehicleImage: vehicleImage,
+    vehicleGallery: vehicleGallery.length > 0 ? vehicleGallery : [vehicleImage],
+    startDate: b.pickup_datetime ? b.pickup_datetime.split('T')[0] : '',
+    endDate: b.return_datetime ? b.return_datetime.split('T')[0] : '',
+    pickupLocation: b.pickup_location,
+    dropoffLocation: b.return_location,
+    totalDays: b.rental_days,
+    pricePerDay: b.vehicles?.price_per_day ? Number(b.vehicles.price_per_day) : 0,
+    subtotal: b.rental_fee ? Number(b.rental_fee) : 0,
+    insuranceFee: 0,
+    serviceFee: b.service_fee ? Number(b.service_fee) : 0,
+    depositAmount: b.deposit_amount ? Number(b.deposit_amount) : 15000000,
+    totalAmount: b.total_amount ? Number(b.total_amount) : ((b.rental_fee ? Number(b.rental_fee) : 0) + (b.service_fee ? Number(b.service_fee) : 0)),
+    status: b.status,
+    rawStatus: b.status,
+    paymentMethod: b.payments?.[0]?.payment_method === 'VNPAY' ? 'Ví điện tử' : (b.payments?.[0]?.payment_method === 'BANK_TRANSFER' ? 'Chuyển khoản' : 'Thẻ tín dụng'),
+    paymentStatus: b.payment_status === 'PAID' ? 'Đã thanh toán' : (b.payment_status === 'REFUNDED' ? 'Hoàn tiền' : 'Chờ thanh toán'),
+    createdAt: b.created_at || '',
+    contractSigned: b.contracts?.status === 'SIGNED' || b.contract_signed || false,
+    notes: b.customer_note || '',
+    adminNote: b.admin_note || '',
+    vehicleLicensePlate: b.vehicles?.license_plate || 'N/A',
+    payments: b.payments || [],
+    handoverRecords: b.handover_records || [],
+    contracts: b.contracts || null,
+    history: b.booking_status_history || []
+  };
+};
+
+const formatCustomer = (u: any): Customer & { documents?: any[]; citizenFront?: string; citizenBack?: string; licenseFront?: string; licenseBack?: string } => {
   const profile = u.customer_profiles || {};
+  const docs = u.documents || [];
+  
+  const getDocUrl = (cat: string, fallback: string) => {
+    const doc = docs.find((d: any) => d.category === cat);
+    if (doc && doc.file_path) {
+      if (doc.file_path.startsWith('http')) return doc.file_path;
+      return `http://localhost:5000/${doc.file_path.replace(/\\/g, '/')}`;
+    }
+    return fallback;
+  };
+
+  const citizenFront = getDocUrl('CITIZEN_FRONT', 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&auto=format&fit=crop&q=60');
+  const citizenBack = getDocUrl('CITIZEN_BACK', 'https://images.unsplash.com/photo-1554224154-26032ffc0d07?w=600&auto=format&fit=crop&q=60');
+  const licenseFront = getDocUrl('LICENSE_FRONT', 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&auto=format&fit=crop&q=60');
+  const licenseBack = getDocUrl('LICENSE_BACK', 'https://images.unsplash.com/photo-1554224154-26032ffc0d07?w=600&auto=format&fit=crop&q=60');
+
   return {
     id: u.id.toString(),
     name: u.full_name,
@@ -185,13 +225,19 @@ const formatCustomer = (u: any): Customer => {
     address: profile.address || 'N/A',
     idCard: profile.citizen_id || 'N/A',
     driverLicense: profile.driver_license_number || 'N/A',
-    licenseStatus: profile.verification_status === 'VERIFIED' ? 'Đã xác minh' : (profile.verification_status === 'PENDING' ? 'Chờ duyệt' : 'Chưa cập nhật'),
+    licenseExpiry: profile.driver_license_expiry ? profile.driver_license_expiry.split('T')[0] : '',
+    licenseStatus: profile.verification_status === 'VERIFIED' ? 'Đã xác minh' : (profile.verification_status === 'PENDING' ? 'Chờ duyệt' : (profile.verification_status === 'REJECTED' ? 'Từ chối' : 'Chưa cập nhật')),
     loyaltyPoints: profile.loyalty_points || 0,
     tier: profile.loyalty_tier || 'Bạc',
     bookingCount: profile.booking_count || 0,
     createdAt: u.created_at || '',
-    frontImage: profile.driver_license_front || 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&auto=format&fit=crop&q=60',
-    backImage: profile.driver_license_back || 'https://images.unsplash.com/photo-1554224154-26032ffc0d07?w=600&auto=format&fit=crop&q=60'
+    frontImage: licenseFront,
+    backImage: licenseBack,
+    citizenFront,
+    citizenBack,
+    licenseFront,
+    licenseBack,
+    documents: docs,
   };
 };
 
@@ -391,7 +437,7 @@ export const api = {
       return formatBooking(res.data.data);
     },
     
-    updateStatus: async (id: string, status: string, paymentStatus?: string): Promise<Booking> => {
+    updateStatus: async (id: string, status: string, paymentStatus?: string, reason?: string): Promise<Booking> => {
       const statusMap: Record<string, string> = {
         'Chờ xác nhận': 'PENDING',
         'PENDING': 'PENDING',
@@ -399,6 +445,7 @@ export const api = {
         'ACTIVE': 'ACTIVE',
         'CONFIRMED': 'CONFIRMED',
         'READY_FOR_PICKUP': 'READY_FOR_PICKUP',
+        'WAITING_FOR_RETURN': 'WAITING_FOR_RETURN',
         'Hoàn thành': 'COMPLETED',
         'COMPLETED': 'COMPLETED',
         'Đã hủy': 'CANCELLED',
@@ -408,10 +455,15 @@ export const api = {
       
       const backendStatus = statusMap[status] || status;
       
-      const res = await axiosInstance.put(`/bookings/${id}/status`, {
+      const payload: any = {
         status: backendStatus,
-        reason: `Cập nhật trạng thái thành ${status}`
-      });
+        reason: reason || `Cập nhật trạng thái thành ${status}`
+      };
+      if (paymentStatus) {
+        payload.payment_status = paymentStatus;
+      }
+      
+      const res = await axiosInstance.put(`/bookings/${id}/status`, payload);
       
       return formatBooking(res.data.data);
     },
@@ -422,6 +474,24 @@ export const api = {
         contractUrl: 'https://autorent.vn/contracts/signed_template.pdf'
       });
       return true;
+    }
+  },
+
+  // Locations API
+  locations: {
+    getAll: async () => {
+      try {
+        const res = await axiosInstance.get('/locations');
+        return res.data.data;
+      } catch (err) {
+        return [
+          { id: 1, name: 'Showroom Sân Bay Đà Nẵng', address: 'Cổng Ga Đến Quốc Tế, Q. Hải Châu, Đà Nẵng' },
+          { id: 2, name: 'Showroom Chi Nhánh Trung Tâm - Hải Châu', address: '150 Nguyễn Văn Linh, Q. Hải Châu, Đà Nẵng' },
+          { id: 3, name: 'Showroom Chi Nhánh Sơn Trà - Biển Mỹ Khê', address: '88 Võ Nguyên Giáp, Q. Sơn Trà, Đà Nẵng' },
+          { id: 4, name: 'Showroom Chi Nhánh Thanh Khê', address: '45 Nguyễn Tất Thành, Q. Thanh Khê, Đà Nẵng' },
+          { id: 5, name: 'Showroom Chi Nhánh Ngũ Hành Sơn', address: '12 Lê Văn Hiến, Q. Ngũ Hành Sơn, Đà Nẵng' }
+        ];
+      }
     }
   },
 
@@ -451,6 +521,20 @@ export const api = {
           return undefined;
         }
       }
+    },
+
+    uploadDocument: async (category: string, file: File, details?: any): Promise<Customer> => {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('category', category);
+      if (details?.citizen_id) formData.append('citizen_id', details.citizen_id);
+      if (details?.driver_license_number) formData.append('driver_license_number', details.driver_license_number);
+      if (details?.driver_license_expiry) formData.append('driver_license_expiry', details.driver_license_expiry);
+
+      const res = await axiosInstance.post('/users/profile/document', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      return formatCustomer(res.data.data);
     },
 
     verifyLicense: async (id: string, data: { status: string; reason?: string }): Promise<any> => {
@@ -504,25 +588,41 @@ export const api = {
 
   // Notifications API
   notifications: {
-    getAll: async () => {
-      const res = await axiosInstance.get('/notifications');
+    getAll: async (params?: { limit?: number; page?: number; all?: boolean }) => {
+      const limit = params?.limit || 50;
+      const page = params?.page || 1;
+      const allParam = params?.all !== false ? '&all=true' : '';
+      const res = await axiosInstance.get(`/notifications?limit=${limit}&page=${page}${allParam}`);
       const list = res.data.data.notifications || res.data.data || [];
       return list.map((n: any) => ({
-        id: n.id.toString(),
+        id: String(n.id),
+        user_id: n.user_id ? String(n.user_id) : undefined,
         title: n.title,
+        content: n.content,
         desc: n.content,
         time: n.created_at || new Date().toISOString(),
-        type: n.type?.toLowerCase() === 'system' ? 'info' : (n.type?.toLowerCase() || 'info'),
-        read: Boolean(n.is_read)
+        created_at: n.created_at || new Date().toISOString(),
+        type: n.type || 'INFO',
+        read: Boolean(n.is_read),
+        is_read: Boolean(n.is_read),
+        users: n.users
       }));
     },
-    markAllAsRead: async () => {
-      await axiosInstance.put('/notifications/mark-all-read');
-      return true;
+    getUnreadCount: async () => {
+      const res = await axiosInstance.get('/notifications/unread-count');
+      return res.data.data.count || 0;
     },
-    delete: async (id: string) => {
-      await axiosInstance.delete(`/notifications/${id}`);
-      return true;
+    markAsRead: async (id: string | number) => {
+      const res = await axiosInstance.put(`/notifications/${id}/read`);
+      return res.data.data;
+    },
+    markAllAsRead: async () => {
+      const res = await axiosInstance.put('/notifications/mark-all-read');
+      return res.data;
+    },
+    delete: async (id: string | number) => {
+      const res = await axiosInstance.delete(`/notifications/${id}`);
+      return res.data;
     }
   },
 
@@ -556,6 +656,29 @@ export const api = {
       const res = await axiosInstance.get('/contracts?limit=100');
       const list = res.data.data.contracts || res.data.data || [];
       return list.map(formatContract);
+    },
+    getByBookingId: async (bookingId: string) => {
+      const res = await axiosInstance.get(`/contracts/booking/${bookingId}`);
+      return res.data.data;
+    },
+    getContractHTML: async (contractId: string) => {
+      const res = await axiosInstance.get(`/contracts/${contractId}/preview`, { responseType: 'text' });
+      return res.data;
+    },
+    downloadContract: async (contractId: string, contractCode?: string) => {
+      const res = await axiosInstance.get(`/contracts/${contractId}/download`, { responseType: 'text' });
+      const blob = new Blob([res.data], { type: 'text/html;charset=utf-8' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `HopDong-${contractCode || contractId}.html`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    },
+    signContract: async (data: { contractId?: string; bookingCode?: string; signatureData: string }) => {
+      const res = await axiosInstance.post('/contracts/sign', data);
+      return res.data.data;
     }
   },
 
@@ -591,6 +714,177 @@ export const api = {
     delete: async (id: string) => {
       const res = await axiosInstance.delete(`/users/${id}`);
       return res.data;
+    }
+  },
+
+  // Handover Records API
+  handover: {
+    create: async (data: {
+      booking_id: string | number;
+      record_type?: 'PICKUP' | 'RETURN';
+      type?: 'PICKUP' | 'RETURN';
+      odometer?: number;
+      mileage?: number;
+      fuel_level?: number | string;
+      vehicle_condition?: 'EXCELLENT' | 'GOOD' | 'NORMAL' | 'DAMAGED';
+      damage_description?: string;
+      checklist?: any;
+      photos?: string[];
+      late_fee?: number;
+      extra_km_fee?: number;
+      fuel_fee?: number;
+      cleaning_fee?: number;
+      damage_fee?: number;
+      refundable_deposit?: number;
+      note?: string;
+    }) => {
+      const record_type = data.record_type || data.type || 'PICKUP';
+      const mileage = data.mileage !== undefined ? Number(data.mileage) : (data.odometer !== undefined ? Number(data.odometer) : 0);
+      let fuelLevelNum = 100;
+      if (typeof data.fuel_level === 'number') {
+        fuelLevelNum = data.fuel_level;
+      } else if (typeof data.fuel_level === 'string') {
+        const parsed = parseInt(data.fuel_level.replace(/[^0-9]/g, ''));
+        fuelLevelNum = isNaN(parsed) ? 100 : Math.min(100, Math.max(0, parsed));
+      }
+
+      const noteParts: string[] = [];
+      if (data.note) noteParts.push(data.note);
+      if (data.checklist) noteParts.push(`Checklist: ${JSON.stringify(data.checklist)}`);
+      if (data.photos && data.photos.length > 0) noteParts.push(`Photos: ${data.photos.join(', ')}`);
+
+      const payload = {
+        booking_id: Number(data.booking_id),
+        record_type,
+        mileage,
+        fuel_level: fuelLevelNum,
+        vehicle_condition: data.vehicle_condition || 'GOOD',
+        damage_description: data.damage_description || null,
+        late_fee: Number(data.late_fee || 0),
+        extra_km_fee: Number(data.extra_km_fee || 0),
+        fuel_fee: Number(data.fuel_fee || 0),
+        cleaning_fee: Number(data.cleaning_fee || 0),
+        damage_fee: Number(data.damage_fee || 0),
+        refundable_deposit: Number(data.refundable_deposit || 0),
+        note: noteParts.length > 0 ? noteParts.join(' | ') : null
+      };
+
+      const res = await axiosInstance.post('/handover-records', payload);
+      return res.data.data;
+    },
+
+    getByBookingId: async (bookingId: string | number) => {
+      const res = await axiosInstance.get(`/handover-records?booking_id=${bookingId}`);
+      return res.data.data.handovers || [];
+    },
+
+    getAll: async (params?: { limit?: number }) => {
+      const res = await axiosInstance.get(`/handover-records?limit=${params?.limit || 100}`);
+      return res.data.data.handovers || [];
+    },
+
+    getById: async (id: string | number) => {
+      const res = await axiosInstance.get(`/handover-records/${id}`);
+      return res.data.data;
+    }
+  },
+
+  // Payments API
+  payments: {
+    getAll: async (params?: { limit?: number }) => {
+      const res = await axiosInstance.get(`/payments?limit=${params?.limit || 100}`);
+      return res.data.data.payments || [];
+    },
+
+    getById: async (id: string | number) => {
+      const res = await axiosInstance.get(`/payments/${id}`);
+      return res.data.data;
+    },
+
+    create: async (data: {
+      booking_id: string | number;
+      transaction_type: 'DEPOSIT' | 'RENTAL' | 'SERVICE_FEE' | 'SURCHARGE' | 'REFUND';
+      amount: number;
+      payment_method: 'CASH' | 'BANK_TRANSFER' | 'VNPAY' | 'MOMO' | 'CREDIT_CARD';
+      payment_reference?: string;
+    }) => {
+      const res = await axiosInstance.post('/payments', {
+        ...data,
+        booking_id: Number(data.booking_id)
+      });
+      return res.data.data;
+    },
+
+    confirm: async (id: string | number, reference?: string) => {
+      const res = await axiosInstance.put(`/payments/${id}/confirm`, { reference });
+      return res.data.data;
+    }
+  },
+
+  // Reviews API
+  reviews: {
+    getAll: async (params?: { limit?: number }) => {
+      const res = await axiosInstance.get(`/reviews?limit=${params?.limit || 100}`);
+      return res.data.data.reviews || [];
+    },
+    getById: async (id: string | number) => {
+      const res = await axiosInstance.get(`/reviews/${id}`);
+      return res.data.data;
+    },
+    create: async (data: { booking_id: string | number; rating: number; content?: string; comment?: string }) => {
+      const res = await axiosInstance.post('/reviews', {
+        booking_id: Number(data.booking_id),
+        rating: data.rating,
+        content: data.content || data.comment || ''
+      });
+      return res.data.data;
+    },
+    updateStatus: async (id: string | number, status: 'APPROVED' | 'HIDDEN' | string) => {
+      const res = await axiosInstance.put(`/reviews/${id}/status`, { status });
+      return res.data.data;
+    },
+    delete: async (id: string | number) => {
+      const res = await axiosInstance.delete(`/reviews/${id}`);
+      return res.data;
+    }
+  },
+
+  // Settings API
+  settings: {
+    getAll: async () => {
+      const res = await axiosInstance.get('/settings');
+      return res.data.data || [];
+    },
+    getByKey: async (key: string) => {
+      const res = await axiosInstance.get(`/settings/${key}`);
+      return res.data.data;
+    },
+    update: async (key: string, value: string, description?: string) => {
+      const res = await axiosInstance.put(`/settings/${key}`, { value, description });
+      return res.data.data;
+    },
+    saveBulk: async (settingsObj: Record<string, any>) => {
+      const promises = Object.entries(settingsObj).map(([key, val]) =>
+        axiosInstance.put(`/settings/${key}`, { value: String(val) })
+      );
+      await Promise.all(promises);
+      return true;
+    }
+  },
+
+
+  // Audit Logs API
+  auditLogs: {
+    getAll: async (params?: { limit?: number; page?: number; search?: string }) => {
+      const limit = params?.limit || 25;
+      const page = params?.page || 1;
+      const searchParam = params?.search ? `&search=${encodeURIComponent(params.search)}` : '';
+      const res = await axiosInstance.get(`/audit-logs?limit=${limit}&page=${page}&sortBy=id&sortOrder=desc${searchParam}`);
+      return res.data.data.logs || [];
+    },
+    getById: async (id: string | number) => {
+      const res = await axiosInstance.get(`/audit-logs/${id}`);
+      return res.data.data;
     }
   }
 };

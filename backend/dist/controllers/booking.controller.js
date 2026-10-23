@@ -6,8 +6,11 @@ import { createBookingSchema, updateBookingStatusSchema, createHandoverRecordSch
 export class BookingController {
     static createBooking = async (req, res, next) => {
         try {
+            if (req.user.role === 'ADMIN') {
+                return ApiResponse.error(res, 'Quản trị viên (Admin) không thực hiện hành động tạo đơn cho thuê trực tiếp. Đơn thuê do Khách hàng tự đặt hoặc bộ phận Vận hành hỗ trợ.', 403);
+            }
             const validatedBody = createBookingSchema.parse(req.body);
-            const customerId = req.user.role === 'ADMIN' && validatedBody.customer_id
+            const customerId = req.user.role === 'MANAGER' && validatedBody.customer_id
                 ? BigInt(validatedBody.customer_id)
                 : req.user.id;
             const booking = await BookingService.createBooking({

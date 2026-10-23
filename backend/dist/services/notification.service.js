@@ -16,11 +16,23 @@ export class NotificationService {
         const skip = (page - 1) * limit;
         return NotificationRepository.findByUser(userId, { skip, take: limit });
     }
+    static async getAllNotifications(options) {
+        const page = options.page || 1;
+        const limit = options.limit || 20;
+        const skip = (page - 1) * limit;
+        return NotificationRepository.findAll({ skip, take: limit });
+    }
     static async markAsRead(id) {
         return NotificationRepository.markAsRead(id);
     }
     static async markAllAsRead(userId) {
         return NotificationRepository.markAllAsRead(userId);
+    }
+    static async markAllAsReadSystem() {
+        return prisma.notifications.updateMany({
+            where: { is_read: false },
+            data: { is_read: true },
+        });
     }
     static async getUnreadCount(userId) {
         return NotificationRepository.countUnread(userId);

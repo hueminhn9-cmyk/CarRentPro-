@@ -36,10 +36,6 @@ export const CustomersManagement: React.FC = () => {
   const [inspectModalVisible, setInspectModalVisible] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
 
-  // Rejection modal state
-  const [rejectModalVisible, setRejectModalVisible] = useState(false);
-  const [rejectReason, setRejectReason] = useState('');
-
   const fetchCustomers = () => {
     setLoading(true);
     api.customers.getAll().then(res => {
@@ -51,39 +47,6 @@ export const CustomersManagement: React.FC = () => {
   useEffect(() => {
     fetchCustomers();
   }, []);
-
-  const handleVerifyLicense = async (id: string, name?: string) => {
-    try {
-      await api.customers.updateLicense(id, 'Đã xác minh');
-      message.success(`Đã phê duyệt GPLX thành công cho ${name || 'khách hàng'}!`);
-      setInspectModalVisible(false);
-      fetchCustomers();
-    } catch (e) {
-      message.error('Phê duyệt GPLX thất bại!');
-    }
-  };
-
-  const handleRejectLicense = async () => {
-    if (!selectedCustomer) return;
-    if (!rejectReason.trim()) {
-      message.warning('Vui lòng nhập lý do từ chối hồ sơ GPLX');
-      return;
-    }
-    try {
-      await api.customers.verifyLicense(selectedCustomer.id, { status: 'REJECTED', reason: rejectReason });
-      message.success(`Đã từ chối hồ sơ GPLX của ${selectedCustomer.name}`);
-      setRejectModalVisible(false);
-      setInspectModalVisible(false);
-      setRejectReason('');
-      fetchCustomers();
-    } catch (e) {
-      message.success('Đã cập nhật từ chối hồ sơ GPLX');
-      setRejectModalVisible(false);
-      setInspectModalVisible(false);
-      setRejectReason('');
-      fetchCustomers();
-    }
-  };
 
   const handlePromoteManager = async (customer: Customer) => {
     try {
@@ -128,8 +91,8 @@ export const CustomersManagement: React.FC = () => {
       dataIndex: 'name',
       key: 'name',
       width: '22%',
-      onHeaderCell: () => ({ style: { textAlign: 'center' } }),
-      onCell: () => ({ style: { textAlign: 'left' } }),
+      onHeaderCell: () => ({ style: { textAlign: 'center' as const } }),
+      onCell: () => ({ style: { textAlign: 'left' as const } }),
       render: (name: string, record: Customer) => (
         <Space size={10} align="center">
           <Avatar 
@@ -151,8 +114,8 @@ export const CustomersManagement: React.FC = () => {
       title: <span style={{ fontWeight: 700, color: '#334155' }}>Thông tin liên hệ</span>,
       key: 'contact',
       width: '22%',
-      onHeaderCell: () => ({ style: { textAlign: 'center' } }),
-      onCell: () => ({ style: { textAlign: 'left' } }),
+      onHeaderCell: () => ({ style: { textAlign: 'center' as const } }),
+      onCell: () => ({ style: { textAlign: 'left' as const } }),
       render: (_, record: Customer) => (
         <div style={{ lineHeight: '1.4', fontSize: '12px' }}>
           <div style={{ color: '#0f172a', fontWeight: 600, whiteSpace: 'nowrap' }}>
@@ -251,27 +214,15 @@ export const CustomersManagement: React.FC = () => {
 
         return (
           <Space size={6} style={{ justifyContent: 'center' }}>
-            {isPending ? (
-              <Button 
-                type="primary" 
-                size="small"
-                icon={<SafetyCertificateOutlined />} 
-                style={{ borderRadius: '6px', background: '#d97706', borderColor: '#d97706', fontWeight: 600, fontSize: '12px' }}
-                onClick={() => openInspectionModal(record)}
-              >
-                Kiểm duyệt GPLX
-              </Button>
-            ) : (
-              <Button 
-                type="default" 
-                size="small"
-                icon={<EyeOutlined style={{ color: '#2563eb' }} />} 
-                style={{ borderRadius: '6px', fontWeight: 600, fontSize: '12px' }}
-                onClick={() => openInspectionModal(record)}
-              >
-                Xem GPLX & Hồ sơ
-              </Button>
-            )}
+            <Button 
+              type="default" 
+              size="small"
+              icon={<EyeOutlined style={{ color: '#2563eb' }} />} 
+              style={{ borderRadius: '6px', fontWeight: 600, fontSize: '12px' }}
+              onClick={() => openInspectionModal(record)}
+            >
+              Hồ sơ KYC
+            </Button>
 
             <Dropdown menu={{ items: moreMenuItems }} trigger={['click']}>
               <Button type="text" size="small" icon={<MoreOutlined />} style={{ borderRadius: '6px' }} />
@@ -288,10 +239,10 @@ export const CustomersManagement: React.FC = () => {
       <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <Title level={3} style={{ margin: 0, fontWeight: 800, color: '#0f172a' }}>
-            Quản lý Khách hàng & Kiểm duyệt GPLX
+            Quản lý Khách hàng & Hồ sơ Định danh (KYC)
           </Title>
           <Text type="secondary" style={{ fontSize: '13px' }}>
-            Đối chiếu giấy phép lái xe, quản lý định danh (KYC) và lịch sử thuê xe khách hàng
+            Giám sát danh sách khách hàng, kiểm toán hồ sơ định danh và phân quyền nhân sự toàn hệ thống
           </Text>
         </div>
 
@@ -424,50 +375,27 @@ export const CustomersManagement: React.FC = () => {
           selectedCustomer ? (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
               <StatusBadge status={selectedCustomer.licenseStatus} />
-              <Space>
-                <Button onClick={() => setInspectModalVisible(false)}>
-                  Đóng
-                </Button>
-
-                {selectedCustomer.licenseStatus === 'Chờ duyệt' && (
-                  <>
-                    <Button 
-                      danger 
-                      ghost
-                      icon={<CloseOutlined />}
-                      onClick={() => setRejectModalVisible(true)}
-                      style={{ borderRadius: '6px' }}
-                    >
-                      Từ chối GPLX
-                    </Button>
-                    <Button 
-                      type="primary" 
-                      icon={<CheckOutlined />}
-                      onClick={() => handleVerifyLicense(selectedCustomer.id, selectedCustomer.name)}
-                      style={{ borderRadius: '6px', background: '#16a34a', borderColor: '#16a34a', fontWeight: 600 }}
-                    >
-                      Phê duyệt GPLX hợp lệ
-                    </Button>
-                  </>
-                )}
-
-                {selectedCustomer.licenseStatus === 'Đã xác minh' && (
-                  <Button 
-                    type="primary" 
-                    icon={<CheckOutlined />}
-                    disabled
-                    style={{ borderRadius: '6px', background: '#16a34a', borderColor: '#16a34a' }}
-                  >
-                    Đã phê duyệt
-                  </Button>
-                )}
-              </Space>
+              <Button type="primary" onClick={() => setInspectModalVisible(false)} style={{ borderRadius: '6px' }}>
+                Đóng hồ sơ
+              </Button>
             </div>
           ) : null
         }
       >
         {selectedCustomer && (
           <div style={{ padding: '8px 0' }}>
+            <div style={{
+              background: '#f0fdf4',
+              border: '1px solid #bbf7d0',
+              padding: '10px 14px',
+              borderRadius: '8px',
+              marginBottom: '16px',
+              fontSize: '12px',
+              color: '#166534'
+            }}>
+              <strong>Quy trình phân quyền:</strong> Việc kiểm tra, đối chiếu và phê duyệt GPLX thực địa trước giờ giao xe thuộc trách nhiệm của Quản lý Chi nhánh (Manager Verification Queue). Admin theo dõi và kiểm toán tính minh bạch của hồ sơ.
+            </div>
+
             {/* Customer Metadata Card */}
             <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '10px', border: '1px solid #e2e8f0', marginBottom: '20px' }}>
               <Row gutter={[16, 12]}>
@@ -532,27 +460,6 @@ export const CustomersManagement: React.FC = () => {
             </Image.PreviewGroup>
           </div>
         )}
-      </Modal>
-
-      {/* Reject Reason Modal */}
-      <Modal
-        title="Từ chối Hồ sơ Giấy phép lái xe"
-        open={rejectModalVisible}
-        onCancel={() => { setRejectModalVisible(false); setRejectReason(''); }}
-        onOk={handleRejectLicense}
-        okText="Xác nhận từ chối"
-        okButtonProps={{ danger: true }}
-        cancelText="Hủy"
-      >
-        <div style={{ marginBottom: '12px' }}>
-          <Text strong style={{ color: '#0f172a' }}>Vui lòng nhập lý do từ chối để phản hồi tới khách hàng:</Text>
-        </div>
-        <TextArea
-          rows={4}
-          value={rejectReason}
-          onChange={e => setRejectReason(e.target.value)}
-          placeholder="Ví dụ: Ảnh GPLX bị mờ số hiệu, lóa sáng không đọc được ngày hết hạn, hoặc loại bằng lái chưa đạt tiêu chuẩn thuê xe tự lái..."
-        />
       </Modal>
     </div>
   );

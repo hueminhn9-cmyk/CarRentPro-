@@ -1,12 +1,27 @@
 import { prisma } from '../config/prisma.js';
 export class UserRepository {
     static async findById(id) {
-        return prisma.users.findUnique({
+        const user = await prisma.users.findUnique({
             where: { id },
             include: {
                 customer_profiles: true,
             },
         });
+        if (!user)
+            return null;
+        let mediaFiles = [];
+        if (user.customer_profiles) {
+            mediaFiles = await prisma.media_files.findMany({
+                where: {
+                    entity_type: 'CUSTOMER_PROFILE',
+                    entity_id: user.customer_profiles.id,
+                },
+            });
+        }
+        return {
+            ...user,
+            documents: mediaFiles,
+        };
     }
     static async findByEmail(email) {
         return prisma.users.findUnique({
@@ -23,7 +38,18 @@ export class UserRepository {
             }),
             prisma.users.count({ where: options.where }),
         ]);
-        return { users, total };
+        const enrichedUsers = await Promise.all(users.map(async (u) => {
+            if (!u.customer_profiles)
+                return { ...u, documents: [] };
+            const docs = await prisma.media_files.findMany({
+                where: {
+                    entity_type: 'CUSTOMER_PROFILE',
+                    entity_id: u.customer_profiles.id,
+                },
+            });
+            return { ...u, documents: docs };
+        }));
+        return { users: enrichedUsers, total };
     }
     static async create(data) {
         return prisma.users.create({

@@ -16,9 +16,7 @@ import { RegisterPage } from '@/pages/Auth/RegisterPage';
 import { CustomerDashboard } from '@/pages/Customer/Dashboard';
 import { VehicleListing } from '@/pages/Customer/VehicleListing';
 import { VehicleDetails } from '@/pages/Customer/VehicleDetails';
-import { BookingStep1 } from '@/pages/Customer/BookingStep1';
 import { BookingCheckout } from '@/pages/Customer/BookingCheckout';
-import { BookingReceipt } from '@/pages/Customer/BookingReceipt';
 import { MyRentals } from '@/pages/Customer/MyRentals';
 import { RentalDetails } from '@/pages/Customer/RentalDetails';
 import { SubmitReview } from '@/pages/Customer/SubmitReview';
@@ -49,7 +47,6 @@ import { CustomersManagement } from '@/pages/Admin/CustomersManagement';
 import { RevenueReports } from '@/pages/Admin/RevenueReports';
 import { MaintenanceManagement } from '@/pages/Admin/MaintenanceManagement';
 import { ContractsManagement } from '@/pages/Admin/ContractsManagement';
-import { VehicleHandover } from '@/pages/Admin/VehicleHandover';
 import { AdminSettings } from '@/pages/Admin/Settings';
 import { Reviews } from '@/pages/Admin/Reviews';
 import { NotificationCenter } from '@/pages/Admin/NotificationCenter';
@@ -89,7 +86,7 @@ export const router = createBrowserRouter([
       { path: '404', element: <NotFoundPage /> }
     ]
   },
-  
+
   // Customer Protected Routes
   {
     path: '/customer',
@@ -100,9 +97,9 @@ export const router = createBrowserRouter([
       { path: 'vehicles', element: <Navigate to="/vehicles" replace /> },
       { path: 'vehicles/:id', element: <Navigate to="/vehicles" replace /> },
       { path: 'checkout', element: <BookingCheckout /> },
-      { path: 'booking/step1', element: <BookingStep1 /> },
+      { path: 'booking/step1', element: <Navigate to="/customer/checkout" replace /> },
       { path: 'booking/checkout', element: <BookingCheckout /> },
-      { path: 'booking/receipt/:id', element: <BookingReceipt /> },
+      { path: 'booking/receipt/:id', element: <RentalDetails /> },
       { path: 'my-rentals', element: <MyRentals /> },
       { path: 'rentals', element: <MyRentals /> },
       { path: 'rentals/:id', element: <RentalDetails /> },
@@ -130,7 +127,7 @@ export const router = createBrowserRouter([
       { path: 'maintenance', element: <MaintenanceBoard /> },
       { path: 'fleet', element: <FleetView /> },
       { path: 'contracts', element: <ContractsManagement /> },
-      { path: 'handover/:id', element: <VehicleHandover /> },
+      { path: 'handover/:id', element: <Navigate to="/manager/operations/today" replace /> },
       { path: 'customers', element: <CustomersManagement /> }
     ]
   },
@@ -154,7 +151,7 @@ export const router = createBrowserRouter([
       { path: 'revenue', element: <RevenueReports /> },
       { path: 'maintenance', element: <MaintenanceManagement /> },
       { path: 'contracts', element: <ContractsManagement /> },
-      { path: 'handover/:id', element: <VehicleHandover /> },
+      { path: 'handover/:id', element: <Navigate to="/manager/operations/today" replace /> },
       { path: 'notifications', element: <NotificationCenter /> },
       { path: 'audit-logs', element: <AuditLogs /> },
       { path: 'settings', element: <AdminSettings /> }

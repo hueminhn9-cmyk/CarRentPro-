@@ -92,13 +92,38 @@ export class UserController {
   static verifyCustomer = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
       const id = BigInt(req.params.id as string);
-      const { status } = req.body;
+      const { status, reason } = req.body;
       if (!['PENDING', 'VERIFIED', 'REJECTED'].includes(status)) {
         return ApiResponse.error(res, 'Trạng thái xác thực không hợp lệ', 400);
       }
 
-      const updated = await UserService.verifyCustomer(id, status);
+      const updated = await UserService.verifyCustomer(id, status, reason);
       return ApiResponse.success(res, 'Cập nhật trạng thái xác thực thành công', serializeBigInt(updated));
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  static uploadDocument = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    try {
+      if (!req.file) {
+        return ApiResponse.error(res, 'Không tìm thấy tệp tin được tải lên', 400);
+      }
+
+      const userId = req.user!.id;
+      const { category, citizen_id, driver_license_number, driver_license_expiry } = req.body;
+
+      if (!category) {
+        return ApiResponse.error(res, 'Vui lòng cung cấp loại giấy tờ (category)', 400);
+      }
+
+      const updatedUser = await UserService.uploadDocument(userId, req.file, category, {
+        citizen_id,
+        driver_license_number,
+        driver_license_expiry,
+      });
+
+      return ApiResponse.success(res, 'Tải lên giấy tờ cá nhân thành công', serializeBigInt(updatedUser));
     } catch (error) {
       next(error);
     }

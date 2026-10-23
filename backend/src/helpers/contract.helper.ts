@@ -269,7 +269,10 @@ export function generateContractHTML(contract: any): string {
         (Ký và ghi rõ họ tên)
         <div class="signature-space">
           ${contract.status === 'SIGNED' 
-            ? `<div class="signature-signed">${user.full_name.toUpperCase()}<br/>Đã ký điện tử<br/>${signedDate}</div>`
+            ? (contract.contract_url && (contract.contract_url.startsWith('data:image/') || contract.contract_url.startsWith('http') || contract.contract_url.startsWith('/uploads'))
+                ? `<div><img src="${contract.contract_url}" alt="Signature" style="max-height: 60px; max-width: 180px; display: block; margin: 0 auto 4px auto;" /><div class="signature-signed" style="font-size: 11px; padding: 2px 6px;">${user.full_name.toUpperCase()}<br/>Đã ký điện tử • ${signedDate}</div></div>`
+                : `<div class="signature-signed">${user.full_name.toUpperCase()}<br/>Đã ký điện tử<br/>${signedDate}</div>`
+              )
             : 'Đang chờ ký...'
           }
         </div>

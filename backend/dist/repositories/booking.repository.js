@@ -18,7 +18,11 @@ export class BookingRepository {
                         users: { select: { id: true, full_name: true, role: true } }
                     }
                 },
-                handover_records: true,
+                handover_records: {
+                    include: {
+                        users: { select: { id: true, full_name: true, email: true, phone: true } }
+                    }
+                },
                 contracts: true,
                 payments: true,
                 reviews: true,

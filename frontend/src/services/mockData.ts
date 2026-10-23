@@ -41,14 +41,22 @@ export interface Booking {
   subtotal: number;
   insuranceFee: number;
   serviceFee: number;
+  depositAmount?: number;
   totalAmount: number;
-  status: 'Chờ xác nhận' | 'Hoàn thành' | 'Đang thuê' | 'Đã hủy';
+  status: string;
   paymentMethod: 'Chuyển khoản' | 'Thẻ tín dụng' | 'Ví điện tử';
   paymentStatus: 'Đã thanh toán' | 'Chờ thanh toán' | 'Hoàn tiền';
   paymentTime?: string;
   createdAt: string;
   contractSigned: boolean;
+  rawStatus?: string;
   notes?: string;
+  adminNote?: string;
+  vehicleLicensePlate?: string;
+  payments?: any[];
+  handoverRecords?: any[];
+  contracts?: any;
+  history?: any;
 }
 
 export interface Customer {
@@ -59,7 +67,8 @@ export interface Customer {
   address: string;
   idCard: string;
   driverLicense: string;
-  licenseStatus: 'Đã xác minh' | 'Chờ duyệt' | 'Chưa cập nhật';
+  licenseExpiry?: string;
+  licenseStatus: 'Đã xác minh' | 'Chờ duyệt' | 'Chưa cập nhật' | 'Từ chối';
   loyaltyPoints: number;
   tier: 'Bạc' | 'Vàng' | 'Kim cương';
   bookingCount: number;

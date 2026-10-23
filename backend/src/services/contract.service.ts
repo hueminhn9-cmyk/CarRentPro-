@@ -12,11 +12,16 @@ export class ContractService {
   }
 
   static async getContractByBookingId(bookingId: bigint) {
-    const contract = await ContractRepository.findByBookingId(bookingId);
+    let contract = await ContractRepository.findByBookingId(bookingId);
     if (!contract) {
-      throw new NotFoundError('Không tìm thấy hợp đồng của đơn đặt xe này');
+      const booking = await ContractRepository.findById(bookingId); // or check if booking exists
+      contract = await ContractRepository.create({
+        booking_id: bookingId,
+        contract_code: `HD-${Date.now().toString().slice(-6)}`,
+        status: 'PENDING_SIGN',
+      });
     }
-    return contract;
+    return ContractRepository.findById(contract.id);
   }
 
   static async getAllContracts(options: any) {

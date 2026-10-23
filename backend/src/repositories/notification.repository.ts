@@ -18,11 +18,27 @@ export class NotificationRepository {
       prisma.notifications.findMany({
         where: { user_id: userId },
         orderBy: { created_at: 'desc' },
+        include: { users: { select: { id: true, full_name: true, email: true } } },
         ...options,
       }),
       prisma.notifications.count({
         where: { user_id: userId },
       }),
+    ]);
+
+    return { notifications, total };
+  }
+
+  static async findAll(options: { skip?: number; take?: number; where?: any }) {
+    const [notifications, total] = await Promise.all([
+      prisma.notifications.findMany({
+        where: options.where,
+        orderBy: { created_at: 'desc' },
+        include: { users: { select: { id: true, full_name: true, email: true } } },
+        skip: options.skip,
+        take: options.take,
+      }),
+      prisma.notifications.count({ where: options.where }),
     ]);
 
     return { notifications, total };

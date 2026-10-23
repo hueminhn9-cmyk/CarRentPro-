@@ -28,14 +28,19 @@ export const SubmitReview: React.FC = () => {
   }, [id, navigate]);
 
   const onFinish = async (values: any) => {
+    if (!id) return;
     setSubmitting(true);
     try {
-      // Simulate submission
-      await new Promise(resolve => setTimeout(resolve, 800));
+      await api.reviews.create({
+        booking_id: id,
+        rating: values.rating,
+        content: values.comment,
+        comment: values.comment
+      });
       message.success('Cảm ơn bạn đã gửi đánh giá cho chiếc xe này!');
       navigate(`/customer/rentals/${id}`);
-    } catch (e) {
-      message.error('Gửi đánh giá thất bại!');
+    } catch (e: any) {
+      message.error(e?.response?.data?.message || 'Gửi đánh giá thất bại!');
     } finally {
       setSubmitting(false);
     }

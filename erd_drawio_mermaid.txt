@@ -1,0 +1,155 @@
+erDiagram
+    users ||--o| customer_profiles : "user_id"
+    users ||--o{ bookings : "customer_id"
+    users ||--o{ handover_records : "recorded_by"
+    users ||--o{ maintenance_records : "created_by"
+    users ||--o{ payments : "customer_id"
+    users ||--o{ reviews : "customer_id"
+    users ||--o{ notifications : "user_id"
+    users ||--o{ audit_logs : "user_id"
+
+    vehicle_categories ||--o{ vehicles : "category_id"
+    locations ||--o{ vehicles : "location_id"
+
+    vehicles ||--o{ bookings : "vehicle_id"
+    vehicles ||--o{ maintenance_records : "vehicle_id"
+    vehicles ||--o{ reviews : "vehicle_id"
+
+    bookings ||--o| contracts : "booking_id"
+    bookings ||--o{ booking_services : "booking_id"
+    bookings ||--o{ handover_records : "booking_id"
+    bookings ||--o{ payments : "booking_id"
+    bookings ||--o| reviews : "booking_id"
+
+    users {
+        bigint id PK
+        varchar full_name
+        varchar email UK
+        varchar phone UK
+        varchar role
+        varchar status
+    }
+
+    customer_profiles {
+        bigint id PK
+        bigint user_id FK
+        varchar citizen_id UK
+        varchar driver_license_number UK
+        date driver_license_expiry
+        varchar verification_status
+    }
+
+    vehicle_categories {
+        bigint id PK
+        varchar name UK
+        text description
+    }
+
+    locations {
+        bigint id PK
+        varchar name UK
+        varchar city
+        varchar address
+    }
+
+    vehicles {
+        bigint id PK
+        bigint category_id FK
+        bigint location_id FK
+        varchar code UK
+        varchar license_plate UK
+        varchar name
+        decimal price_per_day
+        decimal deposit_amount
+        int current_mileage
+        varchar status
+    }
+
+    bookings {
+        bigint id PK
+        varchar booking_code UK
+        bigint customer_id FK
+        bigint vehicle_id FK
+        datetime pickup_datetime
+        datetime return_datetime
+        decimal rental_fee
+        decimal deposit_amount
+        decimal total_amount
+        varchar status
+        varchar payment_status
+    }
+
+    contracts {
+        bigint id PK
+        bigint booking_id FK
+        varchar contract_code UK
+        varchar status
+        timestamp signed_at
+    }
+
+    handover_records {
+        bigint id PK
+        bigint booking_id FK
+        bigint recorded_by FK
+        varchar record_type
+        int mileage
+        int fuel_level
+        varchar vehicle_condition
+        decimal total_surcharge
+        decimal refundable_deposit
+    }
+
+    payments {
+        bigint id PK
+        varchar transaction_code UK
+        bigint booking_id FK
+        bigint customer_id FK
+        varchar transaction_type
+        decimal amount
+        varchar payment_method
+        varchar status
+    }
+
+    maintenance_records {
+        bigint id PK
+        bigint vehicle_id FK
+        bigint created_by FK
+        varchar maintenance_type
+        date scheduled_date
+        decimal cost
+        varchar status
+    }
+
+    booking_services {
+        bigint id PK
+        bigint booking_id FK
+        varchar service_name
+        int quantity
+        decimal total_price
+    }
+
+    reviews {
+        bigint id PK
+        bigint booking_id FK
+        bigint customer_id FK
+        bigint vehicle_id FK
+        int rating
+        text content
+    }
+
+    notifications {
+        bigint id PK
+        bigint user_id FK
+        varchar title
+        text content
+        boolean is_read
+    }
+
+    audit_logs {
+        bigint id PK
+        bigint user_id FK
+        varchar action
+        varchar entity_name
+        bigint entity_id
+        varchar ip_address
+    }

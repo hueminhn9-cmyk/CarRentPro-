@@ -43,10 +43,10 @@ const morganFormat = process.env.NODE_ENV === 'production' ? 'combined' : 'dev';
 app.use(morgan(morganFormat, {
     stream: { write: (message) => logger.info(message.trim()) }
 }));
-// Rate Limiter
+// Rate Limiter (increased in dev for comprehensive testing)
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // Limit each IP to 100 requests per window
+    max: process.env.NODE_ENV === 'production' ? 100 : 10000, // Limit each IP
     message: 'Bạn đã thực hiện quá nhiều yêu cầu từ địa chỉ IP này. Vui lòng thử lại sau 15 phút.',
     standardHeaders: true,
     legacyHeaders: false,

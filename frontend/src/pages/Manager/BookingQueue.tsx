@@ -64,7 +64,8 @@ export const BookingQueue: React.FC = () => {
       (b.vehicle?.licensePlate || '').toLowerCase().includes(search.toLowerCase())
     ) : true;
 
-    const matchStatus = statusFilter ? b.status === statusFilter : true;
+    const s = b.rawStatus || b.status;
+    const matchStatus = statusFilter ? (s === statusFilter || b.status === statusFilter) : true;
 
     return matchSearch && matchStatus;
   });
@@ -88,7 +89,7 @@ export const BookingQueue: React.FC = () => {
         minHeight: '600px'
       }}>
         {kanbanColumns.map(col => {
-          const colItems = filteredBookings.filter(b => b.status === col.key);
+          const colItems = filteredBookings.filter(b => (b.rawStatus || b.status) === col.key);
 
           return (
             <div 

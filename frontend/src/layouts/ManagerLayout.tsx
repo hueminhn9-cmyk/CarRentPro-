@@ -13,10 +13,9 @@ import {
   BellOutlined,
   CarOutlined,
   ClockCircleOutlined,
-  CheckSquareOutlined,
   ExportOutlined,
   ImportOutlined,
-  UserSwitchOutlined
+  CrownOutlined
 } from '@ant-design/icons';
 import { api } from '@/services/api';
 
@@ -38,7 +37,7 @@ export const ManagerLayout: React.FC = () => {
   useEffect(() => {
     if (!currentUser) {
       navigate('/auth/login');
-    } else if (currentUser.role !== 'manager' && currentUser.role !== 'admin') {
+    } else if (currentUser.role?.toLowerCase() !== 'manager' && currentUser.role?.toLowerCase() !== 'admin') {
       navigate('/customer/dashboard');
     }
   }, [currentUser, navigate]);
@@ -55,7 +54,7 @@ export const ManagerLayout: React.FC = () => {
           });
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   if (!currentUser) return null;
@@ -65,60 +64,72 @@ export const ManagerLayout: React.FC = () => {
     navigate('/auth/login');
   };
 
-  // Grouped Menu Items per AutoRent 2.0 Spec (Section 11.2 & Section 59)
+  // Natural Operational Flow: Step-by-step from Overview -> Daily Workflow -> Compliance & Fleet
   const menuItems = [
     {
-      key: 'grp-mgr-overview',
+      key: 'grp-mgr-dashboard',
       type: 'group' as const,
-      label: <span style={{ color: '#64748b', fontSize: '11px', fontWeight: 700, letterSpacing: '0.05em' }}>TỔNG QUAN VẬN HÀNH</span>,
+      label: (
+        <span style={{ color: '#0284c7', fontSize: '11px', fontWeight: 700, letterSpacing: '0.06em' }}>
+          🏢 TỔNG QUAN SHOWROOM
+        </span>
+      ),
       children: [
         {
           key: '/manager/dashboard',
-          icon: <DashboardOutlined />,
-          label: 'Operations Center',
+          icon: <DashboardOutlined style={{ fontSize: '16px', color: '#0284c7' }} />,
+          label: 'Bàn Điều phối Vận hành',
         }
       ]
     },
     {
-      key: 'grp-mgr-operations',
+      key: 'grp-mgr-workflow',
       type: 'group' as const,
-      label: <span style={{ color: '#64748b', fontSize: '11px', fontWeight: 700, letterSpacing: '0.05em' }}>ĐIỀU PHỐI & GIAO NHẬN</span>,
+      label: (
+        <span style={{ color: '#64748b', fontSize: '11px', fontWeight: 700, letterSpacing: '0.06em' }}>
+          ⚡ QUY TRÌNH GIAO NHẬN HÀNG NGÀY
+        </span>
+      ),
       children: [
         {
           key: '/manager/bookings',
-          icon: <CalendarOutlined />,
+          icon: <CalendarOutlined style={{ fontSize: '16px', color: '#2563eb' }} />,
           label: (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span>Booking Queue</span>
+              <span>1. Hàng đợi Đơn thuê</span>
               {stats.pendingBookings ? <Badge count={stats.pendingBookings} size="small" style={{ backgroundColor: '#dc2626' }} /> : null}
             </div>
           ),
         },
         {
           key: '/manager/operations/today',
-          icon: <ClockCircleOutlined />,
-          label: "Lịch trình hôm nay (Today's Ops)",
+          icon: <ClockCircleOutlined style={{ fontSize: '16px', color: '#0d9488' }} />,
+          label: "2. Lịch trình hôm nay",
         },
         {
           key: '/manager/pickup/quick',
-          icon: <ExportOutlined />,
-          label: 'Bàn giao xe (Pickup Wizard)',
+          icon: <ExportOutlined style={{ fontSize: '16px', color: '#16a34a' }} />,
+          label: '3. Giao xe (Pickup)',
         },
         {
           key: '/manager/return/quick',
-          icon: <ImportOutlined />,
-          label: 'Nhận xe trả (Return Wizard)',
+          icon: <ImportOutlined style={{ fontSize: '16px', color: '#ea580c' }} />,
+          label: '4. Nhận xe trả (Return)',
         }
       ]
     },
     {
-      key: 'grp-mgr-customers',
+      key: 'grp-mgr-compliance',
       type: 'group' as const,
-      label: <span style={{ color: '#64748b', fontSize: '11px', fontWeight: 700, letterSpacing: '0.05em' }}>HỒ SƠ KHÁCH HÀNG</span>,
+      label: (
+        <span style={{ color: '#64748b', fontSize: '11px', fontWeight: 700, letterSpacing: '0.06em' }}>
+          📋 KIỂM SOÁT HỒ SƠ & BẰNG LÁI
+        </span>
+      ),
       children: [
         {
           key: '/manager/verification',
-          icon: <SafetyCertificateOutlined />,
+          icon: <SafetyCertificateOutlined style={{ fontSize: '16px', color: '#7c3aed' }} />,
           label: (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span>Duyệt GPLX / Verification</span>
@@ -131,20 +142,24 @@ export const ManagerLayout: React.FC = () => {
     {
       key: 'grp-mgr-fleet',
       type: 'group' as const,
-      label: <span style={{ color: '#64748b', fontSize: '11px', fontWeight: 700, letterSpacing: '0.05em' }}>ĐỘI XE CHI NHÁNH</span>,
+      label: (
+        <span style={{ color: '#64748b', fontSize: '11px', fontWeight: 700, letterSpacing: '0.06em' }}>
+          🚗 ĐỘI XE TẠI SHOWROOM
+        </span>
+      ),
       children: [
         {
           key: '/manager/fleet',
-          icon: <CarOutlined />,
-          label: 'Tình trạng Đội xe',
+          icon: <CarOutlined style={{ fontSize: '16px', color: '#0891b2' }} />,
+          label: 'Tình trạng Đội xe tại bãi',
         },
         {
           key: '/manager/maintenance',
-          icon: <ToolOutlined />,
+          icon: <ToolOutlined style={{ fontSize: '16px', color: '#d97706' }} />,
           label: (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span>Lịch Bảo dưỡng xe</span>
-              {stats.maintenanceCars ? <Badge count={stats.maintenanceCars} size="small" style={{ backgroundColor: '#f59e0b' }} /> : null}
+              <span>Lịch Kỹ thuật & Bảo dưỡng</span>
+              {stats.maintenanceCars ? <Badge count={stats.maintenanceCars} size="small" style={{ backgroundColor: '#ea580c' }} /> : null}
             </div>
           ),
         }
@@ -161,110 +176,154 @@ export const ManagerLayout: React.FC = () => {
   };
 
   const userDropdownItems = [
-    { key: 'role-switch', label: 'Chi nhánh Đống Đa - Hà Nội', icon: <SafetyCertificateOutlined />, disabled: true },
+    { key: 'role-switch', label: 'Chi nhánh Hải Châu - Đà Nẵng', icon: <SafetyCertificateOutlined />, disabled: true },
+    ...(currentUser.role === 'admin' ? [{ key: 'switch-admin', label: 'Chuyển sang Bàn Quản trị (Admin)', icon: <CrownOutlined />, onClick: () => navigate('/admin/dashboard') }] : []),
     { type: 'divider' as const },
     { key: 'logout', label: 'Đăng xuất', icon: <LogoutOutlined />, onClick: handleLogout }
   ];
 
   return (
     <Layout style={{ minHeight: '100vh', background: '#f8fafc' }}>
-      <Sider 
-        trigger={null} 
-        collapsible 
+      <Sider
+        trigger={null}
+        collapsible
         collapsed={collapsed}
-        width={260}
-        theme="dark"
-        style={{ 
+        width={275}
+        theme="light"
+        className="manager-sider"
+        style={{
           position: 'sticky',
           top: 0,
           height: '100vh',
           left: 0,
-          backgroundColor: '#0f172a',
-          boxShadow: '2px 0 12px rgba(15, 23, 42, 0.12)',
+          background: '#ffffff',
+          borderRight: '1px solid #e2e8f0',
+          boxShadow: '2px 0 12px rgba(15, 23, 42, 0.04)',
           zIndex: 100,
           overflowY: 'auto'
         }}
       >
         {/* Brand Header */}
-        <div style={{ 
-          height: '64px', 
-          display: 'flex', 
-          alignItems: 'center', 
-          padding: collapsed ? '0' : '0 20px', 
+        <div style={{
+          height: '68px',
+          display: 'flex',
+          alignItems: 'center',
+          padding: collapsed ? '0' : '0 20px',
           justifyContent: collapsed ? 'center' : 'flex-start',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-          background: 'linear-gradient(90deg, #0f172a 0%, #1e293b 100%)',
+          borderBottom: '1px solid #f1f5f9',
+          background: '#ffffff',
           cursor: 'pointer'
         }}
-        onClick={() => navigate('/manager/dashboard')}
+          onClick={() => navigate('/manager/dashboard')}
         >
           <div style={{
-            width: '36px',
-            height: '36px',
-            borderRadius: '8px',
-            background: 'linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%)',
+            width: '40px',
+            height: '40px',
+            borderRadius: '10px',
+            background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             marginRight: collapsed ? 0 : '12px',
-            border: '1px solid rgba(59, 130, 246, 0.3)'
+            boxShadow: '0 4px 12px rgba(2, 132, 199, 0.25)',
+            flexShrink: 0
           }}>
-            <SafetyCertificateOutlined style={{ fontSize: '20px', color: '#60a5fa' }} />
+            <CarOutlined style={{ fontSize: '20px', color: '#ffffff' }} />
           </div>
           {!collapsed && (
-            <div>
-              <Title level={5} style={{ margin: 0, fontSize: '16px', fontWeight: 800, color: '#ffffff', lineHeight: 1.2 }}>
-                AutoRent <span style={{ color: '#60a5fa' }}>Ops</span>
-              </Title>
-              <Text style={{ fontSize: '11px', color: '#94a3b8' }}>Operations Workspace</Text>
+            <div style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em' }}>
+                  AutoRent
+                </span>
+                <Tag color="cyan" style={{ fontSize: '9px', fontWeight: 800, padding: '0 5px', borderRadius: '4px', margin: 0 }}>
+                  SHOWROOM OPS
+                </Tag>
+              </div>
+              <Text style={{ fontSize: '11px', color: '#64748b', fontWeight: 500, display: 'block' }}>Vận Hành Chi Nhánh</Text>
             </div>
           )}
         </div>
-        
+
         {/* Grouped Navigation Menu */}
         <Menu
-          theme="dark"
+          theme="light"
           mode="inline"
           selectedKeys={getSelectedKeys()}
           onClick={handleMenuClick}
-          style={{ borderRight: 'none', marginTop: '8px', backgroundColor: '#0f172a' }}
+          style={{ borderRight: 'none', padding: '6px 0 20px 0' }}
           items={menuItems}
         />
       </Sider>
 
       <Layout>
         {/* Top Header */}
-        <Header style={{ 
-          padding: '0 28px', 
-          background: '#ffffff', 
-          display: 'flex', 
-          justifyContent: 'space-between', 
+        <Header style={{
+          padding: '0 28px',
+          background: '#ffffff',
+          display: 'flex',
+          justifyContent: 'space-between',
           alignItems: 'center',
           borderBottom: '1px solid #e2e8f0',
-          height: '64px',
+          borderTop: '3px solid #0284c7',
+          height: '68px',
           position: 'sticky',
           top: 0,
           zIndex: 99,
-          boxShadow: '0 1px 3px rgba(15, 23, 42, 0.03)'
+          boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)'
         }}>
-          <Space size={16}>
+          <Space size={14}>
             <Button
               type="text"
               icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
               onClick={() => setCollapsed(!collapsed)}
               style={{ fontSize: '16px', width: '40px', height: '40px' }}
             />
-            <Tag color="blue" style={{ borderRadius: '6px', fontWeight: 600, border: 'none', padding: '4px 10px' }}>
-              OPERATIONS WORKSPACE
+            <Tag 
+              style={{ 
+                background: '#f0f9ff', 
+                color: '#0369a1', 
+                border: '1px solid #bae6fd', 
+                borderRadius: '6px', 
+                fontWeight: 700, 
+                padding: '4px 12px',
+                fontSize: '12px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+            >
+              <CarOutlined style={{ color: '#0284c7' }} /> ĐIỀU PHỐI VẬN HÀNH SHOWROOM
+            </Tag>
+            <Tag color="cyan" style={{ borderRadius: '6px', fontWeight: 600, padding: '4px 10px' }}>
+              📍 Chi nhánh Hải Châu - Đà Nẵng
             </Tag>
           </Space>
 
-          <Space size={20}>
+          <Space size={16}>
+            {/* Quick Switcher back to Admin Suite for Admin users */}
+            {currentUser.role === 'admin' && (
+              <Button 
+                icon={<CrownOutlined />} 
+                onClick={() => navigate('/admin/dashboard')}
+                style={{ 
+                  background: '#f5f3ff', 
+                  borderColor: '#c4b5fd', 
+                  color: '#6d28d9', 
+                  fontWeight: 600, 
+                  borderRadius: '8px',
+                  height: '38px'
+                }}
+              >
+                Chuyển sang Bàn Quản trị (Admin Suite)
+              </Button>
+            )}
+
             <Tooltip title="Nhiệm vụ cần xử lý">
               <Badge count={(stats.pendingBookings || 0) + (stats.pendingVerifications || 0)} size="small" style={{ backgroundColor: '#dc2626' }}>
-                <Button 
-                  type="text" 
-                  icon={<BellOutlined style={{ fontSize: '18px', color: '#475569' }} />} 
+                <Button
+                  type="text"
+                  icon={<BellOutlined style={{ fontSize: '18px', color: '#475569' }} />}
                   onClick={() => navigate('/manager/bookings')}
                   style={{ width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                 />
@@ -272,19 +331,19 @@ export const ManagerLayout: React.FC = () => {
             </Tooltip>
 
             <Dropdown menu={{ items: userDropdownItems }} placement="bottomRight" trigger={['click']}>
-              <Space style={{ cursor: 'pointer', padding: '4px 8px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                <Avatar style={{ backgroundColor: '#1e3a8a' }} icon={<SafetyCertificateOutlined />} />
+              <Space style={{ cursor: 'pointer', padding: '5px 12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc' }}>
+                <Avatar style={{ backgroundColor: '#0284c7' }} icon={<SafetyCertificateOutlined />} />
                 <div style={{ display: 'flex', flexDirection: 'column', lineHeight: '1.2' }}>
-                  <Text strong style={{ fontSize: '13px', color: '#0f172a' }}>{currentUser.name}</Text>
-                  <Text type="secondary" style={{ fontSize: '11px', color: '#2563eb', fontWeight: 600 }}>Quản lý Chi nhánh</Text>
+                  <Text strong style={{ fontSize: '13px', color: '#0f172a' }}>{currentUser.name || 'Quản lý Showroom'}</Text>
+                  <Text style={{ fontSize: '11px', color: '#0284c7', fontWeight: 700 }}>Giám Đốc Chi Nhánh</Text>
                 </div>
               </Space>
             </Dropdown>
           </Space>
         </Header>
 
-        <Content style={{ 
-          margin: '24px 28px', 
+        <Content style={{
+          margin: '24px 28px',
           minHeight: 280,
           overflow: 'initial'
         }}>

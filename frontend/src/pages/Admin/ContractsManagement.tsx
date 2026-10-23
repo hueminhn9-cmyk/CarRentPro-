@@ -1,29 +1,46 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Table, Button, Typography, Space, message } from 'antd';
-import { FileProtectOutlined, DownloadOutlined } from '@ant-design/icons';
+import { FileProtectOutlined, DownloadOutlined, EyeOutlined } from '@ant-design/icons';
 import { api } from '@/services/api';
 import { Contract } from '@/services/mockData';
 import { StatusBadge } from '@/components/common/StatusBadge';
+import { ContractModal } from '@/components/common/ContractModal';
 
 const { Title, Text } = Typography;
 
 export const ContractsManagement: React.FC = () => {
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedContract, setSelectedContract] = useState<any>(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
-  useEffect(() => {
+  const fetchContracts = () => {
+    setLoading(true);
     api.contracts.getAll().then(res => {
       setContracts(res);
       setLoading(false);
     });
+  };
+
+  useEffect(() => {
+    fetchContracts();
   }, []);
+
+  const handleDownload = async (record: Contract) => {
+    try {
+      await api.contracts.downloadContract(record.id, record.bookingCode);
+      message.success(`Đã tải bản Hợp đồng ${record.bookingCode} thành công!`);
+    } catch (err) {
+      message.error('Lỗi khi tải bản hợp đồng');
+    }
+  };
 
   const columns = [
     {
       title: 'Mã hợp đồng',
       dataIndex: 'id',
       key: 'id',
-      render: (text: string) => <Text strong>{text}</Text>
+      render: (text: string) => <Text strong>#{text}</Text>
     },
     {
       title: 'Mã đơn thuê',
@@ -59,17 +76,30 @@ export const ContractsManagement: React.FC = () => {
       render: (status: any) => <StatusBadge status={status} />
     },
     {
-      title: 'Tải xuống',
+      title: 'Thao tác',
       key: 'actions',
-      render: () => (
-        <Button 
-          type="text" 
-          icon={<DownloadOutlined />} 
-          style={{ color: '#1677ff' }}
-          onClick={() => message.success('Đang khởi tạo tệp PDF hợp đồng...')}
-        >
-          PDF
-        </Button>
+      render: (_, record: Contract) => (
+        <Space size={8}>
+          <Button
+            type="text"
+            icon={<EyeOutlined />}
+            style={{ color: '#2563eb' }}
+            onClick={() => {
+              setSelectedContract(record);
+              setModalVisible(true);
+            }}
+          >
+            Xem
+          </Button>
+          <Button 
+            type="text" 
+            icon={<DownloadOutlined />} 
+            style={{ color: '#1677ff' }}
+            onClick={() => handleDownload(record)}
+          >
+            PDF/HTML
+          </Button>
+        </Space>
       )
     }
   ];
@@ -89,6 +119,17 @@ export const ContractsManagement: React.FC = () => {
           rowKey="id"
         />
       </Card>
+
+      {selectedContract && (
+        <ContractModal
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          contractId={selectedContract.id}
+          bookingCode={selectedContract.bookingCode}
+          isSigned={selectedContract.status === 'SIGNED' || selectedContract.status === 'Đã ký'}
+          onSignedSuccess={() => fetchContracts()}
+        />
+      )}
     </div>
   );
 };

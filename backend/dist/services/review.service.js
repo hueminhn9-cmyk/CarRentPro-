@@ -56,6 +56,13 @@ export class ReviewService {
         }
         return ReviewRepository.update(id, data);
     }
+    static async updateReviewStatus(id, status) {
+        const review = await ReviewRepository.findById(id);
+        if (!review) {
+            throw new NotFoundError('Không tìm thấy đánh giá');
+        }
+        return ReviewRepository.update(id, { status });
+    }
     static async getVehicleReviewStats(vehicleId) {
         return ReviewRepository.getStatsByVehicleId(vehicleId);
     }

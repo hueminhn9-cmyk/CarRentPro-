@@ -16,6 +16,7 @@ import bookingServiceRouter from './booking-service.routes.js';
 import handoverRecordRouter from './handover-record.routes.js';
 import auditLogRouter from './audit-log.routes.js';
 import bookingStatusHistoryRouter from './booking-status-history.routes.js';
+import locationRouter from './location.routes.js';
 
 import { prisma } from '../config/prisma.js';
 
@@ -64,5 +65,6 @@ apiRouter.use('/booking-services', bookingServiceRouter);
 apiRouter.use('/handover-records', handoverRecordRouter);
 apiRouter.use('/audit-logs', auditLogRouter);
 apiRouter.use('/booking-status-history', bookingStatusHistoryRouter);
+apiRouter.use('/locations', locationRouter);
 
 export default apiRouter;

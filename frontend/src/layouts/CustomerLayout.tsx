@@ -29,9 +29,9 @@ export const CustomerLayout: React.FC = () => {
   React.useEffect(() => {
     if (!currentUser) {
       navigate('/auth/login');
-    } else if (currentUser.role === 'admin') {
+    } else if (currentUser.role?.toLowerCase() === 'admin') {
       navigate('/admin/dashboard');
-    } else if (currentUser.role === 'manager') {
+    } else if (currentUser.role?.toLowerCase() === 'manager') {
       navigate('/manager/dashboard');
     }
   }, [currentUser, navigate]);

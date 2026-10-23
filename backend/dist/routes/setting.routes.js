@@ -7,6 +7,7 @@ router.get('/', SettingController.getAllSettings);
 router.get('/:key', SettingController.getSettingByKey);
 // Admin-only operations
 router.post('/', authenticate, authorize('ADMIN'), SettingController.createSetting);
+router.put('/', authenticate, authorize('ADMIN'), SettingController.updateBulk);
 router.put('/:key', authenticate, authorize('ADMIN'), SettingController.updateSetting);
 router.delete('/:key', authenticate, authorize('ADMIN'), SettingController.deleteSetting);
 export default router;

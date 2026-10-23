@@ -62,12 +62,14 @@ export class ContractController {
 
   static signContract = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
-      const { bookingCode, contractUrl } = req.body;
-      if (!bookingCode) {
-        return ApiResponse.error(res, 'Mã đơn đặt xe (bookingCode) là bắt buộc', 400);
+      const { bookingCode, contractId, contractUrl, signatureData } = req.body;
+      const target = bookingCode || contractId;
+      if (!target) {
+        return ApiResponse.error(res, 'Mã đơn đặt xe (bookingCode) hoặc ID hợp đồng là bắt buộc', 400);
       }
 
-      const contract = await ContractService.signContract(bookingCode, contractUrl);
+      const urlToSave = signatureData || contractUrl;
+      const contract = await ContractService.signContract(String(target), urlToSave);
       return ApiResponse.success(res, 'Ký hợp đồng thành công', serializeBigInt(contract));
     } catch (error) {
       next(error);

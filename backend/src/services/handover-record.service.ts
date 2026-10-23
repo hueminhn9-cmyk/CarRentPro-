@@ -12,6 +12,12 @@ export class HandoverRecordService {
   }
 
   static async getAll(options: any) {
+    if (options?.where?.booking_id) {
+      options.where.booking_id = BigInt(options.where.booking_id);
+    }
+    if (options?.where?.recorded_by) {
+      options.where.recorded_by = BigInt(options.where.recorded_by);
+    }
     return HandoverRecordRepository.findAll(options);
   }
 
@@ -44,14 +50,15 @@ export class HandoverRecordService {
 
     const record = await HandoverRecordRepository.create(recordInput);
 
-    // Update vehicle mileage
-    await VehicleRepository.update(booking.vehicle_id, { current_mileage: data.mileage });
-
-    // Automatically transition booking status based on handover type
+    // Update vehicle mileage and status based on handover type
     if (data.record_type === 'PICKUP') {
+      await VehicleRepository.update(booking.vehicle_id, { current_mileage: data.mileage, status: 'RENTED' });
       await BookingRepository.update(bookingId, { status: 'ACTIVE' });
       await BookingRepository.addStatusHistory(bookingId, 'ACTIVE', recordedBy, 'Giao xe (PICKUP) hoàn tất');
     } else {
+      const vehicleStatus = data.vehicle_condition === 'DAMAGED' ? 'MAINTENANCE' : 'AVAILABLE';
+      await VehicleRepository.update(booking.vehicle_id, { current_mileage: data.mileage, status: vehicleStatus });
+
       const newSurcharge = Number(booking.surcharge_amount || 0) + totalSurcharge;
       const newTotal = Number(booking.total_amount) + totalSurcharge;
 

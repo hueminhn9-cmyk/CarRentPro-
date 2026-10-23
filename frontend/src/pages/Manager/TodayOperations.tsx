@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Typography, Space, Tag, Button, Row, Col, Divider, Badge } from 'antd';
+import { Card, Typography, Space, Tag, Button, Row, Col, Empty, message } from 'antd';
 import {
   ClockCircleOutlined,
   ExportOutlined,
@@ -8,12 +8,14 @@ import {
   UserOutlined,
   PhoneOutlined,
   CheckCircleOutlined,
-  CalendarOutlined
+  CalendarOutlined,
+  ReloadOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/services/api';
-import { StatusBadge } from '@/components/common/StatusBadge';
 import { TableSkeleton } from '@/components/common/LoadingSkeleton';
+import { EmptyState } from '@/components/common/EmptyState';
+import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
 
@@ -22,15 +24,78 @@ export const TodayOperations: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [operations, setOperations] = useState<any[]>([]);
 
-  useEffect(() => {
+  const fetchOperations = async () => {
     setLoading(true);
-    api.bookings.getAll({ limit: 20 })
-      .then((res: any) => {
-        const list = Array.isArray(res) ? res : (res?.items || res?.data || []);
-        setOperations(list);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    try {
+      const res: any = await api.bookings.getAll({ limit: 100 });
+      const list = Array.isArray(res) ? res : (res?.items || res?.data || []);
+      
+      const todayStr = dayjs().format('YYYY-MM-DD');
+
+      // Filter and map operational items:
+      // 1. Pickups: bookings that are CONFIRMED or READY_FOR_PICKUP (or PENDING)
+      // 2. Returns: bookings that are ACTIVE (currently on trip)
+      const mappedItems: any[] = [];
+
+      list.forEach((b: any) => {
+        const startDate = b.startDate ? dayjs(b.startDate).format('YYYY-MM-DD') : '';
+        const endDate = b.endDate ? dayjs(b.endDate).format('YYYY-MM-DD') : '';
+
+        // Check for Pickup: Ready to deliver vehicle
+        if (b.status === 'CONFIRMED' || b.status === 'READY_FOR_PICKUP' || (b.status === 'Chờ xác nhận' && startDate <= todayStr)) {
+          mappedItems.push({
+            id: b.id,
+            bookingCode: b.bookingCode || `AR-${b.id}`,
+            type: 'PICKUP',
+            time: '09:00',
+            date: b.startDate,
+            vehicle: b.vehicleName || 'Xe AutoRent',
+            plate: b.vehiclePlate || 'Biển số đang cấp',
+            customer: b.customerName || 'Khách hàng',
+            phone: b.customerPhone || 'N/A',
+            pickupLocation: b.pickupLocation || 'Showroom AutoRent',
+            docStatus: b.contractSigned ? 'Hợp đồng đã ký điện tử' : 'Chờ xác minh & ký hợp đồng',
+            paymentStatus: b.paymentStatus || 'Đã cọc',
+            rawBooking: b
+          });
+        }
+        // Check for Return: Vehicle is currently rented out and needs to be returned
+        else if (b.status === 'ACTIVE' || b.status === 'Đang thuê') {
+          mappedItems.push({
+            id: b.id,
+            bookingCode: b.bookingCode || `AR-${b.id}`,
+            type: 'RETURN',
+            time: '17:30',
+            date: b.endDate,
+            vehicle: b.vehicleName || 'Xe AutoRent',
+            plate: b.vehiclePlate || 'Biển số xe',
+            customer: b.customerName || 'Khách hàng',
+            phone: b.customerPhone || 'N/A',
+            dropoffLocation: b.dropoffLocation || 'Showroom AutoRent',
+            docStatus: 'Hợp đồng đang có hiệu lực',
+            paymentStatus: b.paymentStatus || 'Đã thanh toán',
+            rawBooking: b
+          });
+        }
+      });
+
+      // Sort: Prioritize today's items first, then by date
+      mappedItems.sort((a, b) => {
+        if (a.type === 'PICKUP' && b.type === 'RETURN') return -1;
+        if (a.type === 'RETURN' && b.type === 'PICKUP') return 1;
+        return a.date?.localeCompare(b.date || '') || 0;
+      });
+
+      setOperations(mappedItems);
+    } catch (err) {
+      message.error('Không thể tải lịch trình điều hành trong ngày');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOperations();
   }, []);
 
   const todayStr = new Intl.DateTimeFormat('vi-VN', {
@@ -40,91 +105,50 @@ export const TodayOperations: React.FC = () => {
     year: 'numeric'
   }).format(new Date());
 
-  // Mock operational schedule timeline for demonstration
-  const scheduleItems = [
-    {
-      time: '08:30',
-      type: 'PICKUP',
-      vehicle: 'BMW 320i Sport-Line',
-      plate: '30A-889.99',
-      customer: 'Nguyễn Văn Hùng',
-      phone: '0987 654 321',
-      bookingId: 'BK-2026-081',
-      docStatus: 'Đã xác minh GPLX',
-      paymentStatus: 'Đã cọc 15.000.000đ',
-      status: 'READY_FOR_PICKUP'
-    },
-    {
-      time: '10:00',
-      type: 'PICKUP',
-      vehicle: 'VinFast VF8 Plus',
-      plate: '29E-123.45',
-      customer: 'Trần Thị Thu Trang',
-      phone: '0912 345 678',
-      bookingId: 'BK-2026-082',
-      docStatus: 'Đã xác minh GPLX',
-      paymentStatus: 'Đã thanh toán 100%',
-      status: 'CONFIRMED'
-    },
-    {
-      time: '14:30',
-      type: 'RETURN',
-      vehicle: 'Toyota Camry 2.5Q',
-      plate: '30H-998.88',
-      customer: 'Lê Hoàng Long',
-      phone: '0934 567 890',
-      bookingId: 'BK-2026-079',
-      docStatus: 'Hợp đồng hoàn tất',
-      paymentStatus: 'Cọc 20.000.000đ',
-      status: 'ACTIVE'
-    },
-    {
-      time: '17:00',
-      type: 'RETURN',
-      vehicle: 'Mercedes C300 AMG',
-      plate: '30F-666.88',
-      customer: 'Phạm Minh Đức',
-      phone: '0978 112 233',
-      bookingId: 'BK-2026-075',
-      docStatus: 'Kiểm tra hư hại Odo',
-      paymentStatus: 'Cọc 25.000.000đ',
-      status: 'ACTIVE'
-    }
-  ];
+  const pickupCount = operations.filter(o => o.type === 'PICKUP').length;
+  const returnCount = operations.filter(o => o.type === 'RETURN').length;
 
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <Title level={4} style={{ margin: 0, fontWeight: 800, color: '#0f172a' }}>
             Lịch trình Vận hành trong ngày (Today's Operations)
           </Title>
           <Text type="secondary" style={{ fontSize: '13px' }}>
             <CalendarOutlined style={{ marginRight: '6px' }} />
-            {todayStr} • Ca trực Chi nhánh Đống Đa
+            {todayStr} • Ca trực Showroom Điều hành
           </Text>
         </div>
 
         <Space size={12}>
           <Tag color="blue" style={{ padding: '4px 12px', fontSize: '13px', borderRadius: '6px' }}>
-            2 Lượt Giao xe (Pickup)
+            {pickupCount} Lượt Giao xe (Pickup)
           </Tag>
           <Tag color="purple" style={{ padding: '4px 12px', fontSize: '13px', borderRadius: '6px' }}>
-            2 Lượt Nhận xe (Return)
+            {returnCount} Lượt Nhận xe (Return)
           </Tag>
+          <Button icon={<ReloadOutlined />} onClick={fetchOperations} size="small" style={{ borderRadius: '6px' }}>
+            Làm mới
+          </Button>
         </Space>
       </div>
 
       {loading ? (
         <TableSkeleton rows={4} />
+      ) : operations.length === 0 ? (
+        <EmptyState 
+          title="Không có lịch giao nhận xe cần xử lý" 
+          description="Hiện tại không có đơn thuê xe nào ở trạng thái cần bàn giao hoặc hoàn trả trong ca này."
+        />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          {scheduleItems.map((item, index) => {
+          {operations.map((item) => {
             const isPickup = item.type === 'PICKUP';
 
             return (
               <Card
-                key={index}
+                key={`${item.type}-${item.id}`}
                 style={{
                   borderRadius: '14px',
                   border: '1px solid #e2e8f0',
@@ -134,7 +158,7 @@ export const TodayOperations: React.FC = () => {
                 styles={{ body: { padding: '20px 24px' } }}
               >
                 <Row gutter={[20, 16]} align="middle">
-                  {/* Time badge */}
+                  {/* Time / Type badge */}
                   <Col xs={24} sm={4}>
                     <div style={{
                       display: 'flex',
@@ -150,19 +174,22 @@ export const TodayOperations: React.FC = () => {
                       <div style={{ fontSize: '16px', fontWeight: 800, color: isPickup ? '#1e3a8a' : '#581c87' }}>
                         {item.time}
                       </div>
-                      <Tag color={isPickup ? 'blue' : 'purple'} style={{ margin: '4px 0 0 0', fontSize: '10px' }}>
+                      <Tag color={isPickup ? 'blue' : 'purple'} style={{ margin: '4px 0 0 0', fontSize: '11px', fontWeight: 600 }}>
                         {isPickup ? 'BÀN GIAO' : 'NHẬN TRẢ'}
                       </Tag>
+                      <div style={{ fontSize: '11px', color: '#64748b', marginTop: '4px' }}>
+                        {item.date ? dayjs(item.date).format('DD/MM/YYYY') : 'Hôm nay'}
+                      </div>
                     </div>
                   </Col>
 
                   {/* Vehicle & Customer Info */}
                   <Col xs={24} sm={14}>
                     <div style={{ marginBottom: '8px' }}>
-                      <Space size={8} align="center">
+                      <Space size={8} align="center" wrap>
                         <Text strong style={{ fontSize: '16px', color: '#0f172a' }}>{item.vehicle}</Text>
-                        <Tag color="geekblue" style={{ borderRadius: '4px' }}>{item.plate}</Tag>
-                        <Text type="secondary" style={{ fontSize: '12px' }}>({item.bookingId})</Text>
+                        <Tag color="geekblue" style={{ borderRadius: '4px', fontWeight: 600 }}>{item.plate}</Tag>
+                        <Tag color="default" style={{ borderRadius: '4px', fontSize: '12px' }}>#{item.bookingCode}</Tag>
                       </Space>
                     </div>
 
@@ -176,11 +203,15 @@ export const TodayOperations: React.FC = () => {
                       </Col>
                       <Col xs={24} sm={12}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px' }}>
-                          <CheckCircleOutlined style={{ color: '#16a34a' }} />
-                          <Text style={{ color: '#16a34a' }}>{item.docStatus}</Text>
+                          <CheckCircleOutlined style={{ color: isPickup ? '#16a34a' : '#9333ea' }} />
+                          <Text style={{ color: isPickup ? '#16a34a' : '#9333ea', fontWeight: 500 }}>{item.docStatus}</Text>
                         </div>
                       </Col>
                     </Row>
+
+                    <div style={{ marginTop: '8px', fontSize: '12px', color: '#64748b' }}>
+                      <strong>Địa điểm:</strong> {isPickup ? item.pickupLocation : item.dropoffLocation} • <strong>Thanh toán:</strong> {item.paymentStatus}
+                    </div>
                   </Col>
 
                   {/* Action Button */}
@@ -189,7 +220,7 @@ export const TodayOperations: React.FC = () => {
                       <Button
                         type="primary"
                         icon={<ExportOutlined />}
-                        onClick={() => navigate(`/manager/pickup/${item.bookingId}`)}
+                        onClick={() => navigate(`/manager/pickup/${item.id}`)}
                         style={{ borderRadius: '8px', background: '#2563eb', borderColor: '#2563eb', fontWeight: 600 }}
                       >
                         Bắt đầu Bàn giao
@@ -198,7 +229,7 @@ export const TodayOperations: React.FC = () => {
                       <Button
                         type="primary"
                         icon={<ImportOutlined />}
-                        onClick={() => navigate(`/manager/return/${item.bookingId}`)}
+                        onClick={() => navigate(`/manager/return/${item.id}`)}
                         style={{ borderRadius: '8px', background: '#9333ea', borderColor: '#9333ea', fontWeight: 600 }}
                       >
                         Tiến hành Nhận xe

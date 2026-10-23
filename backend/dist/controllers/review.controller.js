@@ -3,17 +3,33 @@ import { QueryHelper } from '../helpers/query.helper.js';
 import { ApiResponse } from '../utils/apiResponse.js';
 import { serializeBigInt } from '../utils/bigintSerializer.js';
 import { createReviewSchema } from '../validators/review.validator.js';
+import { BadRequestError } from '../utils/errors.js';
 export class ReviewController {
     static createReview = async (req, res, next) => {
         try {
             const validatedBody = createReviewSchema.parse(req.body);
+            const content = validatedBody.content || validatedBody.comment || req.body.comment || '';
             const review = await ReviewService.createReview({
                 booking_id: BigInt(validatedBody.booking_id),
                 customer_id: req.user.id,
                 rating: validatedBody.rating,
-                content: validatedBody.content,
+                content,
             });
             return ApiResponse.created(res, 'Gửi đánh giá xe thành công', serializeBigInt(review));
+        }
+        catch (error) {
+            next(error);
+        }
+    };
+    static updateReviewStatus = async (req, res, next) => {
+        try {
+            const id = BigInt(req.params.id);
+            const { status } = req.body;
+            if (!status || !['APPROVED', 'HIDDEN', 'PENDING'].includes(status)) {
+                throw new BadRequestError('Trạng thái không hợp lệ. Cho phép: APPROVED, HIDDEN, PENDING');
+            }
+            const updated = await ReviewService.updateReviewStatus(id, status);
+            return ApiResponse.success(res, 'Cập nhật trạng thái đánh giá thành công', serializeBigInt(updated));
         }
         catch (error) {
             next(error);

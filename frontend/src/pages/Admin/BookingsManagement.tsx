@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Card, Table, Button, Typography, Space, Tag, message, Segmented, Badge } from 'antd';
 import {
   EyeOutlined,
-  CheckCircleOutlined,
-  CloseCircleOutlined,
   AppstoreOutlined,
   BarsOutlined,
   UserOutlined,
@@ -39,26 +37,6 @@ export const BookingsManagement: React.FC = () => {
     fetchBookings();
   }, []);
 
-  const handleApprove = async (id: string) => {
-    try {
-      await api.bookings.updateStatus(id, 'CONFIRMED');
-      message.success('Đã phê duyệt đơn hàng & chuẩn bị bàn giao!');
-      fetchBookings();
-    } catch (e) {
-      message.error('Thực hiện thất bại!');
-    }
-  };
-
-  const handleCancel = async (id: string) => {
-    try {
-      await api.bookings.updateStatus(id, 'CANCELLED');
-      message.success('Đã hủy đơn thuê và hoàn cọc!');
-      fetchBookings();
-    } catch (e) {
-      message.error('Thực hiện thất bại!');
-    }
-  };
-
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(price || 0);
   };
@@ -66,16 +44,30 @@ export const BookingsManagement: React.FC = () => {
   const filtered = bookings.filter(b => {
     const matchSearch = search ? (
       (b.id || '').toLowerCase().includes(search.toLowerCase()) ||
+      (b.bookingCode || '').toLowerCase().includes(search.toLowerCase()) ||
       (b.customerName || b.customer?.name || '').toLowerCase().includes(search.toLowerCase()) ||
       (b.vehicleName || b.vehicle?.name || '').toLowerCase().includes(search.toLowerCase())
     ) : true;
-    const matchStatus = statusFilter ? b.status === statusFilter : true;
+    
+    if (!statusFilter) return matchSearch;
+    
+    const s = b.rawStatus || b.status;
+    const matchStatus = s === statusFilter || 
+      b.status === statusFilter ||
+      (statusFilter === 'PENDING' && (s === 'Chờ xác nhận' || s === 'PENDING')) ||
+      (statusFilter === 'CONFIRMED' && s === 'CONFIRMED') ||
+      (statusFilter === 'READY_FOR_PICKUP' && s === 'READY_FOR_PICKUP') ||
+      (statusFilter === 'ACTIVE' && (s === 'Đang thuê' || s === 'ACTIVE')) ||
+      (statusFilter === 'COMPLETED' && (s === 'Hoàn thành' || s === 'COMPLETED')) ||
+      (statusFilter === 'CANCELLED' && (s === 'Đã hủy' || s === 'CANCELLED'));
+      
     return matchSearch && matchStatus;
   });
 
   const kanbanColumns = [
     { key: 'PENDING', title: 'Chờ duyệt', color: '#f59e0b', bg: '#fffbeb' },
     { key: 'CONFIRMED', title: 'Đã duyệt', color: '#2563eb', bg: '#eff6ff' },
+    { key: 'READY_FOR_PICKUP', title: 'Sẵn sàng giao', color: '#0891b2', bg: '#ecfeff' },
     { key: 'ACTIVE', title: 'Đang thuê', color: '#16a34a', bg: '#f0fdf4' },
     { key: 'COMPLETED', title: 'Hoàn thành', color: '#64748b', bg: '#f8fafc' },
     { key: 'CANCELLED', title: 'Đã hủy', color: '#dc2626', bg: '#fef2f2' }
@@ -130,34 +122,15 @@ export const BookingsManagement: React.FC = () => {
       render: (_, record: any) => (
         <Space size={8}>
           <Button 
-            type="link" 
+            type="primary" 
+            ghost
             size="small"
             icon={<EyeOutlined />} 
             onClick={() => navigate(`/admin/bookings/${record.id}`)}
+            style={{ borderRadius: '6px' }}
           >
-            Chi tiết
+            Chi tiết kiểm toán
           </Button>
-
-          {(record.status === 'PENDING' || record.status === 'Chờ xác nhận') && (
-            <>
-              <Button 
-                type="primary" 
-                size="small" 
-                onClick={() => handleApprove(record.id)}
-                style={{ borderRadius: '6px', background: '#16a34a', borderColor: '#16a34a' }}
-              >
-                Duyệt
-              </Button>
-              <Button 
-                danger 
-                size="small" 
-                onClick={() => handleCancel(record.id)}
-                style={{ borderRadius: '6px' }}
-              >
-                Hủy
-              </Button>
-            </>
-          )}
         </Space>
       )
     }
@@ -167,8 +140,8 @@ export const BookingsManagement: React.FC = () => {
     <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <div>
-          <Title level={4} style={{ margin: 0, fontWeight: 800 }}>Quản lý Đơn thuê & Giám sát Vận hành</Title>
-          <Text type="secondary" style={{ fontSize: '13px' }}>Phê duyệt đơn đặt xe, theo dõi thanh toán và kiểm soát vòng đời hợp đồng</Text>
+          <Title level={4} style={{ margin: 0, fontWeight: 800 }}>Radar Giám sát Đơn thuê & Kiểm toán Toàn quốc</Title>
+          <Text type="secondary" style={{ fontSize: '13px' }}>Theo dõi vòng đời hợp đồng, đối soát thanh toán và kiểm toán tuân thủ (Chỉ xem & Giám sát vĩ mô)</Text>
         </div>
 
         <Segmented
@@ -190,6 +163,7 @@ export const BookingsManagement: React.FC = () => {
           { label: 'Tất cả trạng thái', value: '' },
           { label: 'Chờ duyệt (PENDING)', value: 'PENDING' },
           { label: 'Đã duyệt (CONFIRMED)', value: 'CONFIRMED' },
+          { label: 'Sẵn sàng giao (READY_FOR_PICKUP)', value: 'READY_FOR_PICKUP' },
           { label: 'Đang thuê (ACTIVE)', value: 'ACTIVE' },
           { label: 'Hoàn thành (COMPLETED)', value: 'COMPLETED' },
           { label: 'Đã hủy (CANCELLED)', value: 'CANCELLED' }
@@ -215,7 +189,7 @@ export const BookingsManagement: React.FC = () => {
       ) : (
         <div style={{ display: 'flex', gap: '16px', overflowX: 'auto', paddingBottom: '16px' }}>
           {kanbanColumns.map(col => {
-            const items = filtered.filter(b => b.status === col.key || (col.key === 'PENDING' && b.status === 'Chờ xác nhận'));
+            const items = filtered.filter(b => (b.rawStatus || b.status) === col.key || (col.key === 'PENDING' && b.status === 'Chờ xác nhận') || (col.key === 'ACTIVE' && b.status === 'Đang thuê') || (col.key === 'COMPLETED' && b.status === 'Hoàn thành') || (col.key === 'CANCELLED' && b.status === 'Đã hủy'));
 
             return (
               <div 

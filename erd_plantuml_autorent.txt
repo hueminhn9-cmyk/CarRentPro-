@@ -1,0 +1,197 @@
+@startuml
+skinparam linetype ortho
+skinparam roundcorner 5
+skinparam class {
+    BackgroundColor white
+    ArrowColor #2c3e50
+    BorderColor #2c3e50
+}
+
+entity "users" as users {
+  *id : bigint <<PK>>
+  --
+  full_name : varchar(100)
+  email : varchar(100) <<UK>>
+  phone : varchar(20) <<UK>>
+  password_hash : varchar(255)
+  role : enum (CUSTOMER, MANAGER, ADMIN)
+  status : enum (ACTIVE, INACTIVE, BLOCKED)
+  avatar_url : varchar(255)
+}
+
+entity "customer_profiles" as customer_profiles {
+  *id : bigint <<PK>>
+  --
+  user_id : bigint <<FK>>
+  citizen_id : varchar(20) <<UK>>
+  driver_license_number : varchar(20) <<UK>>
+  driver_license_expiry : date
+  verification_status : enum
+}
+
+entity "vehicle_categories" as vehicle_categories {
+  *id : bigint <<PK>>
+  --
+  name : varchar(100) <<UK>>
+  description : text
+}
+
+entity "locations" as locations {
+  *id : bigint <<PK>>
+  --
+  name : varchar(150) <<UK>>
+  city : varchar(100)
+  address : varchar(255)
+}
+
+entity "vehicles" as vehicles {
+  *id : bigint <<PK>>
+  --
+  category_id : bigint <<FK>>
+  location_id : bigint <<FK>>
+  code : varchar(20) <<UK>>
+  license_plate : varchar(20) <<UK>>
+  name : varchar(150)
+  brand : varchar(100)
+  model : varchar(100)
+  seat_count : int
+  transmission : enum
+  fuel_type : enum
+  current_mileage : int
+  price_per_day : decimal(12,2)
+  deposit_amount : decimal(12,2)
+  status : enum
+}
+
+entity "bookings" as bookings {
+  *id : bigint <<PK>>
+  --
+  booking_code : varchar(20) <<UK>>
+  customer_id : bigint <<FK>>
+  vehicle_id : bigint <<FK>>
+  pickup_datetime : datetime
+  return_datetime : datetime
+  pickup_location : varchar(255)
+  return_location : varchar(255)
+  rental_days : int
+  rental_fee : decimal(12,2)
+  deposit_amount : decimal(12,2)
+  total_amount : decimal(12,2)
+  status : enum
+  payment_status : enum
+}
+
+entity "booking_services" as booking_services {
+  *id : bigint <<PK>>
+  --
+  booking_id : bigint <<FK>>
+  service_name : varchar(150)
+  quantity : int
+  unit_price : decimal(12,2)
+  total_price : decimal(12,2)
+}
+
+entity "contracts" as contracts {
+  *id : bigint <<PK>>
+  --
+  booking_id : bigint <<FK, UK>>
+  contract_code : varchar(50) <<UK>>
+  contract_url : varchar(500)
+  status : enum
+  signed_at : timestamp
+}
+
+entity "handover_records" as handover_records {
+  *id : bigint <<PK>>
+  --
+  booking_id : bigint <<FK>>
+  recorded_by : bigint <<FK>>
+  record_type : enum (PICKUP, RETURN)
+  mileage : int
+  fuel_level : int
+  vehicle_condition : enum
+  total_surcharge : decimal(12,2)
+  refundable_deposit : decimal(12,2)
+}
+
+entity "payments" as payments {
+  *id : bigint <<PK>>
+  --
+  transaction_code : varchar(30) <<UK>>
+  booking_id : bigint <<FK>>
+  customer_id : bigint <<FK>>
+  transaction_type : enum
+  amount : decimal(12,2)
+  payment_method : enum
+  status : enum
+  paid_at : timestamp
+}
+
+entity "maintenance_records" as maintenance_records {
+  *id : bigint <<PK>>
+  --
+  vehicle_id : bigint <<FK>>
+  created_by : bigint <<FK>>
+  maintenance_type : varchar(100)
+  scheduled_date : date
+  completed_date : date
+  cost : decimal(12,2)
+  status : enum
+}
+
+entity "reviews" as reviews {
+  *id : bigint <<PK>>
+  --
+  booking_id : bigint <<FK, UK>>
+  customer_id : bigint <<FK>>
+  vehicle_id : bigint <<FK>>
+  rating : int
+  content : text
+  status : varchar(20)
+}
+
+entity "notifications" as notifications {
+  *id : bigint <<PK>>
+  --
+  user_id : bigint <<FK>>
+  title : varchar(255)
+  content : text
+  is_read : boolean
+}
+
+entity "audit_logs" as audit_logs {
+  *id : bigint <<PK>>
+  --
+  user_id : bigint <<FK>>
+  action : varchar(100)
+  entity_name : varchar(50)
+  entity_id : bigint
+  ip_address : varchar(45)
+}
+
+' ===================================
+' MỐI QUAN HỆ TỰ ĐỘNG NỐI DÂY (RELATIONSHIPS)
+' ===================================
+users ||--o| customer_profiles : "1 - 1"
+users ||--o{ bookings : "1 - N (thuê xe)"
+users ||--o{ handover_records : "1 - N (lập biên bản)"
+users ||--o{ maintenance_records : "1 - N (lên lịch)"
+users ||--o{ payments : "1 - N (thanh toán)"
+users ||--o{ reviews : "1 - N (đánh giá)"
+users ||--o{ notifications : "1 - N (nhận thông báo)"
+users ||--o{ audit_logs : "1 - N (thực hiện)"
+
+vehicle_categories ||--o{ vehicles : "1 - N"
+locations ||--o{ vehicles : "1 - N"
+
+vehicles ||--o{ bookings : "1 - N"
+vehicles ||--o{ maintenance_records : "1 - N"
+vehicles ||--o{ reviews : "1 - N"
+
+bookings ||--o| contracts : "1 - 1"
+bookings ||--o{ booking_services : "1 - N"
+bookings ||--o{ handover_records : "1 - N (pickup/return)"
+bookings ||--o{ payments : "1 - N"
+bookings ||--o| reviews : "1 - 1"
+
+@enduml

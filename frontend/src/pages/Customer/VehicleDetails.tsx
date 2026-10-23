@@ -61,12 +61,9 @@ export const VehicleDetails: React.FC = () => {
 
   if (!vehicle) return <div style={{ textAlign: 'center', padding: '100px 0' }}>Đang tải thông tin xe...</div>;
 
-  const galleryImages = [
-    selectedImage,
-    'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=800&auto=format&fit=crop&q=60',
-    'https://images.unsplash.com/photo-1553440569-bcc63803a83d?w=800&auto=format&fit=crop&q=60',
-    'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&auto=format&fit=crop&q=60'
-  ];
+  const galleryImages = vehicle?.gallery && vehicle.gallery.length > 0 
+    ? vehicle.gallery 
+    : [selectedImage].filter(Boolean);
 
   return (
     <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 16px' }}>

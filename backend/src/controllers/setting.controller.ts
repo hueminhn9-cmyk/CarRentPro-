@@ -35,6 +35,19 @@ export class SettingController {
     }
   };
 
+  static updateBulk = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const data = req.body;
+      const promises = Object.entries(data).map(([key, val]) =>
+        SettingService.updateSetting(key, String(val))
+      );
+      await Promise.all(promises);
+      return ApiResponse.success(res, 'Cập nhật cấu hình thành công');
+    } catch (error) {
+      next(error);
+    }
+  };
+
   static createSetting = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const validated = createSettingSchema.parse(req.body);

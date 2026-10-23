@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Tabs, Table, Typography, Tag, Button, Space, Row, Col, Badge, Modal, Form, Input, DatePicker, message } from 'antd';
+import { Card, Tabs, Table, Typography, Tag, Button, Row, Col, Badge, Modal, Form, Input, InputNumber, DatePicker, Select, message } from 'antd';
 import {
   ToolOutlined,
   CalendarOutlined,
@@ -7,17 +7,19 @@ import {
   WarningOutlined,
   CheckCircleOutlined,
   PlusOutlined,
+  SyncOutlined,
   CarOutlined
 } from '@ant-design/icons';
 import { api } from '@/services/api';
-import { StatusBadge } from '@/components/common/StatusBadge';
 import { TableSkeleton } from '@/components/common/LoadingSkeleton';
 
 const { Title, Text } = Typography;
 
 export const MaintenanceBoard: React.FC = () => {
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [records, setRecords] = useState<any[]>([]);
+  const [vehicles, setVehicles] = useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
 
@@ -26,56 +28,57 @@ export const MaintenanceBoard: React.FC = () => {
     try {
       const res: any = await api.maintenance.getAll({ limit: 50 });
       const list = Array.isArray(res) ? res : (res?.items || res?.data || []);
-      setRecords(list.length > 0 ? list : [
-        {
-          id: 'MN-001',
-          vehicleName: 'BMW 320i Sport',
-          licensePlate: '30A-889.99',
-          serviceType: 'Thay dầu & Lọc gió động cơ',
-          scheduledDate: '2026-08-18',
-          mileage: '48,230 km',
-          status: 'SCHEDULED',
-          cost: 2500000,
-          garage: 'Gara BMW Long Biên'
-        },
-        {
-          id: 'MN-002',
-          vehicleName: 'VinFast Lux A2.0',
-          licensePlate: '30F-123.45',
-          serviceType: 'Bảo dưỡng định kỳ 40,000 km',
-          scheduledDate: '2026-08-15',
-          mileage: '40,100 km',
-          status: 'OVERDUE',
-          cost: 4800000,
-          garage: 'VinFast Service Phạm Hùng'
-        },
-        {
-          id: 'MN-003',
-          vehicleName: 'Toyota Camry 2.5Q',
-          licensePlate: '30H-998.88',
-          serviceType: 'Kiểm tra hệ thống phanh & Thay lốp',
-          scheduledDate: '2026-08-22',
-          mileage: '65,000 km',
-          status: 'SCHEDULED',
-          cost: 8200000,
-          garage: 'Toyota Cầu Giấy'
-        }
-      ]);
-    } catch (err) {
-      message.error('Không thể tải lịch bảo dưỡng.');
+      setRecords(list);
+    } catch (err: any) {
+      message.error(err?.response?.data?.message || 'Không thể tải lịch bảo dưỡng.');
     } finally {
       setLoading(false);
     }
   };
 
+  const fetchVehicles = async () => {
+    try {
+      const res: any = await api.vehicles.getAll();
+      const list = Array.isArray(res) ? res : (res?.vehicles || res?.items || []);
+      setVehicles(list);
+    } catch (err) {
+      // ignore
+    }
+  };
+
   useEffect(() => {
     fetchMaintenance();
+    fetchVehicles();
   }, []);
 
-  const handleCreate = (values: any) => {
-    message.success('Đã lên lịch bảo dưỡng xe mới thành công!');
-    setIsModalOpen(false);
-    form.resetFields();
+  const handleCreate = async (values: any) => {
+    setSubmitting(true);
+    try {
+      const startDate = values.date ? values.date.format('YYYY-MM-DD') : new Date().toISOString().split('T')[0];
+      const endDate = values.endDate ? values.endDate.format('YYYY-MM-DD') : startDate;
+      const desc = `${values.serviceType || 'Bảo dưỡng định kỳ'} | ${values.garage || 'Gara ủy quyền'}`;
+      const cost = Number(values.cost) || 0;
+
+      await api.maintenance.schedule(String(values.vehicleId), desc, cost, startDate, endDate);
+      message.success('Đã lên lịch bảo dưỡng xe thành công! Xe đã chuyển sang trạng thái Bảo dưỡng.');
+      setIsModalOpen(false);
+      form.resetFields();
+      await fetchMaintenance();
+    } catch (err: any) {
+      message.error(err?.response?.data?.message || 'Lỗi khi lên lịch bảo dưỡng');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleComplete = async (id: string, licensePlate: string) => {
+    try {
+      await api.maintenance.complete(id);
+      message.success(`Đã hoàn tất bảo dưỡng xe ${licensePlate}. Xe đã tự động chuyển về trạng thái Sẵn sàng (AVAILABLE)!`);
+      await fetchMaintenance();
+    } catch (err: any) {
+      message.error(err?.response?.data?.message || 'Lỗi khi cập nhật trạng thái bảo dưỡng');
+    }
   };
 
   const columns = [
@@ -90,8 +93,8 @@ export const MaintenanceBoard: React.FC = () => {
       key: 'vehicle',
       render: (_: any, r: any) => (
         <div>
-          <div style={{ fontWeight: 600 }}>{r.vehicleName}</div>
-          <div style={{ fontSize: '12px', color: '#64748b' }}>{r.licensePlate}</div>
+          <div style={{ fontWeight: 600 }}>{r.vehicleName || 'Xe không tên'}</div>
+          <div style={{ fontSize: '12px', color: '#64748b' }}>{r.licensePlate || 'N/A'}</div>
         </div>
       )
     },
@@ -99,18 +102,25 @@ export const MaintenanceBoard: React.FC = () => {
       title: 'Hạng mục bảo dưỡng',
       dataIndex: 'serviceType',
       key: 'serviceType',
-      render: (text: string) => <Text strong style={{ color: '#0f172a' }}>{text}</Text>
+      render: (text: string, r: any) => <Text strong style={{ color: '#0f172a' }}>{text || r.description || 'Bảo dưỡng'}</Text>
     },
     {
       title: 'Gara / Đơn vị thực hiện',
       dataIndex: 'garage',
       key: 'garage',
-      render: (text: string) => <Text type="secondary">{text}</Text>
+      render: (text: string, r: any) => <Text type="secondary">{text || r.description || 'Xưởng dịch vụ'}</Text>
+    },
+    {
+      title: 'Chi phí (VNĐ)',
+      dataIndex: 'cost',
+      key: 'cost',
+      render: (cost: number) => <Text style={{ color: '#0284c7', fontWeight: 600 }}>{cost ? cost.toLocaleString('vi-VN') + ' đ' : '0 đ'}</Text>
     },
     {
       title: 'Ngày lên lịch',
       dataIndex: 'scheduledDate',
-      key: 'scheduledDate'
+      key: 'scheduledDate',
+      render: (d: string, r: any) => d || r.startDate || 'N/A'
     },
     {
       title: 'Trạng thái',
@@ -119,27 +129,34 @@ export const MaintenanceBoard: React.FC = () => {
       render: (status: string) => {
         if (status === 'OVERDUE') return <Tag color="error" icon={<WarningOutlined />}>Quá hạn bảo dưỡng</Tag>;
         if (status === 'SCHEDULED') return <Tag color="warning" icon={<ClockCircleOutlined />}>Đã lên lịch</Tag>;
+        if (status === 'IN_PROGRESS') return <Tag color="processing" icon={<SyncOutlined spin />}>Đang bảo dưỡng</Tag>;
         return <Tag color="success" icon={<CheckCircleOutlined />}>Hoàn thành</Tag>;
       }
     },
     {
       title: 'Thao tác',
       key: 'action',
-      render: (_: any, r: any) => (
-        <Button 
-          type="primary" 
-          size="small" 
-          onClick={() => message.success(`Đã cập nhật hoàn thành bảo dưỡng xe ${r.licensePlate}`)}
-          style={{ borderRadius: '6px', background: '#16a34a', borderColor: '#16a34a' }}
-        >
-          Đánh dấu xong
-        </Button>
-      )
+      render: (_: any, r: any) => {
+        if (r.status === 'COMPLETED') {
+          return <Tag color="success">Đã hoàn tất</Tag>;
+        }
+        return (
+          <Button 
+            type="primary" 
+            size="small" 
+            onClick={() => handleComplete(r.id, r.licensePlate)}
+            style={{ borderRadius: '6px', background: '#16a34a', borderColor: '#16a34a' }}
+          >
+            Đánh dấu xong
+          </Button>
+        );
+      }
     }
   ];
 
   const overdueList = records.filter(r => r.status === 'OVERDUE');
   const upcomingList = records.filter(r => r.status === 'SCHEDULED');
+  const inProgressList = records.filter(r => r.status === 'IN_PROGRESS');
 
   return (
     <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
@@ -180,6 +197,15 @@ export const MaintenanceBoard: React.FC = () => {
                 children: <Table dataSource={records} columns={columns} rowKey="id" pagination={{ pageSize: 10 }} />
               },
               {
+                key: 'in_progress',
+                label: (
+                  <span>
+                    <SyncOutlined style={{ color: '#0284c7' }} /> Đang trong xưởng ({inProgressList.length})
+                  </span>
+                ),
+                children: <Table dataSource={inProgressList} columns={columns} rowKey="id" pagination={false} />
+              },
+              {
                 key: 'overdue',
                 label: (
                   <span>
@@ -201,7 +227,7 @@ export const MaintenanceBoard: React.FC = () => {
                 key: 'upcoming',
                 label: (
                   <span>
-                    <ClockCircleOutlined style={{ color: '#d97706' }} /> Sắp đến hạn (7 ngày tới) ({upcomingList.length})
+                    <ClockCircleOutlined style={{ color: '#d97706' }} /> Sắp đến hạn ({upcomingList.length})
                   </span>
                 ),
                 children: <Table dataSource={upcomingList} columns={columns} rowKey="id" pagination={false} />
@@ -217,22 +243,51 @@ export const MaintenanceBoard: React.FC = () => {
         open={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
         onOk={() => form.submit()}
+        confirmLoading={submitting}
         okText="Lưu lịch hẹn"
         cancelText="Hủy"
       >
         <Form form={form} layout="vertical" onFinish={handleCreate}>
-          <Form.Item name="vehicle" label="Chọn xe bảo dưỡng" rules={[{ required: true }]}>
-            <Input placeholder="Ví dụ: VinFast VF8 (30A-889.99)" />
+          <Form.Item name="vehicleId" label="Chọn xe bảo dưỡng" rules={[{ required: true, message: 'Vui lòng chọn xe' }]}>
+            <Select 
+              showSearch 
+              placeholder="Chọn xe từ danh mục"
+              optionFilterProp="children"
+              filterOption={(input, option: any) =>
+                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+              }
+              options={vehicles.map(v => ({
+                value: v.id,
+                label: `${v.name} (${v.licensePlate || v.license_plate}) - Trạng thái: ${v.status}`
+              }))}
+            />
           </Form.Item>
-          <Form.Item name="serviceType" label="Hạng mục bảo dưỡng" rules={[{ required: true }]}>
+          <Form.Item name="serviceType" label="Hạng mục bảo dưỡng" rules={[{ required: true, message: 'Vui lòng nhập hạng mục' }]}>
             <Input placeholder="Ví dụ: Thay dầu động cơ, lọc gió, kiểm tra lốp" />
           </Form.Item>
-          <Form.Item name="garage" label="Gara / Xưởng dịch vụ" rules={[{ required: true }]}>
+          <Form.Item name="garage" label="Gara / Xưởng dịch vụ" rules={[{ required: true, message: 'Vui lòng nhập tên gara' }]}>
             <Input placeholder="Ví dụ: Xưởng dịch vụ VinFast Cầu Giấy" />
           </Form.Item>
-          <Form.Item name="date" label="Ngày bảo dưỡng" rules={[{ required: true }]}>
-            <DatePicker style={{ width: '100%' }} />
+          <Form.Item name="cost" label="Chi phí dự kiến (VNĐ)">
+            <InputNumber 
+              style={{ width: '100%' }} 
+              placeholder="Ví dụ: 2500000" 
+              formatter={val => `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+              parser={val => val!.replace(/\$\s?|(,*)/g, '') as any}
+            />
           </Form.Item>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="date" label="Ngày bắt đầu" rules={[{ required: true, message: 'Vui lòng chọn ngày bắt đầu' }]}>
+                <DatePicker style={{ width: '100%' }} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="endDate" label="Ngày hoàn thành dự kiến">
+                <DatePicker style={{ width: '100%' }} />
+              </Form.Item>
+            </Col>
+          </Row>
         </Form>
       </Modal>
     </div>

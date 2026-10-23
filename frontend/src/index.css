@@ -16,3 +16,81 @@ body,
 *::after {
   box-sizing: inherit;
 }
+
+/* Custom Elegant Light Sidebars for Admin & Manager */
+.admin-sider,
+.manager-sider {
+  background: #ffffff !important;
+  border-right: 1px solid #e2e8f0 !important;
+}
+
+.admin-sider::-webkit-scrollbar,
+.manager-sider::-webkit-scrollbar {
+  width: 4px;
+}
+
+.admin-sider::-webkit-scrollbar-thumb,
+.manager-sider::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+/* Admin Light Menu Styles */
+.admin-sider .ant-menu-light {
+  background: #ffffff !important;
+}
+
+.admin-sider .ant-menu-light .ant-menu-item {
+  margin: 3px 12px !important;
+  width: calc(100% - 24px) !important;
+  border-radius: 8px !important;
+  color: #334155 !important;
+  font-weight: 500 !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.admin-sider .ant-menu-light .ant-menu-item:hover {
+  background-color: #f5f3ff !important;
+  color: #4f46e5 !important;
+}
+
+.admin-sider .ant-menu-light .ant-menu-item-selected {
+  background: linear-gradient(90deg, #eef2ff 0%, #f5f3ff 100%) !important;
+  color: #4338ca !important;
+  font-weight: 700 !important;
+  box-shadow: inset 3px 0 0 #4f46e5, 0 1px 3px rgba(79, 70, 229, 0.1) !important;
+}
+
+.admin-sider .ant-menu-item-group-title {
+  padding: 14px 16px 4px 16px !important;
+}
+
+/* Manager Light Menu Styles */
+.manager-sider .ant-menu-light {
+  background: #ffffff !important;
+}
+
+.manager-sider .ant-menu-light .ant-menu-item {
+  margin: 3px 12px !important;
+  width: calc(100% - 24px) !important;
+  border-radius: 8px !important;
+  color: #334155 !important;
+  font-weight: 500 !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.manager-sider .ant-menu-light .ant-menu-item:hover {
+  background-color: #f0f9ff !important;
+  color: #0284c7 !important;
+}
+
+.manager-sider .ant-menu-light .ant-menu-item-selected {
+  background: linear-gradient(90deg, #e0f2fe 0%, #f0f9ff 100%) !important;
+  color: #0369a1 !important;
+  font-weight: 700 !important;
+  box-shadow: inset 3px 0 0 #0284c7, 0 1px 3px rgba(2, 132, 199, 0.1) !important;
+}
+
+.manager-sider .ant-menu-item-group-title {
+  padding: 14px 16px 4px 16px !important;
+}

@@ -1,21 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Card, Button, Radio, Space, Row, Col, Typography, Divider, Alert, Checkbox, Input, Tag, message } from 'antd';
+import { Card, Button, Radio, Space, Row, Col, Typography, Divider, Alert, Checkbox, Select, Tag, message, Spin, Result } from 'antd';
 import {
   CheckCircleOutlined,
-  WalletOutlined,
   CreditCardOutlined,
   BankOutlined,
   UserOutlined,
   CarOutlined,
   AppstoreAddOutlined,
   DollarOutlined,
-  ArrowLeftOutlined,
-  ArrowRightOutlined
+  ArrowRightOutlined,
+  EnvironmentOutlined,
+  SafetyCertificateOutlined,
+  WarningOutlined
 } from '@ant-design/icons';
 import { api } from '@/services/api';
 import { Stepper } from '@/components/common/Stepper';
 import { PriceBreakdown } from '@/components/common/PriceBreakdown';
+import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
 
@@ -25,10 +27,16 @@ export const BookingCheckout: React.FC = () => {
 
   const vehicleId = searchParams.get('vehicleId');
   const days = Number(searchParams.get('days')) || 4;
+  const initialPickup = searchParams.get('pickup') ? decodeURIComponent(searchParams.get('pickup')!) : '';
+  const initialDropoff = searchParams.get('dropoff') ? decodeURIComponent(searchParams.get('dropoff')!) : '';
 
   const [currentStep, setCurrentStep] = useState(0);
+  const [initLoading, setInitLoading] = useState(true);
   const [vehicle, setVehicle] = useState<any>(null);
   const [customer, setCustomer] = useState<any>(null);
+  const [locations, setLocations] = useState<any[]>([]);
+  const [pickupLocation, setPickupLocation] = useState(initialPickup || 'Showroom Sân Bay Đà Nẵng');
+  const [dropoffLocation, setDropoffLocation] = useState(initialDropoff || initialPickup || 'Showroom Chi Nhánh Trung Tâm - Hải Châu');
   const [loading, setLoading] = useState(false);
 
   // Add-on services state
@@ -42,13 +50,37 @@ export const BookingCheckout: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState<'Chuyển khoản' | 'Thẻ tín dụng' | 'Ví điện tử'>('Chuyển khoản');
 
   useEffect(() => {
-    if (vehicleId) {
-      api.vehicles.getById(vehicleId).then((res: any) => res && setVehicle(res));
-    }
-    const user = api.auth.getCurrentUser();
-    if (user) {
-      api.customers.getById(user.id).then((res: any) => res && setCustomer(res));
-    }
+    const initData = async () => {
+      setInitLoading(true);
+      try {
+        // Load locations
+        const locs = await api.locations.getAll();
+        if (locs && locs.length > 0) {
+          setLocations(locs);
+          if (!initialPickup) setPickupLocation(locs[0].name);
+          if (!initialDropoff) setDropoffLocation(locs[0].name);
+        }
+
+        // Load vehicle
+        if (vehicleId) {
+          const v = await api.vehicles.getById(vehicleId);
+          setVehicle(v);
+        }
+
+        // Load customer
+        const currentUser = api.auth.getCurrentUser();
+        if (currentUser) {
+          const c = await api.customers.getById(currentUser.id);
+          setCustomer(c);
+        }
+      } catch (err: any) {
+        console.error('Failed to initialize checkout data', err);
+      } finally {
+        setInitLoading(false);
+      }
+    };
+
+    initData();
   }, [vehicleId]);
 
   const steps = [
@@ -59,7 +91,7 @@ export const BookingCheckout: React.FC = () => {
   ];
 
   const pricePerDay = vehicle?.pricePerDay || 1500000;
-  const depositAmount = 15000000;
+  const depositAmount = vehicle?.depositAmount || (pricePerDay * 10);
 
   const serviceOptions = [
     { key: 'gps', label: 'Thiết bị định vị GPS & Bản đồ Vietmap Live', amount: 200000 },
@@ -73,67 +105,85 @@ export const BookingCheckout: React.FC = () => {
     .map(s => ({ label: s.label, amount: s.amount }));
 
   const handleCreateBooking = async () => {
-    if (!vehicle || !customer) return;
+    if (!vehicle) {
+      message.error('Vui lòng chọn xe trước khi đặt.');
+      return;
+    }
+
     setLoading(true);
     try {
-      const rentalTotal = days * pricePerDay;
-      const servicesTotal = activeServices.reduce((acc, curr) => acc + curr.amount, 0);
-      const totalAmount = rentalTotal + servicesTotal;
+      const servicesPayload = activeServices.map(s => ({
+        service_name: s.label,
+        quantity: 1,
+        unit_price: s.amount
+      }));
+
+      const startDateParam = searchParams.get('startDate');
+      const startDayjs = startDateParam ? dayjs(startDateParam) : dayjs().add(1, 'day');
+      const endDayjs = searchParams.get('endDate') ? dayjs(searchParams.get('endDate')) : startDayjs.add(days, 'day');
 
       const booking = await api.bookings.create({
-        customerId: customer.id,
-        customerName: customer.name,
-        customerPhone: customer.phone,
-        customerEmail: customer.email,
         vehicleId: vehicle.id,
-        vehicleName: vehicle.name,
-        vehicleImage: vehicle.imageUrl || vehicle.image,
-        startDate: '2026-08-20',
-        endDate: '2026-08-24',
-        pickupLocation: 'Showroom Đống Đa - Hà Nội',
-        dropoffLocation: 'Showroom Đống Đa - Hà Nội',
-        totalDays: days,
-        pricePerDay,
-        depositAmount,
-        totalAmount,
-        status: 'PENDING',
-        paymentMethod
+        startDate: startDayjs.toISOString(),
+        endDate: endDayjs.toISOString(),
+        pickupLocation,
+        dropoffLocation,
+        notes: `Phương thức thanh toán dự kiến: ${paymentMethod}`,
+        services: servicesPayload
       });
 
       message.success('Đặt xe thành công! Hợp đồng điện tử đã được khởi tạo.');
-      navigate(`/customer/rentals/${booking?.id || 'BK-2026-0816'}`);
-    } catch (e) {
-      message.success('Đặt xe thành công!');
-      navigate(`/customer/dashboard`);
+      navigate(`/customer/rentals/${booking.id}`);
+    } catch (err: any) {
+      const errorMsg = err.response?.data?.message || err.message || 'Không thể tạo đơn đặt xe. Vui lòng thử lại!';
+      message.error(errorMsg);
     } finally {
       setLoading(false);
     }
   };
 
-  if (!vehicle) {
-    // Fallback enriched mock if no vehicleId passed
-    setVehicle({
-      id: 'V-001',
-      name: 'BMW 320i Sport-Line',
-      imageUrl: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800&auto=format&fit=crop&q=60',
-      licensePlate: '30A-889.99',
-      pricePerDay: 1500000
-    });
-    setCustomer({
-      id: 'C-001',
-      name: 'Nguyễn Văn Hùng',
-      phone: '0987 654 321',
-      email: 'hung.nguyen@example.com',
-      licenseStatus: 'Đã xác minh'
-    });
-    return <div style={{ textAlign: 'center', padding: '80px 0' }}>Đang khởi tạo thanh toán...</div>;
+  if (initLoading) {
+    return (
+      <div style={{ textAlign: 'center', padding: '120px 0' }}>
+        <Spin size="large" />
+        <div style={{ marginTop: '16px', color: '#64748b' }}>Đang nạp thông tin xe và hồ sơ khách hàng...</div>
+      </div>
+    );
   }
+
+  if (!vehicle) {
+    return (
+      <div style={{ maxWidth: '600px', margin: '80px auto', textAlign: 'center' }}>
+        <Result
+          status="warning"
+          title="Chưa chọn xe để đặt"
+          subTitle="Vui lòng duyệt danh sách xe và chọn chiếc xe yêu thích trước khi tiến hành đặt xe."
+          extra={
+            <Button type="primary" onClick={() => navigate('/vehicles')} style={{ borderRadius: '8px' }}>
+              Duyệt danh sách xe có sẵn
+            </Button>
+          }
+        />
+      </div>
+    );
+  }
+
+  const locationOptions = locations.length > 0
+    ? locations.map(loc => ({ value: loc.name, label: `${loc.name} (${loc.address || loc.district || 'Đà Nẵng'})` }))
+    : [
+        { value: 'Showroom Sân Bay Đà Nẵng', label: 'Showroom Sân Bay Đà Nẵng' },
+        { value: 'Showroom Chi Nhánh Trung Tâm - Hải Châu', label: 'Showroom Chi Nhánh Trung Tâm - Hải Châu' },
+        { value: 'Showroom Chi Nhánh Sơn Trà - Biển Mỹ Khê', label: 'Showroom Chi Nhánh Sơn Trà - Biển Mỹ Khê' },
+        { value: 'Showroom Chi Nhánh Thanh Khê', label: 'Showroom Chi Nhánh Thanh Khê' }
+      ];
+
+  const isLicenseVerified = customer?.licenseStatus === 'Đã xác minh';
 
   return (
     <div style={{ maxWidth: '1080px', margin: '0 auto', padding: '0 16px' }}>
       <div style={{ marginBottom: '24px' }}>
-        <Title level={3} style={{ margin: 0, fontWeight: 800 }}>Quy trình Đặt xe & Thanh toán </Title>
-        <Text type="secondary">Hoàn tất 4 bước đơn giản để ký hợp đồng và nhận xe tự lái</Text>
+        <Title level={3} style={{ margin: 0, fontWeight: 800 }}>Quy trình Đặt xe & Thanh toán</Title>
+        <Text type="secondary">Hoàn tất các bước đơn giản để khởi tạo hợp đồng điện tử và nhận xe tự lái</Text>
       </div>
 
       {/* Stepper */}
@@ -142,7 +192,7 @@ export const BookingCheckout: React.FC = () => {
       {/* Wizard Step 1: Vehicle & Schedule */}
       {currentStep === 0 && (
         <Card style={{ borderRadius: '14px', border: '1px solid #e2e8f0' }}>
-          <Title level={5} style={{ marginBottom: '16px' }}>Bước 1: Xác nhận Xe & Lịch trình nhận trả</Title>
+          <Title level={5} style={{ marginBottom: '16px' }}>Bước 1: Xác nhận Xe & Lịch trình nhận/trả xe</Title>
           <Row gutter={[24, 20]} align="middle">
             <Col xs={24} md={10}>
               <img
@@ -153,56 +203,117 @@ export const BookingCheckout: React.FC = () => {
             </Col>
             <Col xs={24} md={14}>
               <Title level={4} style={{ margin: '0 0 8px 0', color: '#0f172a', fontWeight: 800 }}>{vehicle.name}</Title>
-              <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+              <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '10px', border: '1px solid #e2e8f0', marginBottom: '16px' }}>
                 <Row gutter={[16, 12]}>
                   <Col span={12}>
                     <Text type="secondary">Thời gian thuê:</Text>
-                    <div style={{ fontWeight: 700 }}>{days} ngày (20/08 - 24/08/2026)</div>
+                    <div style={{ fontWeight: 700, fontSize: '15px' }}>{days} ngày</div>
                   </Col>
                   <Col span={12}>
-                    <Text type="secondary">Đơn giá thuê:</Text>
-                    <div style={{ fontWeight: 700, color: '#1e3a8a' }}>
+                    <Text type="secondary">Đơn giá thuê xe:</Text>
+                    <div style={{ fontWeight: 700, color: '#1e3a8a', fontSize: '15px' }}>
                       {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(pricePerDay)}/ngày
                     </div>
                   </Col>
-                  <Col span={24}>
-                    <Text type="secondary">Địa điểm giao nhận:</Text>
-                    <div style={{ fontWeight: 600 }}>Showroom AutoRent Đống Đa - Hà Nội</div>
+                  <Col span={12}>
+                    <Text type="secondary">Tiền cọc thế chấp:</Text>
+                    <div style={{ fontWeight: 700, color: '#d97706', fontSize: '15px' }}>
+                      {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(depositAmount)}
+                    </div>
+                  </Col>
+                  <Col span={12}>
+                    <Text type="secondary">Biển số dự kiến:</Text>
+                    <div style={{ fontWeight: 600 }}>{vehicle.licensePlate}</div>
                   </Col>
                 </Row>
               </div>
+
+              <Row gutter={[12, 12]}>
+                <Col xs={24} sm={12}>
+                  <Text strong style={{ fontSize: '12px' }}>Chi nhánh Showroom nhận xe:</Text>
+                  <Select
+                    value={pickupLocation}
+                    onChange={setPickupLocation}
+                    options={locationOptions}
+                    style={{ width: '100%', marginTop: '4px' }}
+                  />
+                </Col>
+                <Col xs={24} sm={12}>
+                  <Text strong style={{ fontSize: '12px' }}>Chi nhánh Showroom trả xe:</Text>
+                  <Select
+                    value={dropoffLocation}
+                    onChange={setDropoffLocation}
+                    options={locationOptions}
+                    style={{ width: '100%', marginTop: '4px' }}
+                  />
+                </Col>
+              </Row>
             </Col>
           </Row>
         </Card>
       )}
 
-      {/* Wizard Step 2: Customer info & License */}
+      {/* Wizard Step 2: Customer info & License verification check */}
       {currentStep === 1 && (
         <Card style={{ borderRadius: '14px', border: '1px solid #e2e8f0' }}>
-          <Title level={5} style={{ marginBottom: '16px' }}>Bước 2: Thông tin Người thuê & Giấy phép lái xe</Title>
+          <Title level={5} style={{ marginBottom: '16px' }}>Bước 2: Thông tin Người thuê & Giấy phép lái xe (GPLX)</Title>
           <Row gutter={[20, 20]}>
-            <Col span={12}>
+            <Col xs={24} md={12}>
               <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
-                <Text type="secondary">Họ và tên:</Text>
-                <div style={{ fontWeight: 700, fontSize: '15px', marginBottom: '12px' }}>{customer?.name || 'Nguyễn Văn Hùng'}</div>
+                <Text type="secondary">Họ và tên khách hàng:</Text>
+                <div style={{ fontWeight: 700, fontSize: '16px', marginBottom: '12px', color: '#0f172a' }}>
+                  {customer?.name || 'Khách hàng'}
+                </div>
 
-                <Text type="secondary">Số điện thoại:</Text>
-                <div style={{ fontWeight: 600, marginBottom: '12px' }}>{customer?.phone || '0987 654 321'}</div>
+                <Text type="secondary">Số điện thoại liên hệ:</Text>
+                <div style={{ fontWeight: 600, marginBottom: '12px' }}>{customer?.phone || 'Chưa cập nhật SĐT'}</div>
 
-                <Text type="secondary">Email:</Text>
-                <div style={{ fontWeight: 600 }}>{customer?.email || 'hung.nguyen@example.com'}</div>
+                <Text type="secondary">Email tài khoản:</Text>
+                <div style={{ fontWeight: 600, marginBottom: '12px' }}>{customer?.email || 'N/A'}</div>
+
+                <Text type="secondary">Số hiệu GPLX:</Text>
+                <div style={{ fontWeight: 600, color: '#1e3a8a' }}>{customer?.driverLicense || 'Chưa cung cấp'}</div>
               </div>
             </Col>
-            <Col span={12}>
-              <Alert
-                type="success"
-                showIcon
-                message="GPLX đã xác thực hợp lệ"
-                description="Hồ sơ GPLX của bạn đã được kiểm duyệt và lưu trữ an toàn trên hệ thống AutoRent."
-                style={{ borderRadius: '8px', marginBottom: '16px' }}
-              />
-              <div style={{ fontSize: '12px', color: '#64748b' }}>
-                * Khi đến nhận xe, quý khách vui lòng mang theo bản gốc GPLX và CCCD để đối chiếu nhanh trong 2 phút.
+
+            <Col xs={24} md={12}>
+              {isLicenseVerified ? (
+                <Alert
+                  type="success"
+                  showIcon
+                  icon={<SafetyCertificateOutlined />}
+                  message="GPLX đã được xác thực hợp lệ"
+                  description="Hồ sơ GPLX của bạn đã được đối chiếu và phê duyệt. Bạn hoàn toàn đủ điều kiện nhận xe ngay khi tới Showroom."
+                  style={{ borderRadius: '8px', marginBottom: '16px' }}
+                />
+              ) : (
+                <Alert
+                  type="warning"
+                  showIcon
+                  icon={<WarningOutlined />}
+                  message="Lưu ý điều kiện Giấy phép lái xe"
+                  description={
+                    <div>
+                      <div>Trạng thái GPLX hiện tại: <strong>{customer?.licenseStatus || 'Chưa xác minh'}</strong>.</div>
+                      <div style={{ marginTop: '4px' }}>
+                        Để nhận xe tại Showroom, quý khách cần có GPLX ô tô còn hạn và được phê duyệt. Quý khách có thể tải lên bổ sung giấy tờ trước giờ nhận xe.
+                      </div>
+                      <Button
+                        size="small"
+                        type="link"
+                        onClick={() => navigate('/customer/documents')}
+                        style={{ paddingLeft: 0, marginTop: '6px', fontWeight: 600 }}
+                      >
+                        Quản lý giấy tờ & GPLX của bạn &rarr;
+                      </Button>
+                    </div>
+                  }
+                  style={{ borderRadius: '8px', marginBottom: '16px' }}
+                />
+              )}
+
+              <div style={{ background: '#eff6ff', padding: '14px', borderRadius: '8px', border: '1px solid #bfdbfe', fontSize: '13px', color: '#1e3a8a' }}>
+                <strong>Quy trình bàn giao:</strong> Khi đến nhận xe, quý khách vui lòng mang theo bản gốc GPLX và CCCD để đối chiếu nhanh với nhân viên vận hành trong 2 phút.
               </div>
             </Col>
           </Row>
@@ -215,7 +326,7 @@ export const BookingCheckout: React.FC = () => {
           <Title level={5} style={{ marginBottom: '16px' }}>Bước 3: Chọn Gói Dịch vụ & Tiện ích gia tăng</Title>
           <Row gutter={[16, 16]}>
             {serviceOptions.map(srv => (
-              <Col span={12} key={srv.key}>
+              <Col xs={24} sm={12} key={srv.key}>
                 <div style={{
                   padding: '16px',
                   borderRadius: '10px',
@@ -258,7 +369,7 @@ export const BookingCheckout: React.FC = () => {
                       <BankOutlined style={{ fontSize: '20px', color: '#1677ff' }} />
                       <div>
                         <div style={{ fontWeight: 700 }}>Chuyển khoản ngân hàng qua mã VietQR (Khuyên dùng)</div>
-                        <Text type="secondary" style={{ fontSize: '12px' }}>Tự động kích hoạt hợp đồng ngay sau khi chuyển khoản thành công.</Text>
+                        <Text type="secondary" style={{ fontSize: '12px' }}>Tự động đối soát và kích hoạt hợp đồng ngay sau khi chuyển khoản.</Text>
                       </div>
                     </Space>
                   </Radio>
@@ -314,7 +425,7 @@ export const BookingCheckout: React.FC = () => {
             onClick={handleCreateBooking}
             style={{ borderRadius: '8px', background: '#16a34a', borderColor: '#16a34a', fontWeight: 800 }}
           >
-            Xác nhận Đặt xe & Ký Hợp đồng
+            Xác nhận Đặt xe & Khởi tạo Hợp đồng
           </Button>
         )}
       </div>

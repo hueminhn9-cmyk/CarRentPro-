@@ -11,6 +11,7 @@ router.get('/:id', ReviewController.getReviewById);
 
 // Submit, edit or delete review
 router.post('/', authenticate, ReviewController.createReview);
+router.put('/:id/status', authenticate, authorize('ADMIN'), ReviewController.updateReviewStatus);
 router.put('/:id', authenticate, ReviewController.updateReview);
 router.delete('/:id', authenticate, authorize('ADMIN'), ReviewController.deleteReview);
 

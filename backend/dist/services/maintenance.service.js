@@ -17,10 +17,14 @@ export class MaintenanceService {
             vehicleName: record.vehicles?.name || 'N/A',
             licensePlate: record.vehicles?.license_plate || 'N/A',
             description: record.description || '',
+            serviceType: record.maintenance_type || 'Bảo dưỡng định kỳ',
+            garage: record.description || 'Gara ủy quyền',
             cost: record.cost ? Number(record.cost) : 0,
             startDate: record.scheduled_date ? record.scheduled_date.toISOString().split('T')[0] : '',
+            scheduledDate: record.scheduled_date ? record.scheduled_date.toISOString().split('T')[0] : '',
             endDate: record.completed_date ? record.completed_date.toISOString().split('T')[0] : (record.next_service_date ? record.next_service_date.toISOString().split('T')[0] : ''),
-            status: record.status === 'COMPLETED' ? 'Hoàn thành' : 'Đang bảo dưỡng',
+            status: record.status || 'SCHEDULED',
+            rawStatus: record.status || 'SCHEDULED',
         }));
     }
     static async getById(id) {

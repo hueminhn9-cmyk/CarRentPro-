@@ -1,4 +1,4 @@
-﻿# TÀI LIỆU MÔ TẢ CHỨC NĂNG NGHIỆP VỤ
+# TÀI LIỆU MÔ TẢ CHỨC NĂNG NGHIỆP VỤ
 
 ## Tên dự án: AutoRent — Hệ thống Quản lý Cho thuê Xe Tự lái SaaS
 
@@ -52,24 +52,30 @@ AutoRent là nền tảng SaaS (Software as a Service) quản lý toàn bộ quy
 - Gửi đánh giá & nhận xét sau chuyến đi
 - Xem thông báo hệ thống
 
-### 2.2 MANAGER — Quản lý vận hành
+### 2.2 MANAGER — Quản lý vận hành chi nhánh (Tác nghiệp thực địa)
 
-Bao gồm tất cả quyền CUSTOMER, cộng thêm:
-- Xem bảng điều hành vận hành Manager
-- Duyệt/từ chối đơn đặt xe
-- Thực hiện biên bản bàn giao xe (PICKUP / RETURN)
-- Xác minh giấy tờ GPLX của khách hàng
-- Quản lý lịch bảo dưỡng xe
+Đảm nhiệm các công việc vận hành trực tiếp hàng ngày tại bãi xe & showroom:
+- Trực ca và tiếp nhận, duyệt/từ chối đơn đặt xe hàng ngày (Booking Queue)
+- Thẩm định, kiểm tra tính hợp lệ của giấy tờ GPLX/CCCD khách hàng trước giờ nhận xe (Verification Queue)
+- Trực tiếp thực hiện biên bản bàn giao xe tại bãi (PICKUP): Chụp 6 góc ảnh hiện trạng, ghi nhận chỉ số ODO, đo mức xăng/pin
+- Trực tiếp thực hiện thu hồi xe (RETURN): Kiểm tra hư hại, tính phụ phí phát sinh (km vượt, trễ giờ, vệ sinh, xăng xe) và hoàn tất tiền cọc
+- Quản lý điều phối xe ra vào xưởng bảo dưỡng, nghiệm thu kỹ thuật phương tiện (Maintenance Board)
+- Hỗ trợ khách vãng lai tạo đơn thuê xe trực tiếp tại quầy
 
-### 2.3 ADMIN — Quản trị viên hệ thống
+### 2.3 ADMIN — Ban Điều hành & Quản trị Hệ thống (C-Level / Boss dùng trí óc)
 
-Bao gồm tất cả quyền MANAGER, cộng thêm:
-- Quản lý toàn bộ xe trong hạm đội (CRUD)
-- Quản lý toàn bộ người dùng (bao gồm Manager)
-- Xem báo cáo doanh thu & phân tích
-- Quản lý hợp đồng
-- Xem nhật ký kiểm toán (Audit Logs)
-- Cấu hình tham số hệ thống
+Định vị vai trò là **Lãnh đạo cấp cao (Boss)**: Quản trị bằng **trí óc, chiến lược, dữ liệu thống kê & kiểm toán rủi ro**. **Tuyệt đối KHÔNG làm nghiệp vụ cho thuê trực tiếp và KHÔNG nhúng tay vào các thao tác lao động chân tay tại bãi xe.**
+
+Nhiệm vụ và thẩm quyền cốt lõi:
+- **Executive Dashboard**: Giám sát chỉ số tài chính vĩ mô, doanh thu lũy kế, tỷ lệ khai thác hạm đội (Fleet Utilization Rate)
+- **Báo cáo Tài chính & P&L**: Phân tích chuyên sâu dòng tiền, doanh thu theo từng tháng và tỷ suất hoàn vốn (ROI) theo từng dòng xe
+- **Quản trị Tài sản Cố định (Fleet Asset)**: Hoạch định danh mục xe, mua sắm xe mới, thanh lý xe cũ, định giá niêm yết cơ sở
+- **Giám sát & Đối soát Vận hành (Audit Oversight)**: Radar theo dõi vòng đời đơn thuê toàn quốc, đối soát sổ cái tiền cọc ngân hàng (Escrow), kiểm tra chéo 6 góc ảnh bàn giao của Manager nhằm chống tiêu cực nội bộ
+- **Quyền Lực Khẩn Cấp (Emergency Override)**: Can thiệp đóng băng đơn thuê / hợp đồng khi phát hiện tranh chấp pháp lý, gian lận nghiêm trọng (kèm lý do ghi vết Audit Log)
+- **Quản trị Nhân sự Quản lý**: Bổ nhiệm, cấp tài khoản, điều chuyển hoặc đình chỉ công tác đối với Manager chi nhánh
+- **Kiểm soát Ngân sách Kỹ thuật (OPEX)**: Giám sát tổng chi phí sửa chữa bảo dưỡng xe từ các chi nhánh
+- **Thiết lập Luật chơi & Cấu hình Hệ thống**: Cài đặt mức tiền cọc tối thiểu, phí bảo hiểm ngày, tỷ lệ phạt hủy đơn, thông tin pháp nhân doanh nghiệp
+- **Nhật ký Kiểm toán Toàn cục (Audit Logs)**: Giám sát toàn bộ lịch sử truy vết hành động của người dùng và nhân viên toàn quốc
 
 ---
 

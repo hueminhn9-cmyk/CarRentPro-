@@ -7,52 +7,68 @@ import {
   DeleteOutlined,
   UserOutlined
 } from '@ant-design/icons';
-import { FilterBar } from '@/components/common/FilterBar';
+import { api } from '@/services/api';
 import { TableSkeleton } from '@/components/common/LoadingSkeleton';
 
 const { Title, Text } = Typography;
 
 export const Reviews: React.FC = () => {
   const [loading, setLoading] = useState(false);
-  const [ratingFilter, setRatingFilter] = useState<number | undefined>(undefined);
-  const [reviews, setReviews] = useState<any[]>([
-    {
-      id: 'REV-001',
-      customerName: 'Nguyễn Văn Hùng',
-      vehicleName: 'BMW 320i Sport-Line',
-      rating: 5,
-      comment: 'Xe chạy rất đầm và êm ái, nội thất sạch bóng mùi hương dễ chịu. Thủ tục bàn giao rất nhanh chóng!',
-      date: '2026-08-15',
-      status: 'APPROVED'
-    },
-    {
-      id: 'REV-002',
-      customerName: 'Trần Thị Thu Trang',
-      vehicleName: 'VinFast VF8 Plus',
-      rating: 4,
-      comment: 'Xe điện tăng tốc mượt, trạm sạc chi nhánh hỗ trợ sạc 100% trước khi giao xe. Sẽ tiếp tục ủng hộ!',
-      date: '2026-08-14',
-      status: 'APPROVED'
-    },
-    {
-      id: 'REV-003',
-      customerName: 'Lê Hoàng Long',
-      vehicleName: 'Toyota Camry 2.5Q',
-      rating: 2,
-      comment: 'Xe giao trễ 15 phút do nhân viên rửa xe chưa kịp, mong gara cải thiện tiến độ chuẩn giờ hơn.',
-      date: '2026-08-12',
-      status: 'PENDING'
-    }
-  ]);
+  const [reviews, setReviews] = useState<any[]>([]);
 
-  const handleApprove = (id: string) => {
-    setReviews(reviews.map(r => r.id === id ? { ...r, status: 'APPROVED' } : r));
-    message.success('Đã duyệt hiển thị đánh giá này trên website!');
+  const fetchReviews = async () => {
+    setLoading(true);
+    try {
+      const list: any[] = await api.reviews.getAll();
+      const formatted = (list || []).map(r => ({
+        id: String(r.id),
+        customerName: r.users?.full_name || 'Khách hàng',
+        vehicleName: r.vehicles?.name ? `${r.vehicles.name} (${r.vehicles.license_plate})` : 'Xe AutoRent',
+        rating: r.rating,
+        comment: r.content || r.comment || '',
+        date: r.created_at ? new Date(r.created_at).toISOString().split('T')[0] : 'N/A',
+        status: r.status || 'APPROVED'
+      }));
+      setReviews(formatted);
+    } catch (err: any) {
+      message.error(err?.response?.data?.message || 'Không thể tải danh sách đánh giá');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleHide = (id: string) => {
-    setReviews(reviews.map(r => r.id === id ? { ...r, status: 'HIDDEN' } : r));
-    message.warning('Đã ẩn đánh giá khỏi trang chủ.');
+  useEffect(() => {
+    fetchReviews();
+  }, []);
+
+  const handleApprove = async (id: string) => {
+    try {
+      await api.reviews.updateStatus(id, 'APPROVED');
+      message.success('Đã duyệt hiển thị đánh giá này trên website!');
+      fetchReviews();
+    } catch (err: any) {
+      message.error(err?.response?.data?.message || 'Lỗi khi duyệt đánh giá');
+    }
+  };
+
+  const handleHide = async (id: string) => {
+    try {
+      await api.reviews.updateStatus(id, 'HIDDEN');
+      message.warning('Đã ẩn đánh giá khỏi trang chủ.');
+      fetchReviews();
+    } catch (err: any) {
+      message.error(err?.response?.data?.message || 'Lỗi khi ẩn đánh giá');
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await api.reviews.delete(id);
+      message.success('Đã xóa đánh giá thành công khỏi hệ thống!');
+      fetchReviews();
+    } catch (err: any) {
+      message.error(err?.response?.data?.message || 'Lỗi khi xóa đánh giá');
+    }
   };
 
   const columns = [
@@ -113,7 +129,7 @@ export const Reviews: React.FC = () => {
               onClick={() => handleApprove(r.id)}
               style={{ borderRadius: '6px', background: '#16a34a', borderColor: '#16a34a' }}
             >
-              Duyệt
+              Duyệt hiển thị
             </Button>
           )}
           {r.status !== 'HIDDEN' && (
@@ -123,9 +139,26 @@ export const Reviews: React.FC = () => {
               onClick={() => handleHide(r.id)}
               style={{ borderRadius: '6px' }}
             >
-              Ẩn
+              Ẩn đánh giá
             </Button>
           )}
+          <Popconfirm
+            title="Xóa đánh giá này?"
+            description="Bạn có chắc chắn muốn xóa vĩnh viễn đánh giá này không?"
+            onConfirm={() => handleDelete(r.id)}
+            okText="Xóa"
+            cancelText="Hủy"
+            okButtonProps={{ danger: true }}
+          >
+            <Button 
+              size="small" 
+              danger 
+              icon={<DeleteOutlined />} 
+              style={{ borderRadius: '6px' }}
+            >
+              Xóa
+            </Button>
+          </Popconfirm>
         </Space>
       )
     }
@@ -138,9 +171,13 @@ export const Reviews: React.FC = () => {
         <Text type="secondary" style={{ fontSize: '13px' }}>Quản lý phản hồi, xếp hạng sao của người dùng để nâng cao chất lượng dịch vụ</Text>
       </div>
 
-      <Card style={{ borderRadius: '12px', border: '1px solid #e2e8f0' }} styles={{ body: { padding: 0 } }}>
-        <Table dataSource={reviews} columns={columns} rowKey="id" pagination={{ pageSize: 10 }} />
-      </Card>
+      {loading ? (
+        <TableSkeleton rows={6} />
+      ) : (
+        <Card style={{ borderRadius: '12px', border: '1px solid #e2e8f0' }} styles={{ body: { padding: 0 } }}>
+          <Table dataSource={reviews} columns={columns} rowKey="id" pagination={{ pageSize: 10 }} />
+        </Card>
+      )}
     </div>
   );
 };

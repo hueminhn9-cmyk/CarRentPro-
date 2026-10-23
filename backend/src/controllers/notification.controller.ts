@@ -9,9 +9,13 @@ export class NotificationController {
   static getNotifications = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
       const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 10;
+      const limit = parseInt(req.query.limit as string) || 20;
       
-      const { notifications, total } = await NotificationService.getUserNotifications(req.user!.id, { page, limit });
+      const isAll = req.query.all === 'true' || (req.user!.role === 'ADMIN' && req.query.my !== 'true');
+      const { notifications, total } = isAll
+        ? await NotificationService.getAllNotifications({ page, limit })
+        : await NotificationService.getUserNotifications(req.user!.id, { page, limit });
+
       return ApiResponse.success(res, 'Lấy danh sách thông báo thành công', {
         notifications: serializeBigInt(notifications),
         pagination: {
@@ -37,7 +41,11 @@ export class NotificationController {
 
   static markAllAsRead = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
-      await NotificationService.markAllAsRead(req.user!.id);
+      if (req.user!.role === 'ADMIN' && req.query.my !== 'true') {
+        await NotificationService.markAllAsReadSystem();
+      } else {
+        await NotificationService.markAllAsRead(req.user!.id);
+      }
       return ApiResponse.success(res, 'Đánh dấu đã đọc toàn bộ thông báo thành công');
     } catch (error) {
       next(error);

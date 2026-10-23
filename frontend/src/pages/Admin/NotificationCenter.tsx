@@ -1,84 +1,111 @@
-import React, { useState } from 'react';
-import { Card, Tabs, List, Typography, Badge, Button, Space, Tag, message } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Card, Tabs, List, Typography, Badge, Button, Space, Tag, Popconfirm, message, Skeleton, Empty } from 'antd';
 import {
   BellOutlined,
   CalendarOutlined,
   DollarOutlined,
-  SettingOutlined,
   CheckCircleOutlined,
   SafetyCertificateOutlined,
-  DeleteOutlined
+  DeleteOutlined,
+  ReloadOutlined,
+  CheckOutlined,
+  InfoCircleOutlined,
+  WarningOutlined
 } from '@ant-design/icons';
+import { api } from '@/services/api';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+dayjs.extend(relativeTime);
 
 const { Title, Text } = Typography;
 
 export const NotificationCenter: React.FC = () => {
   const [activeTab, setActiveTab] = useState('all');
-  const [notifications, setNotifications] = useState<any[]>([
-    {
-      id: 'NTF-01',
-      type: 'VERIFICATION',
-      title: 'Hồ sơ GPLX mới chờ xác minh',
-      content: 'Khách hàng Nguyễn Văn Hùng đã gửi ảnh CCCD và GPLX hạng B2.',
-      time: '10 phút trước',
-      read: false
-    },
-    {
-      id: 'NTF-02',
-      type: 'BOOKING',
-      title: 'Đơn thuê xe mới #BK-2026-081',
-      content: 'Khách hàng đặt xe BMW 320i (4 ngày) từ ngày 20/08 đến 24/08.',
-      time: '25 phút trước',
-      read: false
-    },
-    {
-      id: 'NTF-03',
-      type: 'PAYMENT',
-      title: 'Nhận thành công tiền cọc 15.000.000đ',
-      content: 'Giao dịch VNPay thành công cho đơn thuê #BK-2026-081.',
-      time: '30 phút trước',
-      read: true
-    },
-    {
-      id: 'NTF-04',
-      type: 'SYSTEM',
-      title: 'Nhắc nhở bảo dưỡng xe định kỳ',
-      content: 'Xe VinFast Lux A2.0 (30F-123.45) đã vượt 40,000 km cần lên lịch bảo dưỡng.',
-      time: '2 giờ trước',
-      read: true
-    }
-  ]);
+  const [loading, setLoading] = useState(false);
+  const [notifications, setNotifications] = useState<any[]>([]);
 
-  const markAllAsRead = () => {
-    setNotifications(notifications.map(n => ({ ...n, read: true })));
-    message.success('Đã đánh dấu tất cả thông báo là đã đọc');
+  const fetchNotifications = async () => {
+    setLoading(true);
+    try {
+      const data = await api.notifications.getAll({ limit: 100 });
+      setNotifications(data);
+    } catch (e: any) {
+      message.error(e?.response?.data?.message || 'Không thể tải danh sách thông báo');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const clearAll = () => {
-    setNotifications([]);
-    message.info('Đã xóa tất cả thông báo');
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+
+  const markAllAsRead = async () => {
+    try {
+      await api.notifications.markAllAsRead();
+      message.success('Đã đánh dấu tất cả thông báo là đã đọc');
+      fetchNotifications();
+    } catch (e: any) {
+      message.error(e?.response?.data?.message || 'Thao tác thất bại');
+    }
+  };
+
+  const markAsRead = async (id: string | number) => {
+    try {
+      await api.notifications.markAsRead(id);
+      message.success('Đã đánh dấu thông báo là đã đọc');
+      fetchNotifications();
+    } catch (e: any) {
+      message.error(e?.response?.data?.message || 'Thao tác thất bại');
+    }
+  };
+
+  const handleDelete = async (id: string | number) => {
+    try {
+      await api.notifications.delete(id);
+      message.success('Đã xóa thông báo');
+      fetchNotifications();
+    } catch (e: any) {
+      message.error(e?.response?.data?.message || 'Xóa thông báo thất bại');
+    }
   };
 
   const getFilteredList = () => {
-    if (activeTab === 'unread') return notifications.filter(n => !n.read);
-    if (activeTab === 'booking') return notifications.filter(n => n.type === 'BOOKING');
-    if (activeTab === 'payment') return notifications.filter(n => n.type === 'PAYMENT');
-    if (activeTab === 'system') return notifications.filter(n => n.type === 'SYSTEM' || n.type === 'VERIFICATION');
-    return notifications;
+    return notifications.filter(n => {
+      const isRead = n.is_read ?? n.read;
+      const type = (n.type || '').toUpperCase();
+
+      if (activeTab === 'unread') return !isRead;
+      if (activeTab === 'booking') return type === 'BOOKING';
+      if (activeTab === 'payment') return type === 'PAYMENT';
+      if (activeTab === 'system') return type === 'SYSTEM' || type === 'VERIFICATION';
+      return true;
+    });
   };
 
-  const getIcon = (type: string) => {
-    switch (type) {
+  const getIcon = (type: string = '') => {
+    const t = type.toUpperCase();
+    switch (t) {
       case 'BOOKING':
         return <CalendarOutlined style={{ color: '#2563eb', fontSize: '18px' }} />;
       case 'PAYMENT':
         return <DollarOutlined style={{ color: '#16a34a', fontSize: '18px' }} />;
       case 'VERIFICATION':
         return <SafetyCertificateOutlined style={{ color: '#d97706', fontSize: '18px' }} />;
+      case 'WARNING':
+        return <WarningOutlined style={{ color: '#eab308', fontSize: '18px' }} />;
+      case 'SUCCESS':
+        return <CheckCircleOutlined style={{ color: '#10b981', fontSize: '18px' }} />;
+      case 'INFO':
+        return <InfoCircleOutlined style={{ color: '#06b6d4', fontSize: '18px' }} />;
       default:
         return <BellOutlined style={{ color: '#64748b', fontSize: '18px' }} />;
     }
   };
+
+  const filteredList = getFilteredList();
+  const unreadCount = notifications.filter(n => !(n.is_read ?? n.read)).length;
 
   return (
     <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
@@ -89,11 +116,11 @@ export const NotificationCenter: React.FC = () => {
         </div>
 
         <Space>
-          <Button icon={<CheckCircleOutlined />} onClick={markAllAsRead}>
-            Đánh dấu đã đọc tất cả
+          <Button icon={<ReloadOutlined />} onClick={fetchNotifications} loading={loading}>
+            Làm mới
           </Button>
-          <Button icon={<DeleteOutlined />} danger onClick={clearAll}>
-            Xóa tất cả
+          <Button icon={<CheckCircleOutlined />} onClick={markAllAsRead} disabled={unreadCount === 0}>
+            Đánh dấu đã đọc tất cả
           </Button>
         </Space>
       </div>
@@ -104,57 +131,113 @@ export const NotificationCenter: React.FC = () => {
           onChange={setActiveTab}
           items={[
             { key: 'all', label: `Tất cả (${notifications.length})` },
-            { key: 'unread', label: `Chưa đọc (${notifications.filter(n => !n.read).length})` },
+            { key: 'unread', label: `Chưa đọc (${unreadCount})` },
             { key: 'booking', label: 'Đơn thuê' },
             { key: 'payment', label: 'Thanh toán' },
             { key: 'system', label: 'Hệ thống & GPLX' }
           ]}
         />
 
-        <List
-          itemLayout="horizontal"
-          dataSource={getFilteredList()}
-          renderItem={(item) => (
-            <List.Item
-              style={{
-                padding: '16px 20px',
-                borderRadius: '8px',
-                marginBottom: '8px',
-                background: item.read ? '#ffffff' : '#f0f7ff',
-                border: `1px solid ${item.read ? '#f1f5f9' : '#bfdbfe'}`
-              }}
-            >
-              <List.Item.Meta
-                avatar={
-                  <div style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '50%',
-                    background: item.read ? '#f1f5f9' : '#eff6ff',
+        {loading ? (
+          <div style={{ padding: '24px' }}>
+            <Skeleton active avatar paragraph={{ rows: 2 }} />
+            <Skeleton active avatar paragraph={{ rows: 2 }} style={{ marginTop: '20px' }} />
+            <Skeleton active avatar paragraph={{ rows: 2 }} style={{ marginTop: '20px' }} />
+          </div>
+        ) : filteredList.length === 0 ? (
+          <Empty description="Không có thông báo nào" style={{ padding: '40px 0' }} />
+        ) : (
+          <List
+            itemLayout="horizontal"
+            dataSource={filteredList}
+            renderItem={(item) => {
+              const isRead = item.is_read ?? item.read;
+              const formattedTime = item.created_at ? dayjs(item.created_at).format('DD/MM/YYYY HH:mm') : item.time || '';
+
+              return (
+                <List.Item
+                  style={{
+                    padding: '16px 20px',
+                    borderRadius: '8px',
+                    marginBottom: '8px',
+                    background: isRead ? '#ffffff' : '#f0f7ff',
+                    border: `1px solid ${isRead ? '#f1f5f9' : '#bfdbfe'}`,
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    {getIcon(item.type)}
-                  </div>
-                }
-                title={
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Text strong style={{ fontSize: '14px', color: item.read ? '#0f172a' : '#1e3a8a' }}>
-                      {item.title}
-                    </Text>
-                    <Text type="secondary" style={{ fontSize: '11px' }}>{item.time}</Text>
-                  </div>
-                }
-                description={
-                  <div style={{ fontSize: '13px', color: '#475569', marginTop: '2px' }}>
-                    {item.content}
-                  </div>
-                }
-              />
-            </List.Item>
-          )}
-        />
+                    justifyContent: 'space-between'
+                  }}
+                  actions={[
+                    !isRead && (
+                      <Button
+                        type="text"
+                        size="small"
+                        icon={<CheckOutlined />}
+                        title="Đánh dấu đã đọc"
+                        onClick={() => markAsRead(item.id)}
+                        key="read"
+                      />
+                    ),
+                    <Popconfirm
+                      key="delete"
+                      title="Xóa thông báo"
+                      description="Bạn có chắc chắn muốn xóa thông báo này?"
+                      onConfirm={() => handleDelete(item.id)}
+                      okText="Xóa"
+                      cancelText="Hủy"
+                      okButtonProps={{ danger: true }}
+                    >
+                      <Button
+                        type="text"
+                        danger
+                        size="small"
+                        icon={<DeleteOutlined />}
+                        title="Xóa thông báo"
+                      />
+                    </Popconfirm>
+                  ].filter(Boolean)}
+                >
+                  <List.Item.Meta
+                    avatar={
+                      <div style={{
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '50%',
+                        background: isRead ? '#f1f5f9' : '#eff6ff',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0
+                      }}>
+                        {getIcon(item.type)}
+                      </div>
+                    }
+                    title={
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Space>
+                          <Text strong style={{ fontSize: '14px', color: isRead ? '#0f172a' : '#1e3a8a' }}>
+                            {item.title}
+                          </Text>
+                          {item.users && (
+                            <Tag color="cyan" style={{ fontSize: '11px', margin: 0 }}>
+                              {item.users.full_name || item.users.email}
+                            </Tag>
+                          )}
+                          {!isRead && <Badge status="processing" color="#2563eb" />}
+                        </Space>
+                        <Text type="secondary" style={{ fontSize: '11px' }}>{formattedTime}</Text>
+                      </div>
+                    }
+                    description={
+                      <div style={{ fontSize: '13px', color: '#475569', marginTop: '4px' }}>
+                        {item.content}
+                      </div>
+                    }
+                  />
+                </List.Item>
+              );
+            }}
+          />
+        )}
       </Card>
     </div>
   );

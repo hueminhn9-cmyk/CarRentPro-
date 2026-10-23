@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Col, Card, Typography, Button, Space, Tag, Modal, Input, message, Divider, Badge } from 'antd';
+import { Row, Col, Card, Typography, Button, Space, Tag, Modal, Input, message, Divider, Badge, Segmented, Spin } from 'antd';
 import {
   SafetyCertificateOutlined,
   CheckOutlined,
@@ -8,19 +8,20 @@ import {
   PhoneOutlined,
   MailOutlined,
   IdcardOutlined,
-  EyeOutlined
+  ReloadOutlined
 } from '@ant-design/icons';
 import { api } from '@/services/api';
-import { StatusBadge } from '@/components/common/StatusBadge';
 import { EmptyState } from '@/components/common/EmptyState';
 import { TableSkeleton } from '@/components/common/LoadingSkeleton';
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text } = Typography;
 const { TextArea } = Input;
 
 export const VerificationQueue: React.FC = () => {
   const [loading, setLoading] = useState(true);
-  const [customers, setCustomers] = useState<any[]>([]);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [allCustomers, setAllCustomers] = useState<any[]>([]);
+  const [filterTab, setFilterTab] = useState<'PENDING' | 'VERIFIED' | 'ALL'>('PENDING');
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
   const [rejectModalVisible, setRejectModalVisible] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
@@ -28,42 +29,29 @@ export const VerificationQueue: React.FC = () => {
   const fetchVerifications = async () => {
     setLoading(true);
     try {
-      const res: any = await api.customers.getAll({ limit: 50 });
+      const res: any = await api.customers.getAll({ limit: 100 });
       const list = Array.isArray(res) ? res : (res?.items || res?.data || []);
-      // Mock some customer verification items if list is empty
-      const enrichedList = list.length > 0 ? list : [
-        {
-          id: 'CUST-001',
-          name: 'Nguyễn Văn Hùng',
-          phone: '0987 654 321',
-          email: 'hung.nguyen@example.com',
-          driverLicense: 'B2 - 012345678901',
-          licenseExpiry: '2030-12-31',
-          licenseStatus: 'PENDING',
-          createdAt: '10 phút trước',
-          frontImage: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&auto=format&fit=crop&q=60',
-          backImage: 'https://images.unsplash.com/photo-1554224154-26032ffc0d07?w=600&auto=format&fit=crop&q=60'
-        },
-        {
-          id: 'CUST-002',
-          name: 'Trần Thị Thu Trang',
-          phone: '0912 345 678',
-          email: 'trang.tran@example.com',
-          driverLicense: 'B1 - 079198001122',
-          licenseExpiry: '2028-05-15',
-          licenseStatus: 'PENDING',
-          createdAt: '45 phút trước',
-          frontImage: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&auto=format&fit=crop&q=60',
-          backImage: 'https://images.unsplash.com/photo-1554224154-26032ffc0d07?w=600&auto=format&fit=crop&q=60'
-        }
-      ];
+      
+      setAllCustomers(list);
 
-      setCustomers(enrichedList);
-      if (enrichedList.length > 0 && !selectedCustomer) {
-        setSelectedCustomer(enrichedList[0]);
+      // Select first item that matches current filter or list[0]
+      const filtered = list.filter((c: any) => {
+        if (filterTab === 'PENDING') return c.licenseStatus === 'Chờ duyệt' || c.licenseStatus === 'PENDING';
+        if (filterTab === 'VERIFIED') return c.licenseStatus === 'Đã xác minh' || c.licenseStatus === 'VERIFIED';
+        return true;
+      });
+
+      if (filtered.length > 0) {
+        setSelectedCustomer((prev: any) => {
+          const stillExists = filtered.find((x: any) => x.id === prev?.id);
+          return stillExists || filtered[0];
+        });
+      } else {
+        setSelectedCustomer(null);
       }
-    } catch (err) {
-      message.error('Không thể tải danh sách kiểm duyệt GPLX');
+    } catch (err: any) {
+      const msg = err.response?.data?.message || err.message || 'Không thể tải danh sách kiểm duyệt GPLX';
+      message.error(msg);
     } finally {
       setLoading(false);
     }
@@ -73,15 +61,26 @@ export const VerificationQueue: React.FC = () => {
     fetchVerifications();
   }, []);
 
+  const displayedCustomers = allCustomers.filter((c: any) => {
+    if (filterTab === 'PENDING') return c.licenseStatus === 'Chờ duyệt' || c.licenseStatus === 'PENDING';
+    if (filterTab === 'VERIFIED') return c.licenseStatus === 'Đã xác minh' || c.licenseStatus === 'VERIFIED';
+    return true;
+  });
+
+  const pendingCount = allCustomers.filter(c => c.licenseStatus === 'Chờ duyệt' || c.licenseStatus === 'PENDING').length;
+
   const handleApprove = async () => {
     if (!selectedCustomer) return;
+    setActionLoading(true);
     try {
       await api.customers.verifyLicense(selectedCustomer.id, { status: 'VERIFIED' });
-      message.success(`Đã phê duyệt GPLX cho khách hàng ${selectedCustomer.name}`);
-      fetchVerifications();
-    } catch (err) {
-      message.success(`Đã phê duyệt GPLX thành công cho ${selectedCustomer.name}`);
-      fetchVerifications();
+      message.success(`Đã phê duyệt GPLX thành công cho khách hàng ${selectedCustomer.name}`);
+      await fetchVerifications();
+    } catch (err: any) {
+      const errorMsg = err.response?.data?.message || err.message || 'Lỗi khi phê duyệt hồ sơ';
+      message.error(errorMsg);
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -90,35 +89,65 @@ export const VerificationQueue: React.FC = () => {
       message.warning('Vui lòng nhập lý do từ chối hồ sơ');
       return;
     }
+    if (!selectedCustomer) return;
+    setActionLoading(true);
     try {
       await api.customers.verifyLicense(selectedCustomer.id, { status: 'REJECTED', reason: rejectReason });
-      message.success('Đã từ chối hồ sơ GPLX và gửi thông báo cho khách hàng');
+      message.success(`Đã từ chối hồ sơ GPLX của ${selectedCustomer.name} và gửi lý do cho khách hàng`);
       setRejectModalVisible(false);
       setRejectReason('');
-      fetchVerifications();
-    } catch (err) {
-      message.success('Đã từ chối hồ sơ GPLX');
-      setRejectModalVisible(false);
-      setRejectReason('');
-      fetchVerifications();
+      await fetchVerifications();
+    } catch (err: any) {
+      const errorMsg = err.response?.data?.message || err.message || 'Lỗi khi từ chối hồ sơ';
+      message.error(errorMsg);
+    } finally {
+      setActionLoading(false);
     }
   };
 
   return (
     <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-      <div style={{ marginBottom: '20px' }}>
-        <Title level={4} style={{ margin: 0, fontWeight: 800 }}>
-          Hàng đợi Kiểm duyệt GPLX & Danh tính (Verification Queue)
-        </Title>
-        <Text type="secondary" style={{ fontSize: '13px' }}>
-          Đối chiếu bằng lái xe và căn cước công dân trước khi xác nhận đơn thuê
-        </Text>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '16px' }}>
+        <div>
+          <Title level={4} style={{ margin: 0, fontWeight: 800 }}>
+            Hàng đợi Kiểm duyệt GPLX & Danh tính (Verification Queue)
+          </Title>
+          <Text type="secondary" style={{ fontSize: '13px' }}>
+            Đối chiếu bằng lái xe và căn cước công dân trước khi xác nhận đơn thuê
+          </Text>
+        </div>
+
+        <Space size={12}>
+          <Segmented
+            value={filterTab}
+            onChange={(val) => {
+              setFilterTab(val as any);
+              const filtered = allCustomers.filter((c: any) => {
+                if (val === 'PENDING') return c.licenseStatus === 'Chờ duyệt' || c.licenseStatus === 'PENDING';
+                if (val === 'VERIFIED') return c.licenseStatus === 'Đã xác minh' || c.licenseStatus === 'VERIFIED';
+                return true;
+              });
+              setSelectedCustomer(filtered.length > 0 ? filtered[0] : null);
+            }}
+            options={[
+              { label: `Chờ duyệt (${pendingCount})`, value: 'PENDING' },
+              { label: 'Đã duyệt', value: 'VERIFIED' },
+              { label: `Tất cả (${allCustomers.length})`, value: 'ALL' }
+            ]}
+          />
+          <Button icon={<ReloadOutlined />} onClick={fetchVerifications} size="small" style={{ borderRadius: '6px' }}>
+            Làm mới
+          </Button>
+        </Space>
       </div>
 
       {loading ? (
         <TableSkeleton rows={5} />
-      ) : customers.length === 0 ? (
-        <EmptyState title="Không có hồ sơ chờ duyệt" description="Tất cả hồ sơ GPLX của khách hàng đã được xử lý." />
+      ) : displayedCustomers.length === 0 ? (
+        <EmptyState 
+          title={filterTab === 'PENDING' ? 'Không có hồ sơ chờ duyệt' : 'Danh sách hồ sơ trống'} 
+          description={filterTab === 'PENDING' ? 'Tất cả hồ sơ GPLX của khách hàng đã được xử lý hoặc chưa có yêu cầu mới.' : 'Không tìm thấy hồ sơ khách hàng phù hợp với bộ lọc hiện tại.'} 
+        />
       ) : (
         <Row gutter={[20, 20]}>
           {/* Left Panel: Request List */}
@@ -126,15 +155,17 @@ export const VerificationQueue: React.FC = () => {
             <Card
               title={
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '14px', fontWeight: 700 }}>Hồ sơ chờ duyệt</span>
-                  <Badge count={customers.length} style={{ backgroundColor: '#2563eb' }} />
+                  <span style={{ fontSize: '14px', fontWeight: 700 }}>Danh sách hồ sơ</span>
+                  <Badge count={displayedCustomers.length} style={{ backgroundColor: '#2563eb' }} />
                 </div>
               }
               style={{ borderRadius: '12px', border: '1px solid #e2e8f0' }}
               styles={{ body: { padding: '8px', maxHeight: '72vh', overflowY: 'auto' } }}
             >
-              {customers.map((c) => {
+              {displayedCustomers.map((c) => {
                 const isSelected = selectedCustomer?.id === c.id;
+                const isPending = c.licenseStatus === 'Chờ duyệt' || c.licenseStatus === 'PENDING';
+                const isVerified = c.licenseStatus === 'Đã xác minh' || c.licenseStatus === 'VERIFIED';
 
                 return (
                   <div
@@ -154,16 +185,16 @@ export const VerificationQueue: React.FC = () => {
                       <Text strong style={{ fontSize: '14px', color: isSelected ? '#1e3a8a' : '#0f172a' }}>
                         {c.name || 'Khách hàng'}
                       </Text>
-                      <Tag color="warning" style={{ margin: 0, fontSize: '10px' }}>
-                        Chờ duyệt
+                      <Tag color={isPending ? 'warning' : (isVerified ? 'success' : 'default')} style={{ margin: 0, fontSize: '10px' }}>
+                        {c.licenseStatus || 'Chưa duyệt'}
                       </Tag>
                     </div>
                     <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '4px' }}>
                       <PhoneOutlined style={{ marginRight: '4px' }} />
-                      {c.phone || '0901234567'}
+                      {c.phone || 'Chưa cập nhật SĐT'}
                     </div>
                     <div style={{ fontSize: '11px', color: '#94a3b8' }}>
-                      Gửi lúc: {c.createdAt || 'Hôm nay'}
+                      GPLX: {c.driverLicense || 'Chưa có'}
                     </div>
                   </div>
                 );
@@ -176,7 +207,7 @@ export const VerificationQueue: React.FC = () => {
             {selectedCustomer ? (
               <Card
                 title={
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
                     <div>
                       <span style={{ fontSize: '15px', fontWeight: 700 }}>Chi tiết Hồ sơ: {selectedCustomer.name}</span>
                       <Tag color="blue" style={{ marginLeft: '8px' }}>#{selectedCustomer.id}</Tag>
@@ -185,6 +216,7 @@ export const VerificationQueue: React.FC = () => {
                       <Button
                         type="primary"
                         icon={<CheckOutlined />}
+                        loading={actionLoading}
                         onClick={handleApprove}
                         style={{ borderRadius: '8px', background: '#16a34a', borderColor: '#16a34a', fontWeight: 600 }}
                       >
@@ -193,6 +225,7 @@ export const VerificationQueue: React.FC = () => {
                       <Button
                         danger
                         icon={<CloseOutlined />}
+                        loading={actionLoading}
                         onClick={() => setRejectModalVisible(true)}
                         style={{ borderRadius: '8px', fontWeight: 600 }}
                       >
@@ -205,51 +238,65 @@ export const VerificationQueue: React.FC = () => {
               >
                 {/* Customer Metadata */}
                 <Row gutter={[16, 16]} style={{ marginBottom: '20px' }}>
-                  <Col span={8}>
+                  <Col xs={12} sm={6}>
                     <Text type="secondary">Họ và tên:</Text>
-                    <div style={{ fontWeight: 700, fontSize: '14px' }}>{selectedCustomer.name}</div>
+                    <div style={{ fontWeight: 700, fontSize: '14px', color: '#0f172a' }}>{selectedCustomer.name}</div>
                   </Col>
-                  <Col span={8}>
+                  <Col xs={12} sm={6}>
                     <Text type="secondary">Số điện thoại:</Text>
-                    <div style={{ fontWeight: 600 }}>{selectedCustomer.phone}</div>
+                    <div style={{ fontWeight: 600 }}>{selectedCustomer.phone || 'Chưa có'}</div>
                   </Col>
-                  <Col span={8}>
-                    <Text type="secondary">Hạng GPLX & Số hiệu:</Text>
-                    <div style={{ fontWeight: 700, color: '#1e3a8a' }}>{selectedCustomer.driverLicense || 'B2 - 012345678901'}</div>
+                  <Col xs={12} sm={6}>
+                    <Text type="secondary">Số CCCD / Hộ chiếu:</Text>
+                    <div style={{ fontWeight: 700, color: '#0f172a' }}>{selectedCustomer.idCard || 'Chưa có'}</div>
+                  </Col>
+                  <Col xs={12} sm={6}>
+                    <Text type="secondary">Số hiệu GPLX:</Text>
+                    <div style={{ fontWeight: 700, color: '#1e3a8a' }}>{selectedCustomer.driverLicense || 'Chưa có'}</div>
                   </Col>
                 </Row>
 
                 <Divider style={{ margin: '14px 0' }} />
 
-                {/* License Images for OCR/Inspection */}
+                {/* Document Images for OCR/Inspection */}
                 <Title level={5} style={{ fontSize: '14px', marginBottom: '14px' }}>
-                  Hình ảnh Giấy phép Lái xe (GPLX)
+                  Hình ảnh Căn cước công dân & Giấy phép lái xe (GPLX)
                 </Title>
 
-                <Row gutter={[20, 20]}>
-                  <Col span={12}>
-                    <Card
-                      size="small"
-                      title="Mặt trước GPLX"
-                      style={{ borderRadius: '8px', overflow: 'hidden', textAlign: 'center' }}
-                    >
+                <Row gutter={[16, 16]}>
+                  <Col xs={24} sm={12}>
+                    <Card size="small" title="Mặt trước GPLX" style={{ borderRadius: '8px', textAlign: 'center' }}>
                       <img
-                        src={selectedCustomer.frontImage || "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&auto=format&fit=crop&q=60"}
+                        src={selectedCustomer.licenseFront || selectedCustomer.frontImage || 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&auto=format&fit=crop&q=60'}
                         alt="GPLX Front"
-                        style={{ width: '100%', height: '220px', objectFit: 'cover', borderRadius: '6px' }}
+                        style={{ width: '100%', height: '180px', objectFit: 'cover', borderRadius: '6px' }}
                       />
                     </Card>
                   </Col>
-                  <Col span={12}>
-                    <Card
-                      size="small"
-                      title="Mặt sau GPLX"
-                      style={{ borderRadius: '8px', overflow: 'hidden', textAlign: 'center' }}
-                    >
+                  <Col xs={24} sm={12}>
+                    <Card size="small" title="Mặt sau GPLX" style={{ borderRadius: '8px', textAlign: 'center' }}>
                       <img
-                        src={selectedCustomer.backImage || "https://images.unsplash.com/photo-1554224154-26032ffc0d07?w=600&auto=format&fit=crop&q=60"}
+                        src={selectedCustomer.licenseBack || selectedCustomer.backImage || 'https://images.unsplash.com/photo-1554224154-26032ffc0d07?w=600&auto=format&fit=crop&q=60'}
                         alt="GPLX Back"
-                        style={{ width: '100%', height: '220px', objectFit: 'cover', borderRadius: '6px' }}
+                        style={{ width: '100%', height: '180px', objectFit: 'cover', borderRadius: '6px' }}
+                      />
+                    </Card>
+                  </Col>
+                  <Col xs={24} sm={12}>
+                    <Card size="small" title="Mặt trước CCCD" style={{ borderRadius: '8px', textAlign: 'center' }}>
+                      <img
+                        src={selectedCustomer.citizenFront || 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&auto=format&fit=crop&q=60'}
+                        alt="CCCD Front"
+                        style={{ width: '100%', height: '180px', objectFit: 'cover', borderRadius: '6px' }}
+                      />
+                    </Card>
+                  </Col>
+                  <Col xs={24} sm={12}>
+                    <Card size="small" title="Mặt sau CCCD" style={{ borderRadius: '8px', textAlign: 'center' }}>
+                      <img
+                        src={selectedCustomer.citizenBack || 'https://images.unsplash.com/photo-1554224154-26032ffc0d07?w=600&auto=format&fit=crop&q=60'}
+                        alt="CCCD Back"
+                        style={{ width: '100%', height: '180px', objectFit: 'cover', borderRadius: '6px' }}
                       />
                     </Card>
                   </Col>
@@ -268,6 +315,7 @@ export const VerificationQueue: React.FC = () => {
         open={rejectModalVisible}
         onCancel={() => setRejectModalVisible(false)}
         onOk={handleRejectConfirm}
+        confirmLoading={actionLoading}
         okText="Xác nhận từ chối"
         okButtonProps={{ danger: true }}
         cancelText="Hủy"

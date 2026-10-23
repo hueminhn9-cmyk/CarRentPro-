@@ -13,8 +13,8 @@ router.get('/:id', BookingController.getBookingById);
 router.put('/:id', BookingController.updateBooking);
 router.delete('/:id', authorize('ADMIN'), BookingController.deleteBooking);
 
-// Admin & Manager: status change and handover creation
+// Admin & Manager: status change; Manager only: physical handover creation
 router.put('/:id/status', authorize('ADMIN', 'MANAGER'), BookingController.updateStatus);
-router.post('/:id/handover', authorize('ADMIN', 'MANAGER'), BookingController.createHandover);
+router.post('/:id/handover', authorize('MANAGER'), BookingController.createHandover);
 
 export default router;
